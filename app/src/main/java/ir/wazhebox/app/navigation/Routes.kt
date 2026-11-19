@@ -17,7 +17,7 @@ data class ReviewRoute(val freePractice: Boolean = false)
 data class WordDetailRoute(val wordId: Long)
 
 @Serializable
-data object AddWordRoute
+data class AddWordRoute(val wordId: Long = 0)
 
 @Serializable
 data object LibraryRoute
@@ -27,9 +27,6 @@ data object StatsRoute
 
 @Serializable
 data object SettingsRoute
-
-@Serializable
-data object SessionSummaryRoute
 
 @Serializable
 data object DataTransferRoute

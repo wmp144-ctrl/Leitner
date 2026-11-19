@@ -47,6 +47,7 @@
     <string name="home_quick_add">افزودن سریع لغت</string>
     <string name="home_new_learning">در حال یادگیری</string>
     <string name="home_box_summary">جعبه‌ها</string>
+    <string name="home_words_label">لغت</string>
     <string name="home_empty">اولین لغتت را اضافه کن</string>
     <string name="home_empty_hint">می‌توانی از دک آمادهٔ ۵۰۰ کلمه‌ای شروع کنی یا لغت خودت را وارد کنی.</string>
     <string name="home_add_starter">افزودن از دک آماده</string>
