@@ -240,10 +240,18 @@ fun ReviewScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) { Text(stringResource(R.string.review_show_answer)) }
         } else {
+            val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
             RatingRow(
                 previews = state.intervalPreviews,
                 suggested = state.grade?.suggestedRating,
-                onRate = viewModel::rate,
+                onRate = { rating ->
+                    if (state.hapticsEnabled) {
+                        haptics.performHapticFeedback(
+                            androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm,
+                        )
+                    }
+                    viewModel.rate(rating)
+                },
             )
         }
     }

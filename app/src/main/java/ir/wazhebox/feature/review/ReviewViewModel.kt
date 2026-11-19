@@ -42,6 +42,7 @@ data class ReviewUiState(
     val saveError: Boolean = false,
     val clockAnomaly: Boolean = false,
     val empty: Boolean = false,
+    val hapticsEnabled: Boolean = true,
 )
 
 @HiltViewModel
@@ -222,6 +223,7 @@ class ReviewViewModel @Inject constructor(
             desiredRetention = settings.desiredRetention,
             maximumIntervalDays = settings.maximumIntervalDays,
         )
+        _state.value = _state.value.copy(hapticsEnabled = settings.hapticsEnabled)
     }
 
     fun undo() {
