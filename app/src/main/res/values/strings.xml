@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">واژه‌باکس</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">خانه</string>
+    <string name="nav_library">کتابخانه</string>
+    <string name="nav_stats">آمار</string>
+    <string name="nav_settings">تنظیمات</string>
+    <string name="action_add_word">افزودن لغت</string>
+    <string name="action_back">بازگشت</string>
+    <string name="action_next">بعدی</string>
+    <string name="action_done">تمام</string>
+    <string name="action_cancel">انصراف</string>
+    <string name="action_save">ذخیره</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_edit">ویرایش</string>
+    <string name="action_retry">تلاش دوباره</string>
+    <string name="action_start_review">شروع مرور</string>
+    <string name="action_continue">ادامه</string>
+    <string name="action_skip">رد کردن</string>
+    <string name="action_close">بستن</string>
+    <string name="action_undo">بازگردانی</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_minutes_title">چند دقیقه در روز؟</string>
+    <string name="onboarding_minutes_subtitle">ما سقف کارت روزانه را بر همین اساس تنظیم می‌کنیم.</string>
+    <string name="onboarding_minutes_5">۵ دقیقه</string>
+    <string name="onboarding_minutes_10">۱۰ دقیقه</string>
+    <string name="onboarding_minutes_20">۲۰ دقیقه</string>
+    <string name="onboarding_level_title">سطحت چیست؟</string>
+    <string name="onboarding_level_subtitle">بر اساس سطح، لغات مناسب از دک آماده اضافه می‌شود.</string>
+    <string name="onboarding_level_beginner">تازه‌کار</string>
+    <string name="onboarding_level_intermediate">متوسط</string>
+    <string name="onboarding_level_advanced">پیشرفته</string>
+    <string name="onboarding_ready_title">آماده‌ای؟</string>
+    <string name="onboarding_ready_subtitle">اولین جلسهٔ ۱۰ کارتی منتظرت است.</string>
+    <string name="onboarding_start">شروع اولین جلسه</string>
+    <string name="onboarding_sound_later">تست صدا و اعلان بعد از جلسهٔ اول انجام می‌شود.</string>
+
+    <!-- Home -->
+    <string name="home_greeting">سلام</string>
+    <string name="home_today_remaining">%1$s کارت برای امروز</string>
+    <string name="home_today_done">امروز تمام شد ✓</string>
+    <string name="home_next_due">مرور بعدی: %1$s</string>
+    <string name="home_start_session">شروع مرور</string>
+    <string name="home_quick_add">افزودن سریع لغت</string>
+    <string name="home_new_learning">در حال یادگیری</string>
+    <string name="home_box_summary">جعبه‌ها</string>
+    <string name="home_empty">اولین لغتت را اضافه کن</string>
+    <string name="home_empty_hint">می‌توانی از دک آمادهٔ ۵۰۰ کلمه‌ای شروع کنی یا لغت خودت را وارد کنی.</string>
+    <string name="home_add_starter">افزودن از دک آماده</string>
+    <string name="home_free_practice">تمرین آزاد</string>
+    <string name="home_free_practice_hint">تمرین آزاد روی زمان‌بندی اثری ندارد.</string>
+
+    <!-- Review -->
+    <string name="review_direction_en_fa">انگلیسی ← فارسی</string>
+    <string name="review_direction_fa_en">فارسی ← انگلیسی</string>
+    <string name="review_direction_cloze">جای خالی در جمله</string>
+    <string name="review_show_answer">نمایش پاسخ</string>
+    <string name="review_remaining">%1$s مانده</string>
+    <string name="review_box">جعبهٔ %1$s</string>
+    <string name="review_answer_hint">معنی یا ترجمه را بنویس</string>
+    <string name="review_check">بررسی</string>
+    <string name="review_rating_again">فراموش کردم</string>
+    <string name="review_rating_hard">سخت بود</string>
+    <string name="review_rating_good">خوب بود</string>
+    <string name="review_rating_easy">راحت بود</string>
+    <string name="review_correct">درست</string>
+    <string name="review_typo">درست، فقط املایش: %1$s</string>
+    <string name="review_wrong">پاسخ درست: %1$s</string>
+    <string name="review_keyboard_wrong">کیبورد فارسی است. کیبورد انگلیسی را روشن کن.</string>
+    <string name="review_speak">تلفظ کلمه</string>
+    <string name="review_tts_missing">صدای انگلیسی روی این گوشی نصب نیست</string>
+    <string name="review_install_tts">نصب صدای انگلیسی</string>
+    <string name="review_example">مثال</string>
+    <string name="review_exit_title">جلسه ذخیره شود؟</string>
+    <string name="review_exit_message">%1$s کارت باقی مانده. پیشرفتت ذخیره می‌شود.</string>
+    <string name="review_word_deleted">این لغت حذف شد</string>
+    <string name="review_save_error">ذخیره نشد، دوباره تلاش کن</string>
+    <string name="review_empty_today">امروز تمام شد ✓</string>
+    <string name="review_early_fa_en">اول باید کلمه را بشناسی؛ اگر سخت بود، «نمایش پاسخ» را بزن.</string>
+    <string name="review_leech_hint">این کلمه سخت است. با جمله تمرین کنیم؟</string>
+    <string name="review_add_sentence">افزودن جمله</string>
+
+    <!-- Session summary -->
+    <string name="summary_title">جلسه تمام شد</string>
+    <string name="summary_reviewed">%1$s کارت مرور شد</string>
+    <string name="summary_correct">%1$s پاسخ درست</string>
+    <string name="summary_time">%1$s دقیقه</string>
+    <string name="summary_tomorrow">فردا %1$s کارت منتظرت است</string>
+    <string name="summary_back_home">بازگشت به خانه</string>
+
+    <!-- Library -->
+    <string name="library_title">کتابخانه</string>
+    <string name="library_search_hint">جست‌وجوی کلمه یا معنی</string>
+    <string name="library_filter_box">جعبه</string>
+    <string name="library_filter_state">وضعیت</string>
+    <string name="library_filter_state_learning">در حال یادگیری</string>
+    <string name="library_filter_state_review">تثبیت‌شده</string>
+    <string name="library_filter_state_suspended">معلق</string>
+    <string name="library_filter_hard">سخت‌ها</string>
+    <string name="library_sort">مرتب‌سازی</string>
+    <string name="library_sort_newest">تازه‌ترین</string>
+    <string name="library_sort_due">نزدیک‌ترین مرور</string>
+    <string name="library_sort_lapses">بیشترین افت</string>
+    <string name="library_sort_alphabet">الفبا</string>
+    <string name="library_empty">هنوز لغتی نداری</string>
+    <string name="library_empty_search">چیزی پیدا نشد</string>
+    <string name="library_selected">%1$s انتخاب شد</string>
+    <string name="library_suspend">معلق کردن</string>
+    <string name="library_unsuspend">فعال کردن</string>
+    <string name="library_due_today">امروز</string>
+    <string name="library_due_tomorrow">فردا</string>
+    <string name="library_due_in_days">%1$s روز</string>
+
+    <!-- Word add/edit -->
+    <string name="word_term">لغت انگلیسی</string>
+    <string name="word_meaning">معنی فارسی</string>
+    <string name="word_meaning_hint">چند معنی را با | جدا کن</string>
+    <string name="word_pos">نوع کلمه</string>
+    <string name="word_ipa">تلفظ (IPA)</string>
+    <string name="word_example_en">جملهٔ مثال</string>
+    <string name="word_example_fa">ترجمهٔ جمله</string>
+    <string name="word_notes">یادداشت</string>
+    <string name="word_tags">برچسب‌ها</string>
+    <string name="word_tags_hint">با کاما جدا کن</string>
+    <string name="word_deck">دک</string>
+    <string name="word_add_title">افزودن لغت</string>
+    <string name="word_edit_title">ویرایش لغت</string>
+    <string name="word_add_and_next">افزودن و بعدی</string>
+    <string name="word_error_term_required">لغت انگلیسی را وارد کن</string>
+    <string name="word_error_meaning_required">معنی فارسی را وارد کن</string>
+    <string name="word_error_too_long">حداکثر ۱۲۰ نویسه</string>
+    <string name="word_duplicate_warning">این لغت در همین دک هست. ادامه می‌دهی؟</string>
+    <string name="word_duplicate_continue">ادامه</string>
+    <string name="word_duplicate_edit_existing">ویرایش موجود</string>
+    <string name="word_saved">ذخیره شد</string>
+    <string name="word_deleted">حذف شد</string>
+    <string name="word_delete_confirm">این لغت و تاریخچهٔ مرورش حذف شود؟</string>
+    <string name="word_pos_noun">اسم</string>
+    <string name="word_pos_verb">فعل</string>
+    <string name="word_pos_adj">صفت</string>
+    <string name="word_pos_adv">قید</string>
+    <string name="word_pos_phrase">عبارت</string>
+    <string name="word_pos_preposition">حرف اضافه</string>
+    <string name="word_pos_other">دیگر</string>
+
+    <!-- Word detail -->
+    <string name="detail_title">جزئیات لغت</string>
+    <string name="detail_cards">کارت‌ها</string>
+    <string name="detail_reviews">مرورها</string>
+    <string name="detail_lapses">افت‌ها</string>
+    <string name="detail_due">مرور بعدی</string>
+    <string name="detail_created">تاریخ افزودن</string>
+    <string name="detail_suspend">معلق کردن</string>
+    <string name="detail_unsuspend">فعال کردن</string>
+    <string name="detail_add_sentence">افزودن جملهٔ مثال</string>
+
+    <!-- Stats -->
+    <string name="stats_title">آمار</string>
+    <string name="stats_today">امروز</string>
+    <string name="stats_reviews">مرور</string>
+    <string name="stats_new_words">لغت جدید</string>
+    <string name="stats_correct_rate">نرخ پاسخ درست</string>
+    <string name="stats_retention">یادآوری واقعی</string>
+    <string name="stats_retention_hint">نسبت پاسخ‌های درست در مرورهای با فاصلهٔ بیش از یک روز</string>
+    <string name="stats_last_30">۳۰ روز گذشته</string>
+    <string name="stats_heatmap">فعالیت روزانه</string>
+    <string name="stats_boxes">توزیع جعبه‌ها</string>
+    <string name="stats_no_data">هنوز داده‌ای نیست</string>
+    <string name="stats_suggestion">یادآوری واقعی زیر ۸۰٪ است؛ هدف را به ۸۵٪ کاهش بده.</string>
+    <string name="stats_total_words">%1$s لغت</string>
+    <string name="stats_streak_days">%1$s روز پیوسته</string>
+
+    <!-- Settings -->
+    <string name="settings_title">تنظیمات</string>
+    <string name="settings_daily">برنامهٔ روزانه</string>
+    <string name="settings_new_limit">سقف لغت جدید</string>
+    <string name="settings_review_limit">سقف مرور</string>
+    <string name="settings_retention">هدف یادآوری</string>
+    <string name="settings_retention_value">%1$s٪</string>
+    <string name="settings_max_interval">حداکثر فاصله (روز)</string>
+    <string name="settings_start_hour">شروع روز مطالعه</string>
+    <string name="settings_sound">صدا و تلفظ</string>
+    <string name="settings_speech_rate">سرعت گفتار</string>
+    <string name="settings_speech_slow">آهسته</string>
+    <string name="settings_speech_normal">عادی</string>
+    <string name="settings_speech_fast">سریع</string>
+    <string name="settings_test_sound">تست صدا</string>
+    <string name="settings_haptics">بازخورد لرزشی</string>
+    <string name="settings_reminder">یادآور روزانه</string>
+    <string name="settings_reminder_enable">یادآوری مرور</string>
+    <string name="settings_reminder_time">ساعت یادآوری</string>
+    <string name="settings_reminder_days">روزهای هفته</string>
+    <string name="settings_reminder_quiet">بین ۲۳ تا ۷ صبح اعلانی نمی‌رسد.</string>
+    <string name="settings_data">داده‌ها</string>
+    <string name="settings_import_csv">ورود CSV</string>
+    <string name="settings_export_csv">خروجی CSV</string>
+    <string name="settings_backup">پشتیبان کامل (JSON)</string>
+    <string name="settings_restore">بازیابی از پشتیبان</string>
+    <string name="settings_last_backup">آخرین پشتیبان: %1$s</string>
+    <string name="settings_no_backup">هنوز پشتیبانی نگرفته‌ای</string>
+    <string name="settings_about">دربارهٔ واژه‌باکس</string>
+    <string name="settings_licenses">مجوزها</string>
+    <string name="settings_version">نسخهٔ %1$s</string>
+    <string name="settings_privacy">این اپ هیچ مجوز اینترنتی ندارد و هیچ داده‌ای از گوشی خارج نمی‌شود.</string>
+    <string name="settings_deck_management">دک‌ها</string>
+    <string name="settings_wipe">پاک کردن همهٔ داده‌ها</string>
+    <string name="settings_wipe_confirm">همهٔ لغات، کارت‌ها و تاریخچهٔ مرور پاک شود؟ این کار برگشت‌پذیر نیست.</string>
+
+    <!-- Import / export -->
+    <string name="io_import_title">ورود داده</string>
+    <string name="io_export_title">خروجی داده</string>
+    <string name="io_choose_file">انتخاب فایل</string>
+    <string name="io_import_report">گزارش ورود</string>
+    <string name="io_rows_read">%1$s ردیف خوانده شد</string>
+    <string name="io_words_added">%1$s لغت اضافه شد</string>
+    <string name="io_rows_duplicate">%1$s لغت تکراری بود (رد شد)</string>
+    <string name="io_rows_no_meaning">%1$s ردیف معنی نداشت (رد شد)</string>
+    <string name="io_rows_no_term">%1$s ردیف انگلیسی نداشت (رد شد)</string>
+    <string name="io_rows_invalid">%1$s ردیف نامعتبر بود</string>
+    <string name="io_tags_created">%1$s برچسب جدید ساخته شد</string>
+    <string name="io_download_report">دانلود گزارش</string>
+    <string name="io_restore_mode">نحوهٔ بازیابی</string>
+    <string name="io_restore_merge">ادغام با داده‌های موجود</string>
+    <string name="io_restore_replace">جایگزینی کامل</string>
+    <string name="io_restore_preview">%1$s دک، %2$s لغت، %3$s مرور</string>
+    <string name="io_export_done">فایل ساخته شد: %1$s</string>
+    <string name="io_error_corrupt">فایل خراب است؛ هیچ تغییری انجام نشد.</string>
+    <string name="io_error_version">این فایل با نسخهٔ جدیدتری از اپ ساخته شده است.</string>
+    <string name="io_no_space">فضای کافی نیست</string>
+
+    <!-- Common -->
+    <string name="common_loading">در حال بارگذاری…</string>
+    <string name="common_error">خطایی رخ داد</string>
+    <string name="common_today">امروز</string>
+    <string name="common_yesterday">دیروز</string>
+    <string name="common_tomorrow">فردا</string>
+    <string name="common_not_set">تنظیم نشده</string>
+    <string name="common_on">روشن</string>
+    <string name="common_off">خاموش</string>
+    <string name="common_yes">بله</string>
+    <string name="common_no">نه</string>
+    <string name="common_minutes">%1$s دقیقه</string>
+    <string name="common_seconds">%1$s ثانیه</string>
+    <string name="common_days">%1$s روز</string>
+    <string name="clock_anomaly">تاریخ گوشی تغییر کرده؛ برنامه‌ریزی اصلاح شد.</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_review">مرور روزانه</string>
+    <string name="notification_title">%1$s کارت برای امروز</string>
+    <string name="notification_body">۴ دقیقه وقت کافی است.</string>
+    <string name="notification_snooze">تعویق ۳ ساعت</string>
+
+    <!-- Widget -->
+    <string name="widget_label">واژه‌باکس</string>
+    <string name="widget_description">یک کلمهٔ در حال یادگیری، بدون باز کردن اپ.</string>
+    <string name="widget_today_count">%1$s کارت امروز</string>
+    <string name="widget_review">مرور</string>
+    <string name="widget_next_word">کلمهٔ بعدی</string>
+    <string name="widget_done_today">امروز تمام شد ✓</string>
+    <string name="widget_tap_to_reveal">برای دیدن معنی ضربه بزن</string>
+    <string name="widget_start">شروع</string>
+</resources>
