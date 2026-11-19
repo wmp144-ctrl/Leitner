@@ -1,0 +1,151 @@
+rank,term,meaning_fa,pos,ipa,example_en,example_fa,level
+1,time,زمان|وقت,noun,/taɪm/,Do you have time today?,امروز وقت داری؟,A1
+2,people,مردم,noun,/ˈpiːpl/,People like this song.,مردم این آهنگ را دوست دارند.,A1
+3,year,سال,noun,/jɪr/,It was a good year.,سال خوبی بود.,A1
+4,day,روز,noun,/deɪ/,Have a nice day.,روز خوبی داشته باشی.,A1
+5,man,مرد,noun,/mæn/,That man is my teacher.,آن مرد معلم من است.,A1
+6,woman,زن,noun,/ˈwʊmən/,The woman is reading.,آن زن در حال خواندن است.,A1
+7,child,کودک|بچه,noun,/tʃaɪld/,The child is asleep.,کودک خواب است.,A1
+8,world,جهان|دنیا,noun,/wɜːrld/,The world is changing.,جهان در حال تغییر است.,A1
+9,school,مدرسه,noun,/skuːl/,I go to school by bus.,با اتوبوس به مدرسه می‌روم.,A1
+10,family,خانواده,noun,/ˈfæməli/,My family lives here.,خانواده‌ام اینجا زندگی می‌کنند.,A1
+11,water,آب,noun,/ˈwɔːtər/,Please give me water.,لطفاً به من آب بده.,A1
+12,food,غذا,noun,/fuːd/,The food is fresh.,غذا تازه است.,A1
+13,book,کتاب,noun,/bʊk/,This book is easy.,این کتاب آسان است.,A1
+14,work,کار کردن|کار,verb,/wɜːrk/,I work every morning.,هر صبح کار می‌کنم.,A1
+15,friend,دوست,noun,/frend/,She is my best friend.,او بهترین دوست من است.,A1
+16,house,خانه,noun,/haʊs/,Their house is small.,خانه‌شان کوچک است.,A1
+17,night,شب,noun,/naɪt/,The night was quiet.,شب آرام بود.,A1
+18,city,شهر,noun,/ˈsɪti/,Tehran is a big city.,تهران شهر بزرگی است.,A1
+19,car,خودرو|ماشین,noun,/kɑːr/,The car is new.,خودرو نو است.,A1
+20,money,پول,noun,/ˈmʌni/,I need some money.,کمی پول لازم دارم.,A1
+21,life,زندگی,noun,/laɪf/,Life is short.,زندگی کوتاه است.,A1
+22,hand,دست,noun,/hænd/,Wash your hands.,دست‌هایت را بشور.,A1
+23,eye,چشم,noun,/aɪ/,Look me in the eye.,به چشمانم نگاه کن.,A1
+24,door,در,noun,/dɔːr/,Close the door, please.,لطفاً در را ببند.,A1
+25,word,کلمه|واژه,noun,/wɜːrd/,I learn ten words a day.,روزی ده کلمه یاد می‌گیرم.,A1
+26,eat,خوردن,verb,/iːt/,We eat at seven.,ساعت هفت غذا می‌خوریم.,A1
+27,drink,نوشیدن,verb,/drɪŋk/,Drink more water.,آب بیشتری بنوش.,A1
+28,go,رفتن,verb,/ɡoʊ/,I go home at five.,ساعت پنج به خانه می‌روم.,A1
+29,come,آمدن,verb,/kʌm/,Come here, please.,لطفاً اینجا بیا.,A1
+30,see,دیدن,verb,/siː/,I can see the sea.,دریا را می‌بینم.,A1
+31,know,دانستن|شناختن,verb,/noʊ/,Do you know her?,او را می‌شناسی؟,A1
+32,want,خواستن,verb,/wɑːnt/,I want a coffee.,یک قهوه می‌خواهم.,A1
+33,need,نیاز داشتن,verb,/niːd/,We need more time.,به وقت بیشتری نیاز داریم.,A1
+34,say,گفتن,verb,/seɪ/,Say it again.,دوباره بگو.,A1
+35,tell,گفتن|تعریف کردن,verb,/tel/,Tell me the truth.,حقیقت را به من بگو.,A1
+36,give,دادن,verb,/ɡɪv/,Give me a minute.,یک لحظه به من وقت بده.,A1
+37,take,گرفتن|بردن,verb,/teɪk/,Take this umbrella.,این چتر را بردار.,A1
+38,find,پیدا کردن,verb,/faɪnd/,I can't find my key.,کلیدم را پیدا نمی‌کنم.,A1
+39,help,کمک کردن,verb,/help/,Can you help me?,می‌توانی کمکم کنی؟,A1
+40,love,عشق|دوست داشتن,verb,/lʌv/,I love this city.,من این شهر را دوست دارم.,A1
+41,like,دوست داشتن,verb,/laɪk/,She likes tea.,او چای دوست دارد.,A1
+42,look,نگاه کردن,verb,/lʊk/,Look at the board.,به تخته نگاه کن.,A1
+43,make,ساختن|درست کردن,verb,/meɪk/,He makes good bread.,او نان خوبی می‌پزد.,A1
+44,use,استفاده کردن,verb,/juːz/,Use a pencil.,از مداد استفاده کن.,A1
+45,open,باز کردن,verb,/ˈoʊpən/,Open the window.,پنجره را باز کن.,A1
+46,close,بستن,verb,/kloʊz/,Close your book.,کتابت را ببند.,A1
+47,big,بزرگ,adj,/bɪɡ/,It is a big room.,اتاق بزرگی است.,A1
+48,small,کوچک,adj,/smɔːl/,She has a small bag.,او کیف کوچکی دارد.,A1
+49,good,خوب,adj,/ɡʊd/,This is a good idea.,این فکر خوبی است.,A1
+50,bad,بد,adj,/bæd/,The weather is bad.,هوا بد است.,A1
+51,new,جدید|نو,adj,/nuː/,I bought a new phone.,یک گوشی نو خریدم.,A1
+52,old,قدیمی|پیر,adj,/oʊld/,This is an old photo.,این عکس قدیمی است.,A1
+53,long,بلند|طولانی,adj,/lɔːŋ/,It was a long day.,روز طولانی‌ای بود.,A1
+54,short,کوتاه,adj,/ʃɔːrt/,Write a short answer.,یک پاسخ کوتاه بنویس.,A1
+55,hot,گرم,adj,/hɑːt/,The tea is hot.,چای گرم است.,A1
+56,cold,سرد,adj,/koʊld/,The water is cold.,آب سرد است.,A1
+57,easy,آسان,adj,/ˈiːzi/,The test was easy.,آزمون آسان بود.,A1
+58,hard,سخت,adj,/hɑːrd/,This question is hard.,این سؤال سخت است.,A1
+59,happy,خوشحال,adj,/ˈhæpi/,She looks happy.,او خوشحال به نظر می‌رسد.,A1
+60,sad,غمگین,adj,/sæd/,The film made me sad.,فیلم مرا غمگین کرد.,A1
+61,always,همیشه,adv,/ˈɔːlweɪz/,He is always late.,او همیشه دیر می‌آید.,A1
+62,never,هرگز,adv,/ˈnevər/,I never drink coffee.,من هرگز قهوه نمی‌نوشم.,A1
+63,often,غالباً,adv,/ˈɔːfn/,We often walk here.,ما غالباً اینجا قدم می‌زنیم.,A1
+64,sometimes,گاهی,adv,/ˈsʌmtaɪmz/,Sometimes I work late.,گاهی دیر کار می‌کنم.,A1
+65,today,امروز,adv,/təˈdeɪ/,Today is Monday.,امروز دوشنبه است.,A1
+66,tomorrow,فردا,adv,/təˈmɑːroʊ/,See you tomorrow.,فردا می‌بینمت.,A1
+67,yesterday,دیروز,adv,/ˈjestərdeɪ/,It rained yesterday.,دیروز باران آمد.,A1
+68,please,لطفاً,adv,/pliːz/,Please sit down.,لطفاً بنشین.,A1
+69,thank,تشکر کردن,verb,/θæŋk/,I thank you for your help.,از کمکت تشکر می‌کنم.,A1
+70,sorry,متأسف,adj,/ˈsɑːri/,I am sorry for the delay.,از تأخیر متأسفم.,A1
+71,week,هفته,noun,/wiːk/,I work four days a week.,هفته‌ای چهار روز کار می‌کنم.,A2
+72,month,ماه,noun,/mʌnθ/,The rent is due this month.,اجاره این ماه سر می‌رسد.,A2
+73,year,سال,noun,/jɪr/,Next year I will travel.,سال بعد سفر می‌کنم.,A2
+74,question,سؤال|پرسش,noun,/ˈkwestʃən/,That is a good question.,سؤال خوبی است.,A2
+75,answer,پاسخ|جواب,noun,/ˈænsər/,I don't know the answer.,پاسخ را نمی‌دانم.,A2
+76,problem,مشکل,noun,/ˈprɑːbləm/,We solved the problem.,مشکل را حل کردیم.,A2
+77,idea,ایده|فکر,noun,/aɪˈdiːə/,I have an idea.,یک ایده دارم.,A2
+78,reason,دلیل,noun,/ˈriːzən/,Give me one reason.,یک دلیل به من بگو.,A2
+79,result,نتیجه,noun,/rɪˈzʌlt/,The result was surprising.,نتیجه شگفت‌آور بود.,A2
+80,change,تغییر|تغییر دادن,noun,/tʃeɪndʒ/,Small changes matter.,تغییرهای کوچک مهم‌اند.,A2
+81,plan,برنامه|برنامه‌ریزی,noun,/plæn/,What is your plan?,برنامه‌ات چیست؟,A2
+82,school year,سال تحصیلی,noun,/skuːl jɪr/,The school year starts in autumn.,سال تحصیلی پاییز شروع می‌شود.,A2
+83,experience,تجربه,noun,/ɪkˈspɪriəns/,She has five years of experience.,او پنج سال تجربه دارد.,A2
+84,language,زبان,noun,/ˈlæŋɡwɪdʒ/,English is a global language.,انگلیسی زبانی جهانی است.,A2
+85,memory,حافظه|خاطره,noun,/ˈmeməri/,He has a good memory.,او حافظهٔ خوبی دارد.,A2
+86,health,سلامت,noun,/helθ/,Sleep matters for health.,خواب برای سلامت مهم است.,A2
+87,exercise,ورزش|تمرین,noun,/ˈeksərsaɪz/,Exercise every morning.,هر صبح ورزش کن.,A2
+88,food shop,فروشگاه مواد غذایی,noun,/fuːd ʃɑːp/,The food shop closes at nine.,فروشگاه مواد غذایی ساعت نه می‌بندد.,A2
+89,travel,سفر کردن,verb,/ˈtrævl/,I travel by train.,با قطار سفر می‌کنم.,A2
+90,arrive,رسیدن,verb,/əˈraɪv/,We arrive at six.,ساعت شش می‌رسیم.,A2
+91,leave,ترک کردن|رفتن,verb,/liːv/,I leave the office at five.,ساعت پنج دفتر را ترک می‌کنم.,A2
+92,borrow,قرض گرفتن,verb,/ˈbɑːroʊ/,Can I borrow your pen?,می‌توانم خودکارت را قرض بگیرم؟,A2
+93,lend,قرض دادن,verb,/lend/,She lent me her car.,او ماشینش را به من قرض داد.,A2
+94,remember,به یاد آوردن,verb,/rɪˈmembər/,I remember your name.,نامت را به یاد دارم.,A2
+95,forget,فراموش کردن,verb,/fərˈɡet/,Don't forget the keys.,کلیدها را فراموش نکن.,A2
+96,understand,فهمیدن,verb,/ˌʌndərˈstænd/,I understand the question.,سؤال را می‌فهمم.,A2
+97,explain,توضیح دادن,verb,/ɪkˈspleɪn/,Please explain it again.,لطفاً دوباره توضیح بده.,A2
+98,decide,تصمیم گرفتن,verb,/dɪˈsaɪd/,We decided to stay.,تصمیم گرفتیم بمانیم.,A2
+99,improve,بهبود دادن,verb,/ɪmˈpruːv/,Reading improves your writing.,خواندن نوشتنت را بهتر می‌کند.,A2
+100,practice,تمرین کردن,verb,/ˈpræktɪs/,Practice every day.,هر روز تمرین کن.,A2
+101,prepare,آماده کردن,verb,/prɪˈper/,I prepared dinner.,شام آماده کردم.,A2
+102,protect,محافظت کردن,verb,/prəˈtekt/,Protect your data.,از داده‌هایت محافظت کن.,A2
+103,provide,فراهم کردن,verb,/prəˈvaɪd/,They provide free lunch.,آن‌ها ناهار رایگان می‌دهند.,A2
+104,receive,دریافت کردن,verb,/rɪˈsiːv/,I received your letter.,نامه‌ات را دریافت کردم.,A2
+105,achieve,دست یافتن|به دست آوردن,verb,/əˈtʃiːv/,She achieved her goal.,او به هدفش رسید.,A2
+106,avoid,اجتناب کردن,verb,/əˈvɔɪd/,Avoid late nights.,از شب‌بیداری پرهیز کن.,A2
+107,allow,اجازه دادن,verb,/əˈlaʊ/,Smoking is not allowed.,سیگار کشیدن مجاز نیست.,A2
+108,suggest,پیشنهاد دادن,verb,/səɡˈdʒest/,I suggest a short break.,یک استراحت کوتاه پیشنهاد می‌کنم.,A2
+109,describe,توصیف کردن,verb,/dɪˈskraɪb/,Describe the picture.,تصویر را توصیف کن.,A2
+110,compare,مقایسه کردن,verb,/kəmˈper/,Compare the two texts.,دو متن را مقایسه کن.,A2
+111,reliable,قابل اعتماد,adj,/rɪˈlaɪəbl/,He is a reliable friend.,او دوست قابل اعتمادی است.,A2
+112,similar,مشابه,adj,/ˈsɪmələr/,The two words are similar.,این دو کلمه مشابه‌اند.,A2
+113,possible,ممکن,adj,/ˈpɑːsəbl/,It is possible with practice.,با تمرین ممکن است.,A2
+114,important,مهم,adj,/ɪmˈpɔːrtnt/,Sleep is important.,خواب مهم است.,A2
+115,difficult,دشوار,adj,/ˈdɪfɪkəlt/,The passage was difficult.,متن دشوار بود.,A2
+116,useful,مفید,adj,/ˈjuːsfl/,This app is useful.,این اپ مفید است.,A2
+117,careful,مراقب|دقیق,adj,/ˈkerfl/,Be careful with the glass.,مراقب شیشه باش.,A2
+118,famous,مشهور,adj,/ˈfeɪməs/,She is a famous writer.,او نویسندهٔ مشهوری است.,A2
+119,quiet,آرام|ساکت,adj,/ˈkwaɪət/,The street is quiet.,خیابان آرام است.,A2
+120,crowded,شلوغ,adj,/ˈkraʊdɪd/,The bus was crowded.,اتوبوس شلوغ بود.,A2
+121,especially,به‌ویژه,adv,/ɪˈspeʃəli/,Especially on Fridays.,به‌ویژه جمعه‌ها.,A2
+122,probably,احتمالاً,adv,/ˈprɑːbəbli/,He is probably at home.,او احتمالاً خانه است.,A2
+123,however,با این حال,adv,/haʊˈevər/,However, I disagree.,با این حال موافق نیستم.,A2
+124,therefore,بنابراین,adv,/ˈðerfɔːr/,It rained; therefore we stayed.,باران آمد؛ بنابراین ماندیم.,A2
+125,instead,به جای آن,adv,/ɪnˈsted/,Use tea instead.,به جایش چای بنوش.,A2
+126,although,اگرچه,conj,/ɔːlˈðoʊ/,Although tired, she ran.,اگرچه خسته بود، دوید.,A2
+127,unless,مگر اینکه,conj,/ənˈles/,Don't go unless necessary.,مگر لازم باشد نرو.,A2
+128,while,در حالی که,conj,/waɪl/,He called while I studied.,وقتی درس می‌خواندم زنگ زد.,A2
+129,amount,مقدار,noun,/əˈmaʊnt/,A small amount is enough.,مقدار کمی کافی است.,B1
+130,ability,توانایی,noun,/əˈbɪləti/,She has the ability to lead.,او توانایی رهبری را دارد.,B1
+131,approach,رویکرد|نزدیک شدن,noun,/əˈproʊtʃ/,A practical approach works.,یک رویکرد عملی جواب می‌دهد.,B1
+132,benefit,سود|فایده,noun,/ˈbenɪfɪt/,Daily review has benefits.,مرور روزانه فایده دارد.,B1
+133,challenge,چالش,noun,/ˈtʃælɪndʒ/,Learning a language is a challenge.,یادگیری زبان یک چالش است.,B1
+134,concept,مفهوم,noun,/ˈkɑːnsept/,The concept is simple.,مفهوم ساده است.,B1
+135,context,بافت|زمینه,noun,/ˈkɑːntekst/,Words are easier in context.,کلمات در بافت آسان‌ترند.,B1
+136,evidence,شواهد,noun,/ˈevɪdəns/,There is no evidence for it.,شواهدی برای آن نیست.,B1
+137,factor,عامل,noun,/ˈfæktər/,Sleep is a key factor.,خواب عامل کلیدی است.,B1
+138,feature,ویژگی,noun,/ˈfiːtʃər/,This feature saves time.,این ویژگی وقت ذخیره می‌کند.,B1
+139,goal,هدف,noun,/ɡoʊl/,My goal is fluency.,هدفم روانی است.,B1
+140,impact,اثر|تأثیر,noun,/ˈɪmpækt/,Small habits have impact.,عادت‌های کوچک اثر دارند.,B1
+141,issue,مسئله|موضوع,noun,/ˈɪʃuː/,That is a separate issue.,آن مسئلهٔ جداگانه‌ای است.,B1
+142,method,روش,noun,/ˈmeθəd/,This method is tested.,این روش آزموده شده است.,B1
+143,progress,پیشرفت,noun,/ˈprɑːɡres/,I see progress every week.,هر هفته پیشرفت می‌بینم.,B1
+144,purpose,هدف|منظور,noun,/ˈpɜːrpəs/,The purpose is retention.,هدف، ماندگاری است.,B1
+145,research,پژوهش,noun,/rɪˈsɜːrtʃ/,The research supports it.,پژوهش آن را تأیید می‌کند.,B1
+146,source,منبع,noun,/sɔːrs/,Find a reliable source.,یک منبع معتبر پیدا کن.,B1
+147,structure,ساختار,noun,/ˈstrʌktʃər/,Learn the sentence structure.,ساختار جمله را یاد بگیر.,B1
+148,tendency,گرایش,noun,/ˈtendənsi/,We have a tendency to forget.,ما گرایش داریم فراموش کنیم.,B1
+149,accurate,دقیق,adj,/ˈækjərət/,The schedule is accurate.,زمان‌بندی دقیق است.,B1
+150,effective,مؤثر,adj,/ɪˈfektɪv/,Spaced review is effective.,مرور فاصله‌دار مؤثر است.,B1

@@ -1,0 +1,276 @@
+package ir.wazhebox.data.repo
+
+import androidx.room.withTransaction
+import ir.wazhebox.core.time.StudyClock
+import ir.wazhebox.core.time.StudyDays
+import ir.wazhebox.data.db.CardEntity
+import ir.wazhebox.data.db.DailyStatEntity
+import ir.wazhebox.data.db.ReviewEntity
+import ir.wazhebox.data.db.WazheBoxDatabase
+import ir.wazhebox.data.settings.SettingsRepository
+import ir.wazhebox.domain.model.Card
+import ir.wazhebox.domain.model.CardState
+import ir.wazhebox.domain.model.Direction
+import ir.wazhebox.domain.model.Rating
+import ir.wazhebox.domain.model.StudyItem
+import ir.wazhebox.domain.model.Verdict
+import ir.wazhebox.domain.repo.GradeOutcome
+import ir.wazhebox.domain.repo.StudyRepository
+import ir.wazhebox.domain.repo.Workload
+import ir.wazhebox.domain.scheduler.ScheduleResult
+import ir.wazhebox.domain.scheduler.Scheduler
+import ir.wazhebox.domain.scheduler.SchedulerConfig
+import ir.wazhebox.domain.session.SessionBuilder
+import ir.wazhebox.domain.session.SessionConfig
+import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
+
+/**
+ * Review persistence: one transaction writes the review log, the card and the
+ * daily counters, then decides whether the reverse (FA→EN) card has unlocked.
+ */
+@Singleton
+class StudyRepositoryImpl @Inject constructor(
+    private val db: WazheBoxDatabase,
+    private val settingsRepository: SettingsRepository,
+    private val clock: StudyClock,
+) : StudyRepository {
+
+    private val wordDao = db.wordDao()
+    private val cardDao = db.cardDao()
+    private val reviewDao = db.reviewDao()
+    private val statsDao = db.statsDao()
+
+    private suspend fun sessionConfig(freePractice: Boolean): Pair<SessionConfig, SchedulerConfig> {
+        val settings = settingsRepository.settings.first()
+        val now = clock.now()
+        val day = StudyDays.studyDayOf(now, clock.timeZone(), settings.studyDayStartHour).toString()
+        val stat = statsDao.forDay(day)
+        return SessionConfig(
+            dailyReviewLimit = settings.dailyReviewLimit,
+            dailyNewLimit = settings.dailyNewLimit,
+            newIntroducedToday = stat?.newIntroduced ?: 0,
+            freePractice = freePractice,
+        ) to SchedulerConfig(
+            desiredRetention = settings.desiredRetention,
+            maximumIntervalDays = settings.maximumIntervalDays,
+        )
+    }
+
+    private suspend fun liveItems(freePractice: Boolean): List<StudyItem> =
+        wordDao.allWithCards().mapNotNull { row ->
+            val word = row.word.toDomain()
+            if (word.suspended) return@mapNotNull null
+            val cards = row.cards.filter { it.state != CardState.SUSPENDED.name }
+            if (cards.isEmpty()) return@mapNotNull null
+            // EN_FA is the recognition card; the reverse card joins once unlocked.
+            val primary = cards.firstOrNull { it.direction == Direction.EN_FA.name }
+                ?: cards.minByOrNull { it.dueAt }
+                ?: return@mapNotNull null
+            StudyItem(word = word, card = primary.toDomain())
+        }
+
+    override suspend fun buildSession(freePractice: Boolean): List<StudyItem> {
+        val (sessionConfig, _) = sessionConfig(freePractice)
+        val items = if (freePractice) {
+            allDirections(freePractice = true)
+        } else {
+            liveItems(freePractice = false)
+        }
+        return SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
+    }
+
+    private suspend fun allDirections(freePractice: Boolean): List<StudyItem> =
+        wordDao.allWithCards().flatMap { row ->
+            val word = row.word.toDomain()
+            if (word.suspended) return@flatMap emptyList()
+            row.cards
+                .filter { it.state != CardState.SUSPENDED.name }
+                .map { StudyItem(word, it.toDomain()) }
+        }
+
+    override suspend fun workload(freePractice: Boolean): Workload {
+        val (sessionConfig, _) = sessionConfig(freePractice)
+        val items = liveItems(freePractice)
+        val queue = SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
+        return Workload(
+            dueCount = queue.size,
+            nextDueAt = SessionBuilder.nextDue(items),
+            totalWords = wordDao.count(),
+            newCount = items.count { it.card.state == CardState.NEW },
+            learningCount = items.count {
+                it.card.state == CardState.LEARNING || it.card.state == CardState.RELEARNING
+            },
+            reviewCount = items.count { it.card.state == CardState.REVIEW },
+        )
+    }
+
+    override suspend fun grade(
+        cardId: Long,
+        rating: Rating,
+        verdict: Verdict?,
+        answerText: String?,
+        durationMs: Long,
+    ): GradeOutcome? = db.withTransaction {
+        val entity = cardDao.byId(cardId) ?: return@withTransaction null
+        val before = entity.toDomain()
+        val (_, schedulerConfig) = sessionConfig(freePractice = false)
+        val settings = settingsRepository.settings.first()
+        val now = clock.now()
+        val result = Scheduler.schedule(before, rating, now, schedulerConfig)
+
+        val nextReps = before.reps + 1
+        val lapses = before.lapses +
+            if (rating == Rating.AGAIN && before.state == CardState.REVIEW) 1 else 0
+
+        val reviewId = reviewDao.insert(
+            ReviewEntity(
+                cardId = cardId,
+                reviewedAt = now.toEpochMillis(),
+                rating = rating.grade,
+                answerText = answerText,
+                verdict = verdict?.name,
+                durationMs = durationMs,
+                prevState = before.state.name,
+                prevStability = before.stability,
+                prevDifficulty = before.difficulty,
+                nextState = result.state.name,
+                nextStability = result.stability,
+                nextDifficulty = result.difficulty,
+                elapsedDays = result.elapsedDays,
+                scheduledDays = result.intervalDays,
+            ),
+        )
+
+        val updated = entity.copy(
+            state = result.state.name,
+            dueAt = result.dueAt.toEpochMillis(),
+            stability = result.stability,
+            difficulty = result.difficulty,
+            stepIndex = result.stepIndex,
+            reps = nextReps,
+            lapses = lapses,
+            lastReviewAt = now.toEpochMillis(),
+        )
+        cardDao.update(updated)
+
+        recordDailyStats(
+            now = now,
+            reviews = 1,
+            newWords = if (before.state == CardState.NEW) 1 else 0,
+            correct = if (rating != Rating.AGAIN) 1 else 0,
+            totalMs = durationMs,
+            startHour = settings.studyDayStartHour,
+        )
+
+        val faEnCreated = maybeCreateReverseCard(before, result, nextReps, now)
+
+        GradeOutcome(
+            card = updated.toDomain(),
+            reviewId = reviewId,
+            cardBefore = before,
+            rating = rating,
+            wasNew = before.state == CardState.NEW,
+            leechSuggestion = lapses >= (if (schedulerConfig.leechThreshold > 0) schedulerConfig.leechThreshold else 4),
+            faEnCardCreated = faEnCreated,
+            clockAnomaly = result.clockAnomaly,
+        )
+    }
+
+    /** PRD §10.1: reverse card unlocks at REVIEW with at least two reps. */
+    private suspend fun maybeCreateReverseCard(
+        before: Card,
+        result: ScheduleResult,
+        reps: Int,
+        now: Instant,
+    ): Boolean {
+        if (before.direction != Direction.EN_FA) return false
+        if (result.state != CardState.REVIEW || reps < 2) return false
+        val existing = cardDao.forWord(before.wordId)
+        if (existing.any { it.direction == Direction.FA_EN.name }) return false
+        cardDao.insertIgnore(
+            listOf(
+                CardEntity(
+                    wordId = before.wordId,
+                    direction = Direction.FA_EN.name,
+                    state = CardState.NEW.name,
+                    dueAt = now.toEpochMillis(),
+                    createdAt = now.toEpochMillis(),
+                ),
+            ),
+        )
+        return true
+    }
+
+    override suspend fun undo(outcome: GradeOutcome) {
+        db.withTransaction {
+            reviewDao.markUndone(outcome.reviewId)
+            cardDao.byId(outcome.card.id)?.let { entity ->
+                cardDao.update(
+                    entity.copy(
+                        state = outcome.cardBefore.state.name,
+                        dueAt = outcome.cardBefore.dueAt.toEpochMillis(),
+                        stability = outcome.cardBefore.stability,
+                        difficulty = outcome.cardBefore.difficulty,
+                        stepIndex = outcome.cardBefore.stepIndex,
+                        reps = outcome.cardBefore.reps,
+                        lapses = outcome.cardBefore.lapses,
+                        lastReviewAt = outcome.cardBefore.lastReviewAt?.toEpochMillis(),
+                    ),
+                )
+            }
+            if (outcome.faEnCardCreated) {
+                cardDao.forWord(outcome.cardBefore.wordId)
+                    .firstOrNull {
+                        it.direction == Direction.FA_EN.name && it.state == CardState.NEW.name
+                    }
+                    ?.let { cardDao.delete(it.id) }
+            }
+            val settings = settingsRepository.settings.first()
+            val day = StudyDays.studyDayOf(
+                clock.now(),
+                clock.timeZone(),
+                settings.studyDayStartHour,
+            ).toString()
+            statsDao.decrement(
+                day = day,
+                reviews = 1,
+                newWords = if (outcome.wasNew) 1 else 0,
+                correct = if (outcome.rating != Rating.AGAIN) 1 else 0,
+            )
+        }
+    }
+
+    override suspend fun suspendCard(cardId: Long, suspended: Boolean) {
+        val entity = cardDao.byId(cardId) ?: return
+        val now = clock.now().toEpochMillis()
+        cardDao.update(
+            entity.copy(
+                state = if (suspended) CardState.SUSPENDED.name else CardState.REVIEW.name,
+                dueAt = if (suspended) entity.dueAt else now,
+            ),
+        )
+    }
+
+    override suspend fun stateOfCard(cardId: Long): Card? = cardDao.byId(cardId)?.toDomain()
+
+    override suspend fun nextFreePracticeCard(excludeIds: Set<Long>): StudyItem? =
+        allDirections(freePractice = true)
+            .filter { it.card.id !in excludeIds }
+            .minByOrNull { it.card.dueAt }
+
+    private suspend fun recordDailyStats(
+        now: Instant,
+        reviews: Int,
+        newWords: Int,
+        correct: Int,
+        totalMs: Long,
+        startHour: Int,
+    ) {
+        val day = StudyDays.studyDayOf(now, clock.timeZone(), startHour).toString()
+        statsDao.insertIfAbsent(DailyStatEntity(studyDay = day))
+        statsDao.increment(day, reviews, newWords, correct, totalMs)
+    }
+}
