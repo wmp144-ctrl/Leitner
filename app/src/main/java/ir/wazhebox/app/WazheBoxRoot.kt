@@ -137,8 +137,23 @@ fun WazheBoxRoot(
                     })
                 }
 
-                composable<StatsRoute> { PlaceholderScreen(stringResource(R.string.nav_stats)) }
-                composable<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
+                composable<StatsRoute> { ir.wazhebox.feature.stats.StatsScreen() }
+                composable<SettingsRoute> {
+                    ir.wazhebox.feature.settings.SettingsScreen(
+                        onOpenDataTransfer = { navController.navigate(ir.wazhebox.app.navigation.DataTransferRoute) },
+                        onOpenTts = { navController.navigate(ir.wazhebox.app.navigation.TtsSettingsRoute) },
+                        onOpenAbout = { navController.navigate(ir.wazhebox.app.navigation.AboutRoute) },
+                    )
+                }
+                composable<ir.wazhebox.app.navigation.DataTransferRoute> {
+                    ir.wazhebox.feature.transfer.DataTransferScreen(onBack = { navController.popBackStack() })
+                }
+                composable<ir.wazhebox.app.navigation.TtsSettingsRoute> {
+                    ir.wazhebox.feature.settings.TtsSettingsScreen(onBack = { navController.popBackStack() })
+                }
+                composable<ir.wazhebox.app.navigation.AboutRoute> {
+                    ir.wazhebox.feature.settings.AboutScreen(onBack = { navController.popBackStack() })
+                }
 
                 composable<WordDetailRoute>(
                     deepLinks = listOf(navDeepLink<WordDetailRoute>(basePath = "wazhebox://review")),

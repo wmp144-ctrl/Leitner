@@ -43,6 +43,7 @@ class HomeViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val wordRepository: WordRepository,
     private val seedRepository: SeedRepository,
+    private val widgetUpdater: ir.wazhebox.widget.WidgetUpdater,
 ) : ViewModel() {
 
     private val refresh = MutableStateFlow(0)
@@ -55,6 +56,7 @@ class HomeViewModel @Inject constructor(
         .mapLatest { (_, settings) ->
             val workload = studyRepository.workload()
             val today = statsRepository.today()
+            runCatching { widgetUpdater.refresh() }
             HomeUiState(
                 loading = false,
                 dueCount = workload.dueCount,

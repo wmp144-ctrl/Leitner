@@ -49,6 +49,7 @@ class ReviewViewModel @Inject constructor(
     private val studyRepository: StudyRepository,
     private val settingsRepository: SettingsRepository,
     private val tts: TtsController,
+    private val widgetUpdater: ir.wazhebox.widget.WidgetUpdater,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -171,6 +172,7 @@ class ReviewViewModel @Inject constructor(
         val reviewed = _state.value.reviewed + 1
         val correct = _state.value.correct + if (countCorrect) 1 else 0
         val finished = queue.isEmpty()
+        if (finished) viewModelScope.launch { runCatching { widgetUpdater.refresh() } }
         _state.value = _state.value.copy(
             reviewed = reviewed,
             correct = correct,

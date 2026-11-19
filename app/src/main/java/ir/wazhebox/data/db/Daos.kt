@@ -39,6 +39,9 @@ interface DeckDao {
     @Query("DELETE FROM decks WHERE id = :id")
     suspend fun delete(id: Long)
 
+    @Query("DELETE FROM decks")
+    suspend fun deleteAllRows()
+
     @Query("SELECT COUNT(*) FROM decks")
     suspend fun count(): Int
 }
@@ -90,6 +93,9 @@ interface WordDao {
 
     @Query("DELETE FROM words WHERE id IN (:ids)")
     suspend fun deleteAll(ids: List<Long>)
+
+    @Query("DELETE FROM words")
+    suspend fun deleteAllRows()
 
     @Transaction
     @Query("SELECT * FROM words")

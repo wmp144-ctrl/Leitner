@@ -429,6 +429,23 @@ private fun RatingRow(
     }
 }
 
+/** Asked after the first successful session, never on first launch (PRD §17). */
+@Composable
+private fun NotificationPermissionRequest() {
+    if (android.os.Build.VERSION.SDK_INT < 33) return
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.POST_NOTIFICATIONS,
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        if (!granted) launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
+}
+
 @Composable
 private fun SessionSummary(
     reviewed: Int,
@@ -483,6 +500,7 @@ private fun SessionSummary(
             )
         }
         Spacer(Modifier.weight(1f))
+        NotificationPermissionRequest()
         Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.summary_back_home))
         }

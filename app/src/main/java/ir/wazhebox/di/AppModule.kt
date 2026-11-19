@@ -78,4 +78,10 @@ abstract class RepositoryModule {
     @dagger.Binds
     @Singleton
     abstract fun bindSeedRepository(impl: SeedRepositoryImpl): SeedRepository
+
+    @dagger.Binds
+    @Singleton
+    abstract fun bindDataTransferRepository(
+        impl: ir.wazhebox.data.io.DataTransferRepositoryImpl,
+    ): ir.wazhebox.data.io.DataTransferRepository
 }
