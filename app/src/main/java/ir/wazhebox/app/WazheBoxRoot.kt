@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -15,7 +16,9 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -82,7 +85,17 @@ fun WazheBoxRoot(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar {
+                // A hairline instead of a shadow keeps the bar flat like the
+                // rest of the paper surface (PRD §18.2).
+                Column {
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.10f),
+                    )
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 0.dp,
+                    ) {
                     BottomTab.entries.forEach { tab ->
                         NavigationBarItem(
                             selected = destination?.hierarchy?.any { it.hasRoute(tab.routeClass) } == true,
@@ -99,6 +112,7 @@ fun WazheBoxRoot(
                             label = { Text(stringResource(tab.labelRes)) },
                         )
                     }
+                    }
                 }
             }
         },
@@ -106,6 +120,9 @@ fun WazheBoxRoot(
             if (showFab) {
                 FloatingActionButton(
                     onClick = { navController.navigate(AddWordRoute()) },
+                    shape = MaterialTheme.shapes.large,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.action_add_word))
                 }

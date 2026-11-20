@@ -49,7 +49,7 @@
     <string name="home_box_summary">جعبه‌ها</string>
     <string name="home_words_label">لغت</string>
     <string name="home_empty">اولین لغتت را اضافه کن</string>
-    <string name="home_empty_hint">می‌توانی از دک آمادهٔ ۵۰۰ کلمه‌ای شروع کنی یا لغت خودت را وارد کنی.</string>
+    <string name="home_empty_hint">می‌توانی از دک آمادهٔ همراه اپ شروع کنی یا لغت خودت را وارد کنی.</string>
     <string name="home_add_starter">افزودن از دک آماده</string>
     <string name="home_free_practice">تمرین آزاد</string>
     <string name="home_free_practice_hint">تمرین آزاد روی زمان‌بندی اثری ندارد.</string>
@@ -175,6 +175,7 @@
     <string name="stats_suggestion">یادآوری واقعی زیر ۸۰٪ است؛ هدف را به ۸۵٪ کاهش بده.</string>
     <string name="stats_total_words">%1$s لغت</string>
     <string name="stats_streak_days">%1$s روز پیوسته</string>
+    <string name="stats_streak_label">روز پیوسته</string>
 
     <!-- Settings -->
     <string name="settings_title">تنظیمات</string>
@@ -255,6 +256,17 @@
     <string name="notification_title">%1$s کارت برای امروز</string>
     <string name="notification_body">۴ دقیقه وقت کافی است.</string>
     <string name="notification_snooze">تعویق ۳ ساعت</string>
+
+    <!-- UI v2 -->
+    <string name="home_hero_title">برنامهٔ امروز</string>
+    <string name="home_hero_progress">%1$s از %2$s کارت مرور شده</string>
+    <string name="home_hero_done_note">برای امروز کاری نمانده</string>
+    <string name="home_hero_left">مانده</string>
+    <string name="home_hero_next">مرور بعدی: %1$s</string>
+    <string name="home_boxes_title">توزیع جعبه‌ها</string>
+    <string name="library_count">%1$s لغت</string>
+    <string name="library_filter_all">همه</string>
+    <string name="review_rate_hint">چقدر یادت بود؟</string>
 
     <!-- Widget -->
     <string name="widget_label">واژه‌باکس</string>

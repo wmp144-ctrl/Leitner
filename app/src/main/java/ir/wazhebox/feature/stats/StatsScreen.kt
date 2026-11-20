@@ -13,6 +13,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +34,7 @@ import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
 import ir.wazhebox.core.ui.components.BoxBadge
 import ir.wazhebox.core.ui.components.SectionCard
-import ir.wazhebox.core.ui.components.StatTile
+import ir.wazhebox.core.ui.components.StatCard
 import ir.wazhebox.core.ui.theme.Spacing
 
 @Composable
@@ -55,25 +61,38 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
-                StatTile(
-                    label = stringResource(R.string.stats_reviews),
+                StatCard(
                     value = PersianText.number(today?.reviewsDone ?: 0),
+                    label = stringResource(R.string.stats_reviews),
+                    icon = Icons.Filled.Refresh,
+                    modifier = Modifier.weight(1f),
                 )
-                StatTile(
-                    label = stringResource(R.string.stats_new_words),
+                StatCard(
                     value = PersianText.number(today?.newIntroduced ?: 0),
+                    label = stringResource(R.string.stats_new_words),
+                    icon = Icons.Filled.AddCircle,
+                    modifier = Modifier.weight(1f),
                 )
-                StatTile(
-                    label = stringResource(R.string.stats_correct_rate),
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                StatCard(
                     value = if ((today?.reviewsDone ?: 0) == 0) "—" else PersianText.percent(
                         (today?.correctCount ?: 0).toDouble() / (today?.reviewsDone ?: 1),
                     ),
+                    label = stringResource(R.string.stats_correct_rate),
+                    icon = Icons.Filled.CheckCircle,
+                    modifier = Modifier.weight(1f),
                 )
-                StatTile(
-                    label = stringResource(R.string.stats_streak_days, ""),
+                StatCard(
                     value = PersianText.number(state.streak),
+                    label = stringResource(R.string.stats_streak_label),
+                    icon = Icons.Filled.LocalFireDepartment,
+                    modifier = Modifier.weight(1f),
                 )
             }
         }

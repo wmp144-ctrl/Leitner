@@ -1,20 +1,32 @@
 package ir.wazhebox.feature.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -24,21 +36,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
-import ir.wazhebox.core.ui.dueLabel
-import ir.wazhebox.core.ui.jalaliDayLabel
 import ir.wazhebox.core.ui.components.BoxBadge
 import ir.wazhebox.core.ui.components.EmptyState
-import ir.wazhebox.core.ui.components.SectionCard
-import ir.wazhebox.core.ui.components.StatTile
+import ir.wazhebox.core.ui.components.ProgressRing
+import ir.wazhebox.core.ui.components.StatCard
+import ir.wazhebox.core.ui.dueLabel
+import ir.wazhebox.core.ui.jalaliDayLabel
 import ir.wazhebox.core.ui.theme.Spacing
+import ir.wazhebox.core.ui.theme.accents
+import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 
+/**
+ * Home is a single scrollable "today" page: header, the progress hero card,
+ * three metric cards, the box distribution and the add-word action.
+ * Everything important is above the fold on a small phone.
+ */
 @Composable
 fun HomeScreen(
     onStartReview: () -> Unit,
@@ -47,178 +68,331 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val now = kotlinx.datetime.Clock.System.now()
+    val now = Clock.System.now()
+    val timeZone = TimeZone.currentSystemDefault()
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = Spacing.screen),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = Spacing.lg),
+        contentPadding = PaddingValues(top = Spacing.lg, bottom = Spacing.xxxl),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
         item {
-            Column {
-                Text(
-                    text = stringResource(R.string.home_greeting),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = jalaliDayLabel(now, TimeZone.currentSystemDefault()),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-            }
+            HomeHeader(
+                dateLabel = jalaliDayLabel(now, timeZone),
+                totalWords = state.totalWords,
+            )
         }
 
         item {
-            SectionCard {
-                if (state.dueCount > 0) {
-                    Text(
-                        text = stringResource(
-                            R.string.home_today_remaining,
-                            PersianText.number(state.dueCount),
-                        ),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    Button(
-                        onClick = onStartReview,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Icon(Icons.Filled.PlayArrow, contentDescription = null)
-                        Spacer(Modifier.size(4.dp))
-                        Text(stringResource(R.string.home_start_session))
-                    }
-                } else {
-                    Text(
-                        text = stringResource(R.string.home_today_done),
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                    if (state.nextDueAt != null) {
-                        Text(
-                            text = stringResource(
-                                R.string.home_next_due,
-                                dueLabel(state.nextDueAt, now),
-                            ),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    OutlinedButton(
-                        onClick = onFreePractice,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(R.string.home_free_practice))
-                    }
-                    Text(
-                        text = stringResource(R.string.home_free_practice_hint),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+            TodayHero(
+                state = state,
+                now = now,
+                onStartReview = onStartReview,
+                onFreePractice = onFreePractice,
+            )
         }
 
         if (state.totalWords == 0 && !state.loading) {
             item {
-                EmptyState(
-                    title = stringResource(R.string.home_empty),
-                    message = stringResource(R.string.home_empty_hint),
-                    actionLabel = stringResource(R.string.home_add_starter),
-                    onAction = viewModel::importStarterDeck,
-                )
-                TextButton(
-                    onClick = onAddWord,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.home_quick_add))
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    EmptyState(
+                        title = stringResource(R.string.home_empty),
+                        message = stringResource(R.string.home_empty_hint),
+                        actionLabel = stringResource(R.string.home_add_starter),
+                        onAction = viewModel::importStarterDeck,
+                    )
+                    TextButton(
+                        onClick = onAddWord,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text(stringResource(R.string.home_quick_add))
+                    }
                 }
             }
         } else {
-            item {
-                SectionCard {
-                    Text(
-                        text = stringResource(R.string.stats_title),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        StatTile(
-                            label = stringResource(R.string.home_words_label),
-                            value = PersianText.number(state.totalWords),
-                        )
-                        StatTile(
-                            label = stringResource(R.string.stats_reviews),
-                            value = PersianText.number(state.todayReviews),
-                        )
-                        StatTile(
-                            label = stringResource(R.string.stats_correct_rate),
-                            value = if (state.todayReviews == 0) "—" else PersianText.percent(
-                                state.todayCorrect.toDouble() / state.todayReviews,
-                            ),
-                        )
-                    }
-                }
-            }
-
-            item {
-                SectionCard {
-                    Text(
-                        text = stringResource(R.string.home_box_summary),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        (1..6).forEach { box ->
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                BoxBadge(box = box)
-                                Spacer(Modifier.height(4.dp))
-                                Text(
-                                    text = PersianText.number(state.boxes[box] ?: 0),
-                                    style = MaterialTheme.typography.labelMedium,
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.md),
-                ) {
-                    StatTile(
-                        label = stringResource(R.string.library_filter_state_learning),
-                        value = PersianText.number(state.learningCount),
-                        modifier = Modifier.weight(1f),
-                    )
-                    StatTile(
-                        label = stringResource(R.string.library_filter_state_review),
-                        value = PersianText.number(state.reviewCount),
-                        modifier = Modifier.weight(1f),
-                    )
-                    StatTile(
-                        label = stringResource(R.string.stats_new_words),
-                        value = PersianText.number(state.newCount),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-            }
-
+            item { TodayStats(state) }
+            item { BoxDistribution(state.boxes) }
             item {
                 OutlinedButton(
                     onClick = onAddWord,
                     modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(vertical = Spacing.md),
                 ) {
+                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(Spacing.sm))
                     Text(stringResource(R.string.action_add_word))
                 }
             }
         }
+    }
+}
 
-        item { Box(Modifier.height(Spacing.xxxl)) }
+@Composable
+private fun HomeHeader(dateLabel: String, totalWords: Int) {
+    val colors = MaterialTheme.colorScheme
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.home_greeting),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.onSurfaceVariant,
+            )
+            Text(text = dateLabel, style = MaterialTheme.typography.headlineSmall)
+        }
+        if (totalWords > 0) {
+            Text(
+                text = stringResource(R.string.library_count, PersianText.number(totalWords)),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.onPrimaryContainer,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(colors.primaryContainer.copy(alpha = 0.65f))
+                    .padding(horizontal = Spacing.md, vertical = Spacing.xs),
+            )
+        }
+    }
+}
+
+/**
+ * The hero: a ring with how much of today is done, the count that is still
+ * waiting and the one action that matters. When the day is clear the card
+ * turns into a calm "done" state with the next due date and free practice.
+ */
+@Composable
+private fun TodayHero(
+    state: HomeUiState,
+    now: kotlinx.datetime.Instant,
+    onStartReview: () -> Unit,
+    onFreePractice: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    val done = state.dueCount == 0
+    val total = state.todayReviews + state.dueCount
+    val progress = if (total == 0) 0f else state.todayReviews.toFloat() / total
+    val shape = RoundedCornerShape(30.dp)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(
+                Brush.linearGradient(
+                    listOf(
+                        colors.primary.copy(alpha = 0.16f),
+                        colors.secondaryContainer.copy(alpha = 0.55f),
+                    ),
+                ),
+            )
+            .border(1.dp, colors.primary.copy(alpha = 0.14f), shape)
+            .padding(Spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(Spacing.lg),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.lg),
+        ) {
+            ProgressRing(progress = progress, size = 96.dp, strokeWidth = 10.dp) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (done) {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            tint = colors.primary,
+                            modifier = Modifier.size(30.dp),
+                        )
+                    } else {
+                        Text(
+                            text = PersianText.number(state.dueCount),
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
+                        Text(
+                            text = stringResource(R.string.home_hero_left),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colors.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+            ) {
+                Text(
+                    text = stringResource(R.string.home_hero_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = if (done) {
+                        stringResource(R.string.home_hero_done_note)
+                    } else {
+                        stringResource(
+                            R.string.home_hero_progress,
+                            PersianText.number(state.todayReviews),
+                            PersianText.number(total),
+                        )
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colors.onSurfaceVariant,
+                )
+            }
+        }
+
+        if (!done) {
+            Button(
+                onClick = onStartReview,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = Spacing.md),
+            ) {
+                Icon(Icons.Filled.PlayArrow, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(Spacing.sm))
+                Text(stringResource(R.string.home_start_session))
+            }
+        } else {
+            OutlinedButton(
+                onClick = onFreePractice,
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = Spacing.md),
+            ) {
+                Text(stringResource(R.string.home_free_practice))
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                if (state.nextDueAt != null) {
+                    Text(
+                        text = stringResource(
+                            R.string.home_hero_next,
+                            dueLabel(state.nextDueAt, now),
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.onSurfaceVariant,
+                    )
+                }
+                Text(
+                    text = stringResource(R.string.home_free_practice_hint),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TodayStats(state: HomeUiState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        StatCard(
+            value = PersianText.number(state.totalWords),
+            label = stringResource(R.string.home_words_label),
+            icon = Icons.AutoMirrored.Filled.MenuBook,
+            modifier = Modifier.weight(1f),
+        )
+        StatCard(
+            value = PersianText.number(state.todayReviews),
+            label = stringResource(R.string.stats_reviews),
+            icon = Icons.Filled.Refresh,
+            modifier = Modifier.weight(1f),
+        )
+        StatCard(
+            value = if (state.todayReviews == 0) "—" else PersianText.percent(
+                state.todayCorrect.toDouble() / state.todayReviews,
+            ),
+            label = stringResource(R.string.stats_correct_rate),
+            icon = Icons.Filled.CheckCircle,
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
+/**
+ * Boxes as one stacked bar plus the numbered badges: the bar shows the shape of
+ * the collection at a glance, the badges keep every number readable.
+ */
+@Composable
+private fun BoxDistribution(boxes: Map<Int, Int>) {
+    val colors = MaterialTheme.colorScheme
+    val accent = MaterialTheme.accents
+    val palette = listOf(
+        colors.primary,
+        colors.primary.copy(alpha = 0.72f),
+        colors.secondary,
+        colors.secondary.copy(alpha = 0.72f),
+        accent.cool,
+        accent.warm,
+    )
+    val total = boxes.values.sum()
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(colors.surfaceContainerLow)
+            .border(1.dp, colors.outline.copy(alpha = 0.12f), MaterialTheme.shapes.large)
+            .padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.home_boxes_title),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = stringResource(R.string.library_count, PersianText.number(total)),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onSurfaceVariant,
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .clip(CircleShape)
+                .background(colors.surfaceVariant),
+        ) {
+            if (total > 0) {
+                (1..6).forEach { box ->
+                    val count = boxes[box] ?: 0
+                    if (count > 0) {
+                        Box(
+                            modifier = Modifier
+                                .weight(count.toFloat())
+                                .fillMaxHeight()
+                                .background(palette[box - 1]),
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            (1..6).forEach { box ->
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    BoxBadge(box = box)
+                    Text(
+                        text = PersianText.number(boxes[box] ?: 0),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            }
+        }
+
     }
 }

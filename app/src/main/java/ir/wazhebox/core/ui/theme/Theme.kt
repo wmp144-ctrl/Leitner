@@ -11,6 +11,10 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -55,12 +59,30 @@ private val DarkScheme = darkColorScheme(
 )
 
 private val WazheBoxShapes = Shapes(
-    extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(20.dp),
-    extraLarge = RoundedCornerShape(28.dp),
+    extraSmall = RoundedCornerShape(10.dp),
+    small = RoundedCornerShape(14.dp),
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(30.dp),
 )
+
+/** Colours the Material scheme does not carry; provided through the theme. */
+@Immutable
+data class WazheBoxAccents(
+    val warm: Color,
+    val cool: Color,
+)
+
+private val LightAccents = WazheBoxAccents(warm = WarmAccentLight, cool = CoolAccentLight)
+private val DarkAccents = WazheBoxAccents(warm = WarmAccentDark, cool = CoolAccentDark)
+
+private val LocalAccents = staticCompositionLocalOf { LightAccents }
+
+/** `MaterialTheme.accents.warm` / `.cool` inside any composable. */
+val MaterialTheme.accents: WazheBoxAccents
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalAccents.current
 
 /**
  * App theme. Always RTL: the only UI language in 1.0 is Persian (PRD §23),
@@ -81,7 +103,10 @@ fun WazheBoxTheme(
         else -> LightScheme
     }
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    CompositionLocalProvider(
+        LocalLayoutDirection provides LayoutDirection.Rtl,
+        LocalAccents provides if (darkTheme) DarkAccents else LightAccents,
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = WazheBoxTypography,

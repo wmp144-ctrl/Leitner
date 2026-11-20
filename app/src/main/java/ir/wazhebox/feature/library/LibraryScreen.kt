@@ -1,24 +1,32 @@
 package ir.wazhebox.feature.library
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.AssistChip
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -50,6 +59,7 @@ fun LibraryScreen(
     viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val colors = MaterialTheme.colorScheme
     val now = Clock.System.now()
     var sortMenu by remember { mutableStateOf(false) }
 
@@ -59,12 +69,23 @@ fun LibraryScreen(
             .padding(horizontal = Spacing.screen),
         verticalArrangement = Arrangement.spacedBy(Spacing.sm),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = stringResource(R.string.library_title),
-                style = MaterialTheme.typography.headlineSmall,
-            )
-            Spacer(Modifier.weight(1f))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Spacing.lg),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.nav_library),
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Text(
+                    text = stringResource(R.string.library_count, PersianText.number(state.rows.size)),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.onSurfaceVariant,
+                )
+            }
             TextButton(onClick = { sortMenu = true }) {
                 Text(stringResource(R.string.library_sort))
                 Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
@@ -86,17 +107,32 @@ fun LibraryScreen(
             value = state.query,
             onValueChange = viewModel::setQuery,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(R.string.library_search_hint)) },
+            placeholder = { Text(stringResource(R.string.library_search_hint)) },
+            leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
             singleLine = true,
+            shape = CircleShape,
+            trailingIcon = {
+                if (state.query.isNotBlank()) {
+                    IconButton(onClick = { viewModel.setQuery("") }) {
+                        Icon(
+                            imageVector = Icons.Filled.Clear,
+                            contentDescription = stringResource(R.string.action_cancel),
+                        )
+                    }
+                }
+            },
         )
 
-        Row(
+        // Five chips overflow a phone width, so the row scrolls instead of
+        // clipping the last filter (a real bug in the previous layout).
+        LazyRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+            contentPadding = PaddingValues(end = Spacing.xs),
         ) {
-            StateFilter.entries.forEach { filter ->
+            items(StateFilter.entries) { filter ->
                 val label = when (filter) {
-                    StateFilter.ALL -> stringResource(R.string.common_yes)
+                    StateFilter.ALL -> stringResource(R.string.library_filter_all)
                     StateFilter.LEARNING -> stringResource(R.string.library_filter_state_learning)
                     StateFilter.REVIEW -> stringResource(R.string.library_filter_state_review)
                     StateFilter.SUSPENDED -> stringResource(R.string.library_filter_state_suspended)
@@ -114,8 +150,9 @@ fun LibraryScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .padding(Spacing.sm),
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(colors.secondaryContainer)
+                    .padding(horizontal = Spacing.md, vertical = Spacing.xs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -130,7 +167,7 @@ fun LibraryScreen(
                     Text(stringResource(R.string.library_suspend))
                 }
                 TextButton(onClick = viewModel::deleteSelected) {
-                    Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.action_delete), color = colors.error)
                 }
                 TextButton(onClick = viewModel::clearSelection) {
                     Text(stringResource(R.string.action_cancel))
@@ -147,17 +184,26 @@ fun LibraryScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = Spacing.xxxl),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                contentPadding = PaddingValues(top = Spacing.xs, bottom = Spacing.xxxl),
             ) {
                 items(state.rows, key = { it.word.id }) { row ->
                     val selected = row.word.id in state.selected
+                    val background by animateColorAsState(
+                        targetValue = if (selected) colors.secondaryContainer else colors.surfaceContainerLow,
+                        label = "library-row",
+                    )
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                if (selected) MaterialTheme.colorScheme.secondaryContainer
-                                else MaterialTheme.colorScheme.surface,
+                            .animateItem()
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(background)
+                            .border(
+                                width = 1.dp,
+                                color = if (selected) colors.secondary.copy(alpha = 0.45f)
+                                else colors.outline.copy(alpha = 0.10f),
+                                shape = MaterialTheme.shapes.medium,
                             )
                             .combinedClickable(
                                 onClick = {
@@ -166,7 +212,7 @@ fun LibraryScreen(
                                 },
                                 onLongClick = { viewModel.toggleSelection(row.word.id) },
                             )
-                            .padding(vertical = Spacing.md, horizontal = Spacing.sm),
+                            .padding(horizontal = Spacing.md, vertical = Spacing.md),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
@@ -180,18 +226,18 @@ fun LibraryScreen(
                             Text(
                                 text = row.word.meaningFa,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = colors.onSurfaceVariant,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             BoxBadge(box = row.box)
-                            androidx.compose.foundation.layout.Spacer(Modifier.padding(2.dp))
+                            Spacer(Modifier.size(2.dp))
                             Text(
                                 text = dueLabel(row.card?.dueAt, now),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = colors.onSurfaceVariant,
                             )
                         }
                     }

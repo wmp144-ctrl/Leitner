@@ -28,3 +28,11 @@ internal val OutlineLight = Color(0xFF7C776E)
 internal val OutlineDark = Color(0xFF94918A)
 internal val OnSurfaceLight = Color(0xFF1B1C17)
 internal val OnSurfaceDark = Color(0xFFE5E3DA)
+
+// Secondary accents outside the Material scheme: warm for "hard", cool for
+// "easy". They keep the four review ratings distinguishable without inventing
+// a fifth semantic colour (PRD §18.6: never colour alone, always with a label).
+internal val WarmAccentLight = Color(0xFFB4550F)
+internal val WarmAccentDark = Color(0xFFFFB785)
+internal val CoolAccentLight = Color(0xFF3A5FA8)
+internal val CoolAccentDark = Color(0xFFA9C2F7)

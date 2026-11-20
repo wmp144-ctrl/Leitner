@@ -8,7 +8,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,9 +26,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
@@ -52,6 +61,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -76,6 +86,7 @@ import ir.wazhebox.core.ui.theme.EnglishWordStyle
 import ir.wazhebox.core.ui.theme.Inter
 import ir.wazhebox.core.ui.theme.PersianMeaningStyle
 import ir.wazhebox.core.ui.theme.Spacing
+import ir.wazhebox.core.ui.theme.accents
 import ir.wazhebox.core.text.BidiText
 import ir.wazhebox.domain.model.Direction
 import ir.wazhebox.domain.model.Rating
@@ -179,7 +190,13 @@ fun ReviewScreen(
         )
         LinearProgressIndicator(
             progress = { progress },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(CircleShape),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+            strokeCap = StrokeCap.Round,
         )
 
         Row(
@@ -397,8 +414,11 @@ private fun QuestionFace(
             .fillMaxWidth()
             .heightIn(min = 260.dp),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)),
     ) {
         Column(
             modifier = Modifier
@@ -420,12 +440,23 @@ private fun QuestionFace(
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
-                Text(
-                    text = stringResource(R.string.review_tap_answer),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.TouchApp,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Text(
+                        text = stringResource(R.string.review_tap_answer),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             } else {
                 Text(
                     text = meaning,
@@ -558,6 +589,11 @@ private fun RatingRow(
     onRate: (Rating) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+        Text(
+            text = stringResource(R.string.review_rate_hint),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
@@ -569,21 +605,44 @@ private fun RatingRow(
                     Rating.GOOD -> stringResource(R.string.review_rating_good)
                     Rating.EASY -> stringResource(R.string.review_rating_easy)
                 }
-                val container = if (rating == suggested) {
-                    androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    )
-                } else {
-                    androidx.compose.material3.ButtonDefaults.filledTonalButtonColors()
+                val tint = when (rating) {
+                    Rating.AGAIN -> MaterialTheme.colorScheme.error
+                    Rating.HARD -> MaterialTheme.accents.warm
+                    Rating.GOOD -> MaterialTheme.colorScheme.primary
+                    Rating.EASY -> MaterialTheme.accents.cool
                 }
-                androidx.compose.material3.FilledTonalButton(
-                    onClick = { onRate(rating) },
-                    modifier = Modifier.weight(1f),
-                    colors = container,
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 10.dp),
+                val icon = when (rating) {
+                    Rating.AGAIN -> Icons.Filled.Close
+                    Rating.HARD -> Icons.Filled.TrendingDown
+                    Rating.GOOD -> Icons.Filled.Check
+                    Rating.EASY -> Icons.Filled.Bolt
+                }
+                val highlighted = rating == suggested
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(tint.copy(alpha = if (highlighted) 0.22f else 0.08f))
+                        .border(
+                            width = 1.dp,
+                            color = tint.copy(alpha = if (highlighted) 0.55f else 0.16f),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .clickable { onRate(rating) }
+                        .padding(vertical = Spacing.sm, horizontal = Spacing.xs),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = tint,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Text(text = label, style = MaterialTheme.typography.labelMedium, color = tint)
                         Text(
                             text = intervalLabel(previews[rating] ?: 0.0),
                             style = MaterialTheme.typography.labelSmall,
