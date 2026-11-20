@@ -11,8 +11,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.LocalSize
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionStartActivity
@@ -35,7 +35,6 @@ import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.state.getAppWidgetState
@@ -64,7 +63,11 @@ class WazheBoxWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            WidgetContent()
+            // GlanceTheme is the supported way to get colours in RemoteViews;
+            // building ColorProvider from raw ints is a restricted API.
+            GlanceTheme {
+                WidgetContent()
+            }
         }
     }
 }
@@ -102,10 +105,11 @@ private fun WidgetContent() {
     val compact = size.width < 190.dp || size.height < 130.dp
     val tall = size.height >= 200.dp
 
-    val background = ColorProvider(android.graphics.Color.parseColor("#FBF9F6"))
-    val primary = ColorProvider(android.graphics.Color.parseColor("#2F6B5E"))
-    val muted = ColorProvider(android.graphics.Color.parseColor("#4A4640"))
-    val ink = ColorProvider(android.graphics.Color.parseColor("#1B1C17"))
+    val palette = GlanceTheme.colors
+    val background = palette.surface
+    val primary = palette.primary
+    val muted = palette.onSurfaceVariant
+    val ink = palette.onSurface
 
     Column(
         modifier = GlanceModifier

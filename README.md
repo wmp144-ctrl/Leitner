@@ -37,7 +37,19 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 ./gradlew assembleDebug        # APK دیباگ
 ./gradlew testDebugUnitTest    # تست‌های واحد (۱۱۰ تست)
 ./gradlew assembleRelease      # APK ریلیز با R8
+./gradlew bundleRelease        # AAB برای آپلود در Google Play
+./gradlew lintRelease          # بازرسی استاتیک (۰ خطا)
 ```
+
+امضای نسخهٔ ریلیز از فایل `keystore.properties` در ریشه خوانده می‌شود (در گیت
+نیست). بدون آن، بیلد ریلیز بدون امضا ساخته می‌شود.
+
+## انتشار در Google Play
+
+- چک‌لیست استانداردها، امضا، Data safety و صفحهٔ فروشگاه:
+  [`docs/PLAY_RELEASE.md`](docs/PLAY_RELEASE.md)
+- سیاست حریم خصوصی آمادهٔ میزبانی: [`PRIVACY.md`](PRIVACY.md)
+- تصمیم‌های بیلد/امضا: ADR-017 در [`docs/ADR.md`](docs/ADR.md)
 
 ## ساختار
 

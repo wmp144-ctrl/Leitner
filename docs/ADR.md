@@ -263,3 +263,25 @@ PRD §12.2 دکمهٔ «نمایش پاسخ» را لازم می‌دانست. �
 
 بازبینی ظاهری روی دستگاه همچنان انجام نشده است (امولاتور در محیط نیست)؛ تغییرات
 فقط با کامپایل، تست واحد و بیلد ریلیز بررسی شده‌اند.
+
+## ADR-017 — آماده‌سازی انتشار در Google Play
+
+**تاریخ:** ۲۰ نوامبر ۲۰۲۶ · **وضعیت:** پذیرفته
+
+برای انتشار، بیلد و امضا استاندارد شدند:
+
+- **امضای خارج از مخزن:** `app/build.gradle.kts` اگر `keystore.properties` در ریشه
+  باشد، `signingConfigs.release` را می‌سازد و `bundleRelease`/`assembleRelease` با
+  همان upload key امضا می‌شوند. کلون تازه بدون آن هم بیلد می‌شود (بدون امضا).
+  `keystore.properties`, `*.jks`, `*.keystore` در `.gitignore` هستند.
+- **سخت‌سازی مانيفست:** `android:usesCleartextTraffic="false"`؛ هر چند اپ مجوز
+  `INTERNET` ندارد، این خط دفاع دوم است.
+- **بستهٔ AAB:** `app/build/outputs/bundle/release/app-release.aab` ساخته و با
+  `jarsigner -verify` تأیید شد؛ APK هم با `apksigner verify` تأیید شد. `targetSdk`
+  ۳۶، `minSdk` ۲۶، بدون `debuggable`.
+- **۱۶KB page size:** همهٔ کتابخانه‌های نیتیو (Compose path و DataStore) با
+  `LOAD align = 0x4000` بررسی شدند و شرط جدید Play را پاس می‌کنند.
+- **بدون لاگ/کوئری دستی:** هیچ `Log.`، `printStackTrace` یا `rawQuery` در کد نیست.
+- **مستندات:** `PRIVACY.md` (سیاست حریم خصوصی فارسی/انگلیسی) و
+  `docs/PLAY_RELEASE.md` (چک‌لیست Play Console، Data safety، امضا، نسخه‌بندی و
+  دارایی‌های فروشگاه) اضافه شدند.
