@@ -1,5 +1,10 @@
 package ir.wazhebox.app
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -112,7 +117,22 @@ fun WazheBoxRoot(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            NavHost(navController = navController, startDestination = startDestination) {
+            NavHost(
+                navController = navController,
+                startDestination = startDestination,
+                // A soft fade-and-settle between screens keeps navigation calm
+                // instead of snapping (PRD §18.7 asks for restrained motion).
+                enterTransition = {
+                    fadeIn(tween(durationMillis = 220)) +
+                        scaleIn(initialScale = 0.97f, animationSpec = tween(durationMillis = 260))
+                },
+                exitTransition = { fadeOut(tween(durationMillis = 140)) },
+                popEnterTransition = { fadeIn(tween(durationMillis = 220)) },
+                popExitTransition = {
+                    fadeOut(tween(durationMillis = 140)) +
+                        scaleOut(targetScale = 0.97f, animationSpec = tween(durationMillis = 200))
+                },
+            ) {
                 composable<OnboardingRoute> {
                     OnboardingScreen(
                         onFinished = {

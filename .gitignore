@@ -12,3 +12,6 @@ captures/
 *.keystore
 !debug.keystore
 .kotlin/
+
+# Local installable APKs and test keystore
+/artifacts/

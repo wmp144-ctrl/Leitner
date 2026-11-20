@@ -1,14 +1,24 @@
 package ir.wazhebox.feature.review
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,23 +31,28 @@ import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -53,6 +68,7 @@ import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
 import ir.wazhebox.core.ui.components.BoxBadge
 import ir.wazhebox.core.ui.components.EmptyState
+import ir.wazhebox.core.ui.components.TapFlipCard
 import ir.wazhebox.core.ui.components.LoadingBox
 import ir.wazhebox.core.ui.intervalLabel
 import ir.wazhebox.core.ui.minutesLabel
@@ -156,8 +172,13 @@ fun ReviewScreen(
         }
 
         val total = (state.reviewed + state.remaining).coerceAtLeast(1)
+        val progress by animateFloatAsState(
+            targetValue = state.reviewed.toFloat() / total,
+            animationSpec = tween(durationMillis = 320),
+            label = "session-progress",
+        )
         LinearProgressIndicator(
-            progress = { state.reviewed.toFloat() / total },
+            progress = { progress },
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -194,15 +215,66 @@ fun ReviewScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
-            QuestionCard(
-                term = word.term,
-                meaning = word.primaryMeaning,
-                direction = direction,
-                showAnswer = state.showAnswer,
-                speaking = false,
-                onSpeak = viewModel::speak,
-                ttsUnavailable = false,
-            )
+            // Each new card rises into place, so a review feels like a hand of
+            // cards rather than a screen that swaps its text.
+            val entrance = remember(current.card.id) { Animatable(0f) }
+            LaunchedEffect(current.card.id) { entrance.animateTo(1f, tween(durationMillis = 280)) }
+
+            Box(modifier = Modifier.fillMaxWidth()) {
+                // Two faint layers under the card suggest the rest of the deck.
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(top = 14.dp, start = 12.dp, end = 12.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)),
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(top = 7.dp, start = 6.dp, end = 6.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)),
+                )
+                // Keying by card id gives every card a fresh flip: the next word
+                // starts face up instead of unwinding the previous 180° turn.
+                key(current.card.id) {
+                    TapFlipCard(
+                        flipped = state.showAnswer,
+                        enabled = !state.showAnswer,
+                        onFlip = {
+                            if (!state.showAnswer) {
+                                tickHaptics()
+                                viewModel.reveal()
+                            }
+                        },
+                        modifier = Modifier.graphicsLayer {
+                            alpha = entrance.value
+                            translationY = (1f - entrance.value) * 48f
+                        },
+                        front = {
+                            QuestionFace(
+                                term = word.term,
+                                meaning = word.primaryMeaning,
+                                direction = direction,
+                                onSpeak = viewModel::speak,
+                            )
+                        },
+                        back = {
+                            AnswerFace(
+                                term = word.term,
+                                meaning = word.meaningFa,
+                                ipa = word.ipa,
+                                exampleEn = word.exampleEn,
+                                exampleFa = word.exampleFa,
+                                direction = direction,
+                                grade = state.grade,
+                                gradeAnswer = state.grade?.matchedAnswer,
+                            )
+                        },
+                    )
+                }
+            }
 
             if (direction == Direction.FA_EN && !state.showAnswer) {
                 OutlinedTextField(
@@ -217,19 +289,6 @@ fun ReviewScreen(
                     ),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = Inter),
                     singleLine = true,
-                )
-            }
-
-            if (state.showAnswer) {
-                AnswerDetails(
-                    term = word.term,
-                    meaning = word.meaningFa,
-                    ipa = word.ipa,
-                    exampleEn = word.exampleEn,
-                    exampleFa = word.exampleFa,
-                    direction = direction,
-                    grade = state.grade,
-                    gradeAnswer = state.grade?.matchedAnswer,
                 )
             }
 
@@ -269,18 +328,19 @@ fun ReviewScreen(
             }
         }
 
-        if (!state.showAnswer) {
-            if (direction == Direction.FA_EN && state.typed.isNotBlank()) {
-                Button(
-                    onClick = viewModel::checkAnswer,
-                    modifier = Modifier.fillMaxWidth(),
-                ) { Text(stringResource(R.string.review_check)) }
-            }
-            OutlinedButton(
-                onClick = viewModel::reveal,
+        if (direction == Direction.FA_EN && !state.showAnswer && state.typed.isNotBlank()) {
+            Button(
+                onClick = viewModel::checkAnswer,
                 modifier = Modifier.fillMaxWidth(),
-            ) { Text(stringResource(R.string.review_show_answer)) }
-        } else {
+            ) { Text(stringResource(R.string.review_check)) }
+        }
+
+        AnimatedVisibility(
+            visible = state.showAnswer,
+            enter = fadeIn(tween(durationMillis = 220)) +
+                slideInVertically(tween(durationMillis = 260)) { height -> height / 4 },
+            exit = fadeOut(tween(durationMillis = 120)),
+        ) {
             val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
             RatingRow(
                 previews = state.intervalPreviews,
@@ -324,49 +384,107 @@ fun ReviewScreen(
     }
 }
 
+/** Front of the card: only the question, plus a hint that the card flips. */
 @Composable
-private fun QuestionCard(
+private fun QuestionFace(
     term: String,
     meaning: String,
     direction: Direction,
-    showAnswer: Boolean,
-    speaking: Boolean,
     onSpeak: () -> Unit,
-    ttsUnavailable: Boolean,
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 260.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Spacing.xxl),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.md),
+            verticalArrangement = Arrangement.spacedBy(Spacing.md, Alignment.CenterVertically),
         ) {
-            val showEnglish = direction != Direction.FA_EN
-            if (showEnglish) {
+            if (direction != Direction.FA_EN) {
                 Text(
                     text = BidiText.isolateLtr(term),
                     style = EnglishWordStyle,
                     textAlign = TextAlign.Center,
                 )
-                IconButton(onClick = onSpeak, enabled = !ttsUnavailable) {
+                IconButton(onClick = onSpeak) {
                     Icon(
                         Icons.Filled.VolumeUp,
                         contentDescription = stringResource(R.string.review_speak),
-                        tint = if (ttsUnavailable) MaterialTheme.colorScheme.outline
-                        else MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
+                Text(
+                    text = stringResource(R.string.review_tap_answer),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             } else {
                 Text(
                     text = meaning,
                     style = PersianMeaningStyle,
                     textAlign = TextAlign.Center,
                 )
+                Text(
+                    text = stringResource(R.string.review_tap_word),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
-            if (showAnswer && direction == Direction.FA_EN) {
+        }
+    }
+}
+
+/** Reverse of the card: the answer, its pronunciation and both examples. */
+@Composable
+private fun AnswerFace(
+    term: String,
+    meaning: String,
+    ipa: String?,
+    exampleEn: String?,
+    exampleFa: String?,
+    direction: Direction,
+    grade: ir.wazhebox.domain.grading.GradeResult?,
+    gradeAnswer: String?,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 260.dp),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.45f),
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(Spacing.xl),
+            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+        ) {
+            if (direction == Direction.FA_EN) {
                 Text(text = BidiText.isolateLtr(term), style = EnglishWordStyle)
+            } else {
+                Text(text = meaning, style = PersianMeaningStyle)
             }
+            AnswerDetails(
+                term = term,
+                meaning = meaning,
+                ipa = ipa,
+                exampleEn = exampleEn,
+                exampleFa = exampleFa,
+                direction = direction,
+                grade = grade,
+                gradeAnswer = gradeAnswer,
+            )
         }
     }
 }

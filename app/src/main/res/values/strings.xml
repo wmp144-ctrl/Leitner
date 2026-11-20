@@ -59,6 +59,8 @@
     <string name="review_direction_fa_en">فارسی ← انگلیسی</string>
     <string name="review_direction_cloze">جای خالی در جمله</string>
     <string name="review_show_answer">نمایش پاسخ</string>
+    <string name="review_tap_answer">برای دیدن پاسخ روی کارت ضربه بزن</string>
+    <string name="review_tap_word">برای دیدن واژه روی کارت ضربه بزن</string>
     <string name="review_remaining">%1$s مانده</string>
     <string name="review_box">جعبهٔ %1$s</string>
     <string name="review_answer_hint">معنی یا ترجمه را بنویس</string>
@@ -80,7 +82,7 @@
     <string name="review_word_deleted">این لغت حذف شد</string>
     <string name="review_save_error">ذخیره نشد، دوباره تلاش کن</string>
     <string name="review_empty_today">امروز تمام شد ✓</string>
-    <string name="review_early_fa_en">اول باید کلمه را بشناسی؛ اگر سخت بود، «نمایش پاسخ» را بزن.</string>
+    <string name="review_early_fa_en">اول باید کلمه را بشناسی؛ اگر سخت بود، روی کارت ضربه بزن.</string>
     <string name="review_leech_hint">این کلمه سخت است. با جمله تمرین کنیم؟</string>
     <string name="review_add_sentence">افزودن جمله</string>
 
