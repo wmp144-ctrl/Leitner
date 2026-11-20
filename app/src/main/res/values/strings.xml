@@ -181,6 +181,11 @@
     <string name="stats_total_words">%1$s لغت</string>
     <string name="stats_streak_days">%1$s روز پیوسته</string>
     <string name="stats_streak_label">روز پیوسته</string>
+    <string name="stats_retention_sample">بر پایهٔ %1$s مرور با فاصلهٔ بیش از یک روز</string>
+    <string name="stats_chart_peak">بیشترین: %1$s</string>
+    <string name="stats_chart_from">۳۰ روز پیش</string>
+    <string name="stats_chart_to">امروز</string>
+    <string name="stats_total_reviews">%1$s مرور در کل</string>
 
     <!-- Settings -->
     <string name="settings_title">تنظیمات</string>
