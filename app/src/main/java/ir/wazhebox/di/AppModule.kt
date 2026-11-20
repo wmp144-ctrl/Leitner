@@ -17,12 +17,10 @@ import ir.wazhebox.data.db.TagDao
 import ir.wazhebox.data.db.WazheBoxDatabase
 import ir.wazhebox.data.db.WordDao
 import ir.wazhebox.data.repo.DeckRepositoryImpl
-import ir.wazhebox.data.repo.SeedRepositoryImpl
 import ir.wazhebox.data.repo.StatsRepositoryImpl
 import ir.wazhebox.data.repo.StudyRepositoryImpl
 import ir.wazhebox.data.repo.WordRepositoryImpl
 import ir.wazhebox.domain.repo.DeckRepository
-import ir.wazhebox.domain.repo.SeedRepository
 import ir.wazhebox.domain.repo.StatsRepository
 import ir.wazhebox.domain.repo.StudyRepository
 import ir.wazhebox.domain.repo.WordRepository
@@ -74,10 +72,6 @@ abstract class RepositoryModule {
     @dagger.Binds
     @Singleton
     abstract fun bindDeckRepository(impl: DeckRepositoryImpl): DeckRepository
-
-    @dagger.Binds
-    @Singleton
-    abstract fun bindSeedRepository(impl: SeedRepositoryImpl): SeedRepository
 
     @dagger.Binds
     @Singleton

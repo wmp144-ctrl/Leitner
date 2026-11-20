@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
@@ -34,6 +38,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen(
+    onOpenMenu: () -> Unit,
     onOpenDataTransfer: () -> Unit,
     onOpenTts: () -> Unit,
     onOpenAbout: () -> Unit,
@@ -48,10 +53,22 @@ fun SettingsScreen(
             .padding(horizontal = Spacing.screen),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
-        Text(
-            text = stringResource(R.string.settings_title),
-            style = MaterialTheme.typography.headlineSmall,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.weight(1f),
+            )
+            IconButton(onClick = onOpenMenu) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = stringResource(R.string.nav_menu),
+                )
+            }
+        }
 
         SectionCard {
             Text(

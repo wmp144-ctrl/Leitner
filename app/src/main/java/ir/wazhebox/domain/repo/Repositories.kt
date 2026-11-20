@@ -3,7 +3,6 @@ package ir.wazhebox.domain.repo
 import ir.wazhebox.domain.model.Card
 import ir.wazhebox.domain.model.DailyStat
 import ir.wazhebox.domain.model.Deck
-import ir.wazhebox.domain.model.Level
 import ir.wazhebox.domain.model.Rating
 import ir.wazhebox.domain.model.StudyItem
 import ir.wazhebox.domain.model.Verdict
@@ -112,7 +111,3 @@ interface StatsRepository {
     suspend fun totalReviews(): Int
 }
 
-interface SeedRepository {
-    suspend fun importStarterDeck(level: Level, limit: Int = 100): Int
-    suspend fun starterDeckSize(): Int
-}

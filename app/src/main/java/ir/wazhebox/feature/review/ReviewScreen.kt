@@ -42,7 +42,6 @@ import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -61,7 +60,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -108,9 +106,10 @@ fun ReviewScreen(
     viewModel: ReviewViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    var showExitDialog by remember { mutableStateOf(false) }
 
-    BackHandler(enabled = !state.finished) { showExitDialog = true }
+    // Every answer is written as it is graded, so leaving never loses progress
+    // and the old "save this session?" question is gone (v2).
+    BackHandler(enabled = !state.finished) { onExit() }
 
     if (state.loading) {
         LoadingBox()
@@ -177,7 +176,7 @@ fun ReviewScreen(
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { showExitDialog = true }) {
+            IconButton(onClick = onExit) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
             }
             Spacer(Modifier.weight(1f))
@@ -270,12 +269,10 @@ fun ReviewScreen(
                 key(current.card.id) {
                     TapFlipCard(
                         flipped = state.showAnswer,
-                        enabled = !state.showAnswer,
+                        // Tapping again turns the card back to the English word.
                         onFlip = {
-                            if (!state.showAnswer) {
-                                tickHaptics()
-                                viewModel.reveal()
-                            }
+                            tickHaptics()
+                            if (state.showAnswer) viewModel.hideAnswer() else viewModel.reveal()
                         },
                         modifier = Modifier.graphicsLayer {
                             alpha = entrance.value
@@ -324,6 +321,20 @@ fun ReviewScreen(
                 )
             }
 
+            AnimatedVisibility(
+                visible = state.showAnswer,
+                enter = fadeIn(tween(durationMillis = 220)) +
+                    slideInVertically(tween(durationMillis = 260)) { height -> height / 4 },
+                exit = fadeOut(tween(durationMillis = 120)),
+            ) {
+                RatingGrid(
+                    previews = state.intervalPreviews,
+                    suggested = state.grade?.suggestedRating,
+                    hapticsEnabled = state.hapticsEnabled,
+                    onRate = viewModel::rate,
+                )
+            }
+
             if (state.leechWordId != null) {
                 ElevatedCard {
                     Column(Modifier.padding(Spacing.lg), verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
@@ -367,52 +378,6 @@ fun ReviewScreen(
             ) { Text(stringResource(R.string.review_check)) }
         }
 
-        AnimatedVisibility(
-            visible = state.showAnswer,
-            enter = fadeIn(tween(durationMillis = 220)) +
-                slideInVertically(tween(durationMillis = 260)) { height -> height / 4 },
-            exit = fadeOut(tween(durationMillis = 120)),
-        ) {
-            val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
-            RatingRow(
-                previews = state.intervalPreviews,
-                suggested = state.grade?.suggestedRating,
-                onRate = { rating ->
-                    if (state.hapticsEnabled) {
-                        haptics.performHapticFeedback(
-                            androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm,
-                        )
-                    }
-                    viewModel.rate(rating)
-                },
-            )
-        }
-    }
-
-    if (showExitDialog) {
-        AlertDialog(
-            onDismissRequest = { showExitDialog = false },
-            title = { Text(stringResource(R.string.review_exit_title)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.review_exit_message,
-                        PersianText.number(state.remaining),
-                    ),
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    showExitDialog = false
-                    onExit()
-                }) { Text(stringResource(R.string.action_save)) }
-            },
-            dismissButton = {
-                TextButton(onClick = { showExitDialog = false }) {
-                    Text(stringResource(R.string.action_cancel))
-                }
-            },
-        )
     }
 }
 
@@ -597,75 +562,107 @@ private fun AnswerDetails(
     }
 }
 
+/**
+ * The four ratings as a 2×2 block: the tiles are taller than the old single
+ * row and sit right under the card, so the thumb never has to travel to the
+ * bottom of the screen between two cards.
+ */
 @Composable
-private fun RatingRow(
+private fun RatingGrid(
     previews: Map<Rating, Double>,
     suggested: Rating?,
+    hapticsEnabled: Boolean,
     onRate: (Rating) -> Unit,
 ) {
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
         Text(
             text = stringResource(R.string.review_rate_hint),
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-        ) {
-            Rating.entries.forEach { rating ->
-                val label = when (rating) {
-                    Rating.AGAIN -> stringResource(R.string.review_rating_again)
-                    Rating.HARD -> stringResource(R.string.review_rating_hard)
-                    Rating.GOOD -> stringResource(R.string.review_rating_good)
-                    Rating.EASY -> stringResource(R.string.review_rating_easy)
-                }
-                val tint = when (rating) {
-                    Rating.AGAIN -> MaterialTheme.colorScheme.error
-                    Rating.HARD -> MaterialTheme.accents.warm
-                    Rating.GOOD -> MaterialTheme.colorScheme.primary
-                    Rating.EASY -> MaterialTheme.accents.cool
-                }
-                val icon = when (rating) {
-                    Rating.AGAIN -> Icons.Filled.Close
-                    Rating.HARD -> Icons.Filled.TrendingDown
-                    Rating.GOOD -> Icons.Filled.Check
-                    Rating.EASY -> Icons.Filled.Bolt
-                }
-                val highlighted = rating == suggested
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(tint.copy(alpha = if (highlighted) 0.22f else 0.08f))
-                        .border(
-                            width = 1.dp,
-                            color = tint.copy(alpha = if (highlighted) 0.55f else 0.16f),
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .clickable { onRate(rating) }
-                        .padding(vertical = Spacing.sm, horizontal = Spacing.xs),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(2.dp),
-                    ) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            tint = tint,
-                            modifier = Modifier.size(18.dp),
-                        )
-                        Text(text = label, style = MaterialTheme.typography.labelMedium, color = tint)
-                        Text(
-                            text = intervalLabel(previews[rating] ?: 0.0),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+        Rating.entries.chunked(2).forEach { pair ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                pair.forEach { rating ->
+                    RatingTile(
+                        rating = rating,
+                        interval = previews[rating] ?: 0.0,
+                        highlighted = rating == suggested,
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            if (hapticsEnabled) {
+                                haptics.performHapticFeedback(
+                                    androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm,
+                                )
+                            }
+                            onRate(rating)
+                        },
+                    )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun RatingTile(
+    rating: Rating,
+    interval: Double,
+    highlighted: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val label = when (rating) {
+        Rating.AGAIN -> stringResource(R.string.review_rating_again)
+        Rating.HARD -> stringResource(R.string.review_rating_hard)
+        Rating.GOOD -> stringResource(R.string.review_rating_good)
+        Rating.EASY -> stringResource(R.string.review_rating_easy)
+    }
+    val tint = when (rating) {
+        Rating.AGAIN -> MaterialTheme.colorScheme.error
+        Rating.HARD -> MaterialTheme.accents.warm
+        Rating.GOOD -> MaterialTheme.colorScheme.primary
+        Rating.EASY -> MaterialTheme.accents.cool
+    }
+    val icon = when (rating) {
+        Rating.AGAIN -> Icons.Filled.Close
+        Rating.HARD -> Icons.Filled.TrendingDown
+        Rating.GOOD -> Icons.Filled.Check
+        Rating.EASY -> Icons.Filled.Bolt
+    }
+
+    Row(
+        modifier = modifier
+            .heightIn(min = 68.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .background(tint.copy(alpha = if (highlighted) 0.20f else 0.06f))
+            .border(
+                width = if (highlighted) 1.5.dp else 1.dp,
+                color = tint.copy(alpha = if (highlighted) 0.60f else 0.16f),
+                shape = MaterialTheme.shapes.medium,
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = Spacing.md, vertical = Spacing.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(24.dp),
+        )
+        Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            Text(text = label, style = MaterialTheme.typography.titleMedium, color = tint)
+            Text(
+                text = intervalLabel(interval),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

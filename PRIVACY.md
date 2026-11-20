@@ -11,8 +11,8 @@
 بنابراین هیچ داده‌ای — نه لغت‌ها، نه آمار مرور، نه شناسهٔ دستگاه — از گوشی خارج
 نمی‌شود.
 
-**چه چیزی روی گوشی ذخیره می‌شود؟** لغت‌هایی که خودتان اضافه می‌کنید، دک آمادهٔ
-همراه اپ، تاریخچهٔ مرور و تنظیمات. همه در فضای خصوصی برنامه روی همان دستگاه
+**چه چیزی روی گوشی ذخیره می‌شود؟** لغت‌هایی که خودتان اضافه یا از فایل CSV وارد
+می‌کنید، تاریخچهٔ مرور و تنظیمات. همه در فضای خصوصی برنامه روی همان دستگاه
 نگه‌داری می‌شوند.
 
 **پشتیبان‌گیری سیستم.** اگر پشتیبان‌گیری خودکار اندروید روی گوشی شما روشن باشد،
@@ -43,7 +43,7 @@ WazheBox is an English vocabulary study app that runs entirely on your device.
 and no third-party service. The app does not request the INTERNET permission,
 so no data — words, review history or device identifiers — leaves your phone.
 
-**What is stored on the device:** the words you add, the bundled starter deck,
+**What is stored on the device:** the words you add or import from a CSV file,
 your review history and your settings, all inside the app's private storage.
 
 **System backup.** If Android's automatic backup is enabled, the operating

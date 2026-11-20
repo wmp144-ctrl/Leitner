@@ -1,23 +1,28 @@
 package ir.wazhebox.feature.home
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import ir.wazhebox.data.io.DataTransferRepository
+import ir.wazhebox.data.io.ImportReport
 import ir.wazhebox.data.settings.SettingsRepository
 import ir.wazhebox.data.settings.UserSettings
-import ir.wazhebox.domain.model.Level
-import ir.wazhebox.domain.repo.SeedRepository
 import ir.wazhebox.domain.repo.StatsRepository
 import ir.wazhebox.domain.repo.StudyRepository
 import ir.wazhebox.domain.repo.WordRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import javax.inject.Inject
 
@@ -33,7 +38,6 @@ data class HomeUiState(
     val nextDueAt: Instant? = null,
     val boxes: Map<Int, Int> = emptyMap(),
     val settings: UserSettings = UserSettings(),
-    val importing: Boolean = false,
 )
 
 @HiltViewModel
@@ -42,7 +46,8 @@ class HomeViewModel @Inject constructor(
     private val statsRepository: StatsRepository,
     private val settingsRepository: SettingsRepository,
     private val wordRepository: WordRepository,
-    private val seedRepository: SeedRepository,
+    private val dataTransfer: DataTransferRepository,
+    @ApplicationContext private val context: Context,
     private val widgetUpdater: ir.wazhebox.widget.WidgetUpdater,
 ) : ViewModel() {
 
@@ -74,24 +79,41 @@ class HomeViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     private val _importing = MutableStateFlow(false)
-    val importing: StateFlow<Boolean> = _importing
+    val importing: StateFlow<Boolean> = _importing.asStateFlow()
+
+    private val _importReport = MutableStateFlow<ImportReport?>(null)
+    val importReport: StateFlow<ImportReport?> = _importReport.asStateFlow()
+
+    private val _importError = MutableStateFlow(false)
+    val importError: StateFlow<Boolean> = _importError.asStateFlow()
 
     fun refresh() {
         refresh.value = refresh.value + 1
     }
 
-    fun importStarterDeck() {
+    /**
+     * Imports a CSV of words straight from the file picker: the app starts with
+     * an empty library, so this is the normal way a deck gets in.
+     */
+    fun importCsv(uri: Uri) {
         if (_importing.value) return
         _importing.value = true
+        _importError.value = false
+        _importReport.value = null
         viewModelScope.launch {
-            val settings = state.value.settings
-            seedRepository.importStarterDeck(settings.level, limit = 100)
+            runCatching {
+                val text = withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)
+                        ?.use { it.readText() } ?: error("open_failed")
+                }
+                dataTransfer.importCsv(text)
+            }.onSuccess { report ->
+                _importReport.value = report
+                refresh()
+            }.onFailure {
+                _importError.value = true
+            }
             _importing.value = false
-            refresh()
         }
-    }
-
-    fun setLevel(level: Level) {
-        viewModelScope.launch { settingsRepository.completeOnboarding(state.value.settings.dailyMinutes, level) }
     }
 }

@@ -7,6 +7,9 @@
     <string name="nav_library">کتابخانه</string>
     <string name="nav_stats">آمار</string>
     <string name="nav_settings">تنظیمات</string>
+    <string name="nav_menu">منو</string>
+    <string name="drawer_tagline">یادگیری واژه‌های انگلیسی</string>
+    <string name="drawer_offline">کاملاً آفلاین، بدون نیاز به اینترنت</string>
     <string name="action_add_word">افزودن لغت</string>
     <string name="action_back">بازگشت</string>
     <string name="action_next">بعدی</string>
@@ -29,12 +32,12 @@
     <string name="onboarding_minutes_10">۱۰ دقیقه</string>
     <string name="onboarding_minutes_20">۲۰ دقیقه</string>
     <string name="onboarding_level_title">سطحت چیست؟</string>
-    <string name="onboarding_level_subtitle">بر اساس سطح، لغات مناسب از دک آماده اضافه می‌شود.</string>
+    <string name="onboarding_level_subtitle">برای تنظیم تمرین‌های پیشنهادی.</string>
     <string name="onboarding_level_beginner">تازه‌کار</string>
     <string name="onboarding_level_intermediate">متوسط</string>
     <string name="onboarding_level_advanced">پیشرفته</string>
     <string name="onboarding_ready_title">آماده‌ای؟</string>
-    <string name="onboarding_ready_subtitle">اولین جلسهٔ ۱۰ کارتی منتظرت است.</string>
+    <string name="onboarding_ready_subtitle">حالا فایل واژه‌هایت را وارد کن تا اولین جلسه ساخته شود.</string>
     <string name="onboarding_start">شروع اولین جلسه</string>
     <string name="onboarding_sound_later">تست صدا و اعلان بعد از جلسهٔ اول انجام می‌شود.</string>
 
@@ -44,13 +47,16 @@
     <string name="home_today_done">امروز تمام شد ✓</string>
     <string name="home_next_due">مرور بعدی: %1$s</string>
     <string name="home_start_session">شروع مرور</string>
-    <string name="home_quick_add">افزودن سریع لغت</string>
     <string name="home_new_learning">در حال یادگیری</string>
     <string name="home_box_summary">جعبه‌ها</string>
     <string name="home_words_label">لغت</string>
-    <string name="home_empty">اولین لغتت را اضافه کن</string>
-    <string name="home_empty_hint">می‌توانی از دک آمادهٔ همراه اپ شروع کنی یا لغت خودت را وارد کنی.</string>
-    <string name="home_add_starter">افزودن از دک آماده</string>
+    <string name="home_empty">هنوز لغتی نداری</string>
+    <string name="home_empty_hint">فایل واژه‌هایت (CSV) را وارد کن؛ کارت‌های مرور خودکار ساخته می‌شوند.</string>
+    <string name="home_import_csv">انتخاب فایل CSV</string>
+    <string name="home_import_done">%1$s لغت وارد شد</string>
+    <string name="home_import_skipped">%1$s لغت تکراری رد شد</string>
+    <string name="home_import_rejected">%1$s سطر خوانده نشد</string>
+    <string name="home_import_error">فایل خوانده نشد؛ دوباره تلاش کن</string>
     <string name="home_free_practice">تمرین آزاد</string>
     <string name="home_free_practice_hint">تمرین آزاد روی زمان‌بندی اثری ندارد.</string>
 
@@ -77,8 +83,6 @@
     <string name="review_tts_missing">صدای انگلیسی روی این گوشی نصب نیست</string>
     <string name="review_install_tts">نصب صدای انگلیسی</string>
     <string name="review_example">مثال</string>
-    <string name="review_exit_title">جلسه ذخیره شود؟</string>
-    <string name="review_exit_message">%1$s کارت باقی مانده. پیشرفتت ذخیره می‌شود.</string>
     <string name="review_word_deleted">این لغت حذف شد</string>
     <string name="review_save_error">ذخیره نشد، دوباره تلاش کن</string>
     <string name="review_empty_today">امروز تمام شد ✓</string>

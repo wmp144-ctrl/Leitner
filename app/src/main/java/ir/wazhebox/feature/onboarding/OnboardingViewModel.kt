@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ir.wazhebox.data.settings.SettingsRepository
 import ir.wazhebox.domain.model.Level
-import ir.wazhebox.domain.repo.SeedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +22,6 @@ data class OnboardingUiState(
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
-    private val seedRepository: SeedRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(OnboardingUiState())
@@ -45,19 +43,16 @@ class OnboardingViewModel @Inject constructor(
         _state.value = _state.value.copy(step = (_state.value.step - 1).coerceAtLeast(0))
     }
 
-    /** Persist the choices and unlock 50–100 starter words (PRD §13.4). */
+    /**
+     * Persist the choices only: the app ships with no words, the library fills
+     * up from the user's own CSV import (v2).
+     */
     fun finish() {
         val current = _state.value
         if (current.saving) return
         _state.value = current.copy(saving = true)
         viewModelScope.launch {
             settingsRepository.completeOnboarding(current.minutes, current.level)
-            val limit = when (current.level) {
-                Level.BEGINNER -> 50
-                Level.INTERMEDIATE -> 80
-                Level.ADVANCED -> 100
-            }
-            seedRepository.importStarterDeck(current.level, limit)
             _state.value = _state.value.copy(saving = false, finished = true)
         }
     }

@@ -116,6 +116,11 @@ class ReviewViewModel @Inject constructor(
         )
     }
 
+    /** Flips the card back to the question without grading it. */
+    fun hideAnswer() {
+        _state.value = _state.value.copy(showAnswer = false, grade = null)
+    }
+
     fun reveal() {
         _state.value = _state.value.copy(
             showAnswer = true,

@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -57,6 +58,7 @@ import kotlinx.datetime.Clock
 @Composable
 fun LibraryScreen(
     onOpenWord: (Long) -> Unit,
+    onOpenMenu: () -> Unit,
     viewModel: LibraryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -91,6 +93,12 @@ fun LibraryScreen(
             TextButton(onClick = { sortMenu = true }) {
                 Text(stringResource(R.string.library_sort))
                 Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+            }
+            IconButton(onClick = onOpenMenu) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = stringResource(R.string.nav_menu),
+                )
             }
             DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                 LibrarySort.entries.forEach { sort ->

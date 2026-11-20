@@ -24,8 +24,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +61,10 @@ import ir.wazhebox.core.ui.theme.accents
  * same stacked distribution bar for boxes.
  */
 @Composable
-fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
+fun StatsScreen(
+    onOpenMenu: () -> Unit,
+    viewModel: StatsViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val today = state.today
 
@@ -76,7 +81,7 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
             .padding(top = Spacing.lg, bottom = Spacing.xxxl),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
-        Header(totalWords = state.totalWords)
+        Header(totalWords = state.totalWords, onOpenMenu = onOpenMenu)
         RetentionHero(state)
         TodayCard(state = state, today = today)
         Last30Card(state)
@@ -85,7 +90,7 @@ fun StatsScreen(viewModel: StatsViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun Header(totalWords: Int) {
+private fun Header(totalWords: Int, onOpenMenu: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -102,9 +107,15 @@ private fun Header(totalWords: Int) {
             color = colors.onPrimaryContainer,
             modifier = Modifier
                 .clip(CircleShape)
-                .background(colors.primaryContainer.copy(alpha = 0.65f))
+                .background(colors.primaryContainer)
                 .padding(horizontal = Spacing.md, vertical = Spacing.xs),
         )
+        IconButton(onClick = onOpenMenu) {
+            Icon(
+                imageVector = Icons.Filled.Menu,
+                contentDescription = stringResource(R.string.nav_menu),
+            )
+        }
     }
 }
 

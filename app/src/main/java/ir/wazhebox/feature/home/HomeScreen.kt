@@ -1,5 +1,7 @@
 package ir.wazhebox.feature.home
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -20,18 +22,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -57,19 +59,26 @@ import kotlinx.datetime.TimeZone
 
 /**
  * Home is a single scrollable "today" page: header, the progress hero card,
- * three metric cards, the box distribution and the add-word action.
- * Everything important is above the fold on a small phone.
+ * three metric cards and the box distribution. There is no add-word button
+ * here any more (v2): words come from the file import or the menu.
  */
 @Composable
 fun HomeScreen(
     onStartReview: () -> Unit,
     onFreePractice: () -> Unit,
-    onAddWord: () -> Unit,
+    onOpenMenu: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val importing by viewModel.importing.collectAsStateWithLifecycle()
+    val importReport by viewModel.importReport.collectAsStateWithLifecycle()
+    val importError by viewModel.importError.collectAsStateWithLifecycle()
     val now = Clock.System.now()
     val timeZone = TimeZone.currentSystemDefault()
+
+    val openCsv = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::importCsv)
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -82,11 +91,12 @@ fun HomeScreen(
             HomeHeader(
                 dateLabel = jalaliDayLabel(now, timeZone),
                 totalWords = state.totalWords,
+                onOpenMenu = onOpenMenu,
             )
         }
 
         // With an empty deck the hero would claim the day is done, which is
-        // wrong: the empty state below is the only thing worth showing.
+        // wrong: the import card below is the only thing worth showing.
         if (state.totalWords > 0) {
             item {
                 TodayHero(
@@ -96,37 +106,61 @@ fun HomeScreen(
                     onFreePractice = onFreePractice,
                 )
             }
-        }
-
-        if (state.totalWords == 0 && !state.loading) {
+            item { TodayStats(state) }
+            item { BoxDistribution(state.boxes) }
+        } else if (!state.loading) {
             item {
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.md)) {
                     EmptyState(
                         title = stringResource(R.string.home_empty),
                         message = stringResource(R.string.home_empty_hint),
-                        actionLabel = stringResource(R.string.home_add_starter),
-                        onAction = viewModel::importStarterDeck,
+                        actionLabel = stringResource(R.string.home_import_csv),
+                        onAction = {
+                            openCsv.launch(arrayOf("text/*", "text/csv", "text/comma-separated-values"))
+                        },
                     )
-                    TextButton(
-                        onClick = onAddWord,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(stringResource(R.string.home_quick_add))
+                    if (importing) {
+                        LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                     }
-                }
-            }
-        } else {
-            item { TodayStats(state) }
-            item { BoxDistribution(state.boxes) }
-            item {
-                OutlinedButton(
-                    onClick = onAddWord,
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(vertical = Spacing.md),
-                ) {
-                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(Spacing.sm))
-                    Text(stringResource(R.string.action_add_word))
+                    importReport?.let { report ->
+                        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                            Text(
+                                text = stringResource(
+                                    R.string.home_import_done,
+                                    PersianText.number(report.added),
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            if (report.duplicates > 0) {
+                                Text(
+                                    text = stringResource(
+                                        R.string.home_import_skipped,
+                                        PersianText.number(report.duplicates),
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            if (report.rejected.isNotEmpty()) {
+                                Text(
+                                    text = stringResource(
+                                        R.string.home_import_rejected,
+                                        PersianText.number(report.rejected.size),
+                                    ),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                    }
+                    if (importError) {
+                        Text(
+                            text = stringResource(R.string.home_import_error),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
                 }
             }
         }
@@ -134,7 +168,7 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HomeHeader(dateLabel: String, totalWords: Int) {
+private fun HomeHeader(dateLabel: String, totalWords: Int, onOpenMenu: () -> Unit) {
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -155,8 +189,16 @@ private fun HomeHeader(dateLabel: String, totalWords: Int) {
                 color = colors.onPrimaryContainer,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(colors.primaryContainer.copy(alpha = 0.65f))
+                    .background(colors.primaryContainer)
                     .padding(horizontal = Spacing.md, vertical = Spacing.xs),
+            )
+            Spacer(Modifier.width(Spacing.xs))
+        }
+        IconButton(onClick = onOpenMenu) {
+            Icon(
+                imageVector = Icons.Filled.Menu,
+                contentDescription = stringResource(R.string.nav_menu),
+                tint = colors.onSurface,
             )
         }
     }
@@ -187,12 +229,12 @@ private fun TodayHero(
             .background(
                 Brush.linearGradient(
                     listOf(
-                        colors.primary.copy(alpha = 0.16f),
-                        colors.secondaryContainer.copy(alpha = 0.55f),
+                        colors.primaryContainer,
+                        colors.secondaryContainer.copy(alpha = 0.7f),
                     ),
                 ),
             )
-            .border(1.dp, colors.primary.copy(alpha = 0.14f), shape)
+            .border(1.dp, colors.primary.copy(alpha = 0.12f), shape)
             .padding(Spacing.xl),
         verticalArrangement = Arrangement.spacedBy(Spacing.lg),
     ) {
@@ -338,7 +380,7 @@ private fun BoxDistribution(boxes: Map<Int, Int>) {
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
             .background(colors.surfaceContainerLow)
-            .border(1.dp, colors.outline.copy(alpha = 0.12f), MaterialTheme.shapes.large)
+            .border(1.dp, colors.outlineVariant, MaterialTheme.shapes.large)
             .padding(Spacing.lg),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
