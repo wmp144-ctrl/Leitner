@@ -1,6 +1,7 @@
 package ir.wazhebox.feature.review
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -30,17 +32,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import kotlin.math.roundToInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
@@ -91,10 +98,43 @@ fun ReviewScreen(
     val direction = current.card.direction
     val word = current.word
 
+    // Swipe gestures (PRD §12.2, opt-in): right reveals the answer, left fails
+    // the card once its answer is visible. The card follows the finger.
+    var dragOffset by remember(current.card.id) { mutableFloatStateOf(0f) }
+    val swipeThreshold = with(LocalDensity.current) { 96.dp.toPx() }
+    val hapticFeedback = androidx.compose.ui.platform.LocalHapticFeedback.current
+    fun tickHaptics() {
+        if (state.hapticsEnabled) {
+            hapticFeedback.performHapticFeedback(
+                androidx.compose.ui.hapticfeedback.HapticFeedbackType.Confirm,
+            )
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = Spacing.screen, vertical = Spacing.md),
+            .padding(horizontal = Spacing.screen, vertical = Spacing.md)
+            .pointerInput(state.swipeEnabled, state.showAnswer, current.card.id) {
+                if (!state.swipeEnabled) return@pointerInput
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        when {
+                            dragOffset >= swipeThreshold && !state.showAnswer -> {
+                                tickHaptics()
+                                viewModel.reveal()
+                            }
+                            dragOffset <= -swipeThreshold && state.showAnswer -> {
+                                tickHaptics()
+                                viewModel.rate(Rating.AGAIN)
+                            }
+                        }
+                        dragOffset = 0f
+                    },
+                    onDragCancel = { dragOffset = 0f },
+                    onHorizontalDrag = { _, amount -> dragOffset += amount },
+                )
+            },
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -150,6 +190,7 @@ fun ReviewScreen(
         Column(
             modifier = Modifier
                 .weight(1f)
+                .offset { IntOffset(dragOffset.roundToInt(), 0) }
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
