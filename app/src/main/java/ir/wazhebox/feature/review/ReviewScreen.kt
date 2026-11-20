@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +33,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.Undo
@@ -47,6 +51,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -64,6 +69,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -78,10 +84,11 @@ import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
 import ir.wazhebox.core.ui.components.BoxBadge
 import ir.wazhebox.core.ui.components.EmptyState
+import ir.wazhebox.core.ui.components.ProgressRing
+import ir.wazhebox.core.ui.components.StatCard
 import ir.wazhebox.core.ui.components.TapFlipCard
 import ir.wazhebox.core.ui.components.LoadingBox
 import ir.wazhebox.core.ui.intervalLabel
-import ir.wazhebox.core.ui.minutesLabel
 import ir.wazhebox.core.ui.theme.EnglishWordStyle
 import ir.wazhebox.core.ui.theme.Inter
 import ir.wazhebox.core.ui.theme.PersianMeaningStyle
@@ -681,6 +688,16 @@ private fun SessionSummary(
     onDone: () -> Unit,
     onExit: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val accuracy = if (reviewed == 0) 0.0 else correct.toDouble() / reviewed
+    val shareText = stringResource(
+        R.string.summary_share_text,
+        PersianText.number(reviewed),
+        PersianText.number(correct),
+        PersianText.percent(accuracy),
+    )
+    val minutes = PersianText.number(((elapsedMs / 60_000.0).coerceAtLeast(0.0).toInt()).coerceAtLeast(1))
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -699,23 +716,44 @@ private fun SessionSummary(
                 message = stringResource(R.string.home_free_practice_hint),
             )
         } else {
-            Text(
-                text = stringResource(R.string.summary_reviewed, PersianText.number(reviewed)),
-                style = MaterialTheme.typography.titleLarge,
-            )
-            Text(
-                text = stringResource(
-                    R.string.summary_correct,
-                    PersianText.number(correct) + " (" +
-                        PersianText.percent(if (reviewed == 0) 0.0 else correct.toDouble() / reviewed) + ")",
-                ),
-                style = MaterialTheme.typography.bodyLarge,
-            )
-            Text(
-                text = minutesLabel(elapsedMs),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            // The ring is the headline of the summary: accuracy is what the
+            // user came to see, the numbers sit under it as context.
+            ProgressRing(progress = accuracy.toFloat(), size = 168.dp, strokeWidth = 14.dp) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = PersianText.percent(accuracy),
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                    Text(
+                        text = stringResource(R.string.summary_accuracy),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                StatCard(
+                    value = PersianText.number(reviewed),
+                    label = stringResource(R.string.stats_reviews),
+                    icon = Icons.Filled.CheckCircle,
+                    modifier = Modifier.weight(1f),
+                )
+                StatCard(
+                    value = PersianText.number(correct),
+                    label = stringResource(R.string.summary_correct_label),
+                    icon = Icons.Filled.Check,
+                    modifier = Modifier.weight(1f),
+                )
+                StatCard(
+                    value = minutes,
+                    label = stringResource(R.string.summary_minutes_label),
+                    icon = Icons.Filled.Schedule,
+                    modifier = Modifier.weight(1f),
+                )
+            }
         }
         if (!freePractice) {
             Text(
@@ -727,6 +765,31 @@ private fun SessionSummary(
         }
         Spacer(Modifier.weight(1f))
         NotificationPermissionRequest()
+        if (reviewed > 0) {
+            OutlinedButton(
+                onClick = {
+                    val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(android.content.Intent.EXTRA_TEXT, shareText)
+                    }
+                    context.startActivity(
+                        android.content.Intent.createChooser(
+                            send,
+                            context.getString(R.string.summary_share),
+                        ),
+                    )
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                )
+                Spacer(Modifier.width(Spacing.sm))
+                Text(stringResource(R.string.summary_share))
+            }
+        }
         Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.summary_back_home))
         }

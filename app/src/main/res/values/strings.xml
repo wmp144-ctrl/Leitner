@@ -93,6 +93,11 @@
     <string name="summary_time">%1$s دقیقه</string>
     <string name="summary_tomorrow">فردا %1$s کارت منتظرت است</string>
     <string name="summary_back_home">بازگشت به خانه</string>
+    <string name="summary_accuracy">دقت پاسخ</string>
+    <string name="summary_correct_label">پاسخ درست</string>
+    <string name="summary_minutes_label">دقیقه</string>
+    <string name="summary_share">اشتراک‌گذاری نتیجه</string>
+    <string name="summary_share_text">با واژه‌باکس امروز %1$s کارت مرور کردم و %2$s پاسخ درست دادم (%3$s).</string>
 
     <!-- Library -->
     <string name="library_title">کتابخانه</string>

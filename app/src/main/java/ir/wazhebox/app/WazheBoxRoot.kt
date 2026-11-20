@@ -6,8 +6,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
@@ -16,11 +16,8 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,7 +46,10 @@ import ir.wazhebox.app.navigation.ReviewRoute
 import ir.wazhebox.app.navigation.SettingsRoute
 import ir.wazhebox.app.navigation.StatsRoute
 import ir.wazhebox.app.navigation.WordDetailRoute
+import ir.wazhebox.core.ui.components.CurvedNavBar
+import ir.wazhebox.core.ui.theme.Spacing
 import ir.wazhebox.core.ui.components.LoadingBox
+import ir.wazhebox.core.ui.components.NavBarTab
 import ir.wazhebox.feature.add.AddWordScreen
 import ir.wazhebox.feature.detail.WordDetailScreen
 import ir.wazhebox.feature.home.HomeScreen
@@ -85,35 +85,29 @@ fun WazheBoxRoot(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                // A hairline instead of a shadow keeps the bar flat like the
-                // rest of the paper surface (PRD §18.2).
-                Column {
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.10f),
-                    )
-                    NavigationBar(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        tonalElevation = 0.dp,
-                    ) {
-                    BottomTab.entries.forEach { tab ->
-                        NavigationBarItem(
-                            selected = destination?.hierarchy?.any { it.hasRoute(tab.routeClass) } == true,
-                            onClick = {
-                                navController.navigate(tab.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = { Icon(tab.icon, contentDescription = null) },
-                            label = { Text(stringResource(tab.labelRes)) },
-                        )
-                    }
-                    }
-                }
+                // Floating, slightly translucent bar with a curved notch that
+                // slides under the active tab (ADR-014).
+                CurvedNavBar(
+                    tabs = BottomTab.entries.map { tab ->
+                        NavBarTab(label = stringResource(tab.labelRes), icon = tab.icon)
+                    },
+                    selectedIndex = BottomTab.entries.indexOfFirst { tab ->
+                        destination?.hierarchy?.any { it.hasRoute(tab.routeClass) } == true
+                    }.coerceAtLeast(0),
+                    onSelect = { index ->
+                        val tab = BottomTab.entries[index]
+                        navController.navigate(tab.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .padding(horizontal = Spacing.lg, vertical = Spacing.sm),
+                )
             }
         },
         floatingActionButton = {
