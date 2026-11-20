@@ -16,8 +16,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import ir.wazhebox.R
 import ir.wazhebox.app.MainActivity
 import ir.wazhebox.core.notifications.NotificationChannels
+import ir.wazhebox.core.text.PersianText
 import ir.wazhebox.core.time.StudyClock
-import ir.wazhebox.core.time.StudyDays
 import ir.wazhebox.data.db.WazheBoxDatabase
 import ir.wazhebox.data.settings.SettingsRepository
 import kotlinx.coroutines.flow.first
@@ -64,10 +64,8 @@ class DailyReminderWorker(
         if (local.hour < 7 || local.hour >= 23) return Result.success()
 
         val due = database.cardDao().countDueNow(now.toEpochMilliseconds())
-        val today = StudyDays.studyDayOf(now, clock.timeZone(), settings.studyDayStartHour)
-        val stat = database.statsDao().forDay(today.toString())
+        // Nothing left to review today: no notification at all (PRD §17).
         if (due <= 0) return Result.success()
-        if (stat != null && stat.reviewsDone > 0 && due == 0) return Result.success()
 
         showNotification(due)
         return Result.success()
@@ -92,7 +90,10 @@ class DailyReminderWorker(
         val notification = NotificationCompat.Builder(applicationContext, NotificationChannels.DAILY_REVIEW_ID)
             .setSmallIcon(android.R.drawable.ic_menu_agenda)
             .setContentTitle(
-                applicationContext.getString(R.string.notification_title, due.toString()),
+                applicationContext.getString(
+                    R.string.notification_title,
+                    PersianText.toPersianDigits(due.toString()),
+                ),
             )
             .setContentText(applicationContext.getString(R.string.notification_body))
             .setContentIntent(pending)

@@ -158,7 +158,7 @@ fun DataTransferScreen(
                 onClick = { openJsonPreview.launch(arrayOf("application/json", "text/plain", "*/*")) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
-            ) { Text(stringResource(R.string.settings_restore) + " (پیش‌نمایش)") }
+            ) { Text(stringResource(R.string.io_preview_backup)) }
             Button(
                 onClick = { openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*")) },
                 modifier = Modifier.fillMaxWidth(),
@@ -214,9 +214,13 @@ fun DataTransferScreen(
             )
         }
 
-        state.message?.let {
+        state.message?.let { message ->
             Text(
-                text = stringResource(R.string.io_export_done, ""),
+                // "exported" and "restored" used to both render the export
+                // message with an empty file name, so a restore looked like a
+                // broken export.
+                text = if (message == "restored") stringResource(R.string.io_restored)
+                else stringResource(R.string.io_saved),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
             )

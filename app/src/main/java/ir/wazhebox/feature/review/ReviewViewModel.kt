@@ -62,7 +62,14 @@ class ReviewViewModel @Inject constructor(
     val state: StateFlow<ReviewUiState> = _state.asStateFlow()
 
     private val queue = ArrayDeque<StudyItem>()
-    private val undoStack = ArrayDeque<Pair<StudyItem, GradeOutcome>>()
+    /** Undo needs the rating too, otherwise the accuracy counter cannot be rolled back. */
+    private data class UndoEntry(
+        val item: StudyItem,
+        val outcome: GradeOutcome,
+        val countedCorrect: Boolean,
+    )
+
+    private val undoStack = ArrayDeque<UndoEntry>()
     private var questionStartedAt: Long = 0
     private var sessionStartedAt: Long = 0
 
@@ -145,7 +152,13 @@ class ReviewViewModel @Inject constructor(
                 _state.value = _state.value.copy(saveError = true)
                 return@launch
             }
-            undoStack.addLast(current to outcome).also {
+            undoStack.addLast(
+                UndoEntry(
+                    item = current,
+                    outcome = outcome,
+                    countedCorrect = rating != Rating.AGAIN,
+                ),
+            ).also {
                 while (undoStack.size > MAX_UNDO) undoStack.removeFirst()
             }
             val requeue = outcome.card.state == CardState.LEARNING ||
@@ -231,16 +244,19 @@ class ReviewViewModel @Inject constructor(
     }
 
     fun undo() {
-        val (undoItem, outcome) = undoStack.removeLastOrNull() ?: return
+        val entry = undoStack.removeLastOrNull() ?: return
         viewModelScope.launch {
-            studyRepository.undo(outcome)
-            val restored = undoItem.copy(card = outcome.cardBefore)
+            studyRepository.undo(entry.outcome)
+            val restored = entry.item.copy(card = entry.outcome.cardBefore)
             queue.addFirst(restored)
             _state.value = _state.value.copy(
                 current = restored,
                 remaining = queue.size,
                 reviewed = (_state.value.reviewed - 1).coerceAtLeast(0),
-                correct = _state.value.correct.coerceAtLeast(0),
+                // Undoing a correct answer must also take it back out of the
+                // accuracy shown on the summary; it used to stay counted.
+                correct = (_state.value.correct - if (entry.countedCorrect) 1 else 0)
+                    .coerceAtLeast(0),
                 canUndo = undoStack.isNotEmpty(),
                 showAnswer = false,
                 typed = "",

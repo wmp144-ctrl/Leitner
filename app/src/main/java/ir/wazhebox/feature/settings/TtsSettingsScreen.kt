@@ -62,7 +62,7 @@ fun TtsSettingsScreen(
         SectionCard {
             Text(
                 text = when (status) {
-                    TtsStatus.READY -> "صدای انگلیسی آماده است."
+                    TtsStatus.READY -> stringResource(R.string.tts_ready)
                     TtsStatus.MISSING_DATA -> stringResource(R.string.review_tts_missing)
                     TtsStatus.NOT_SUPPORTED -> stringResource(R.string.review_tts_missing)
                     TtsStatus.ERROR -> stringResource(R.string.review_tts_missing)
@@ -101,7 +101,7 @@ fun TtsSettingsScreen(
 
         SectionCard {
             Text(
-                text = "برای نصب صدای انگلیسی: تنظیمات گوشی ← زبان و ورودی ← خروجی تبدیل متن به گفتار ← موتور Google ← نصب داده‌های صوتی.",
+                text = stringResource(R.string.tts_install_steps),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

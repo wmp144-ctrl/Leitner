@@ -1,6 +1,9 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+
 package ir.wazhebox.feature.detail
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -104,7 +107,12 @@ fun WordDetailScreen(
                 }
             }
             if (state.tags.isNotEmpty()) {
-                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                // A word can carry several tags; a Row would push the extra
+                // chips off the card, so they wrap instead.
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                ) {
                     state.tags.forEach { tag -> AssistChip(onClick = {}, label = { Text(tag) }) }
                 }
             }
@@ -172,8 +180,8 @@ fun WordDetailScreen(
                     word.createdAt.toLocalDateTime(TimeZone.currentSystemDefault()).date,
                 ),
             )
-            if (word.pos != null) {
-                KeyValueRow(label = stringResource(R.string.word_pos), value = word.pos!!)
+            word.pos?.let { pos ->
+                KeyValueRow(label = stringResource(R.string.word_pos), value = pos)
             }
         }
 

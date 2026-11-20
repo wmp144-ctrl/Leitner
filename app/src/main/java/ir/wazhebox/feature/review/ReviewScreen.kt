@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -148,6 +149,10 @@ fun ReviewScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // Edge-to-edge is on, so the keyboard has to lift this column
+            // explicitly; otherwise the rating row and the typed answer sit
+            // under the IME (ADR-016).
+            .imePadding()
             .padding(horizontal = Spacing.screen, vertical = Spacing.md)
             .pointerInput(state.swipeEnabled, state.showAnswer, current.card.id) {
                 if (!state.swipeEnabled) return@pointerInput
@@ -310,6 +315,9 @@ fun ReviewScreen(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Done,
                         autoCorrectEnabled = false,
+                    ),
+                    keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                        onDone = { if (state.typed.isNotBlank()) viewModel.checkAnswer() },
                     ),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = Inter),
                     singleLine = true,

@@ -20,7 +20,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import android.content.Intent
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -56,6 +58,7 @@ import ir.wazhebox.feature.home.HomeScreen
 import ir.wazhebox.feature.library.LibraryScreen
 import ir.wazhebox.feature.onboarding.OnboardingScreen
 import ir.wazhebox.feature.review.ReviewScreen
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Root composable: one NavHost plus the bottom bar.
@@ -63,6 +66,8 @@ import ir.wazhebox.feature.review.ReviewScreen
  */
 @Composable
 fun WazheBoxRoot(
+    // Intents that arrive after launch (widget taps, notification taps).
+    newIntents: Flow<Intent>? = null,
     viewModel: RootViewModel = hiltViewModel(),
 ) {
     val onboardingCompleted by viewModel.onboardingCompleted.collectAsStateWithLifecycle()
@@ -81,6 +86,12 @@ fun WazheBoxRoot(
     val showFab = destination?.let {
         it.hasRoute<HomeRoute>() || it.hasRoute<LibraryRoute>()
     } == true
+
+    if (newIntents != null) {
+        LaunchedEffect(navController) {
+            newIntents.collect { intent -> navController.handleDeepLink(intent) }
+        }
+    }
 
     Scaffold(
         bottomBar = {

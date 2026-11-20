@@ -115,6 +115,7 @@
     <string name="library_sort_alphabet">الفبا</string>
     <string name="library_empty">هنوز لغتی نداری</string>
     <string name="library_empty_search">چیزی پیدا نشد</string>
+    <string name="library_empty_search_hint">عبارت دیگری را امتحان کن یا فیلترها را بردار.</string>
     <string name="library_selected">%1$s انتخاب شد</string>
     <string name="library_suspend">معلق کردن</string>
     <string name="library_unsuspend">فعال کردن</string>
@@ -241,6 +242,12 @@
     <string name="io_restore_replace">جایگزینی کامل</string>
     <string name="io_restore_preview">%1$s دک، %2$s لغت، %3$s مرور</string>
     <string name="io_export_done">فایل ساخته شد: %1$s</string>
+    <string name="io_saved">فایل ذخیره شد.</string>
+    <string name="io_restored">پشتیبان بازیابی شد.</string>
+    <string name="io_preview_backup">پیش‌نمایش پشتیبان</string>
+    <string name="library_delete_confirm">لغت‌های انتخاب‌شده و تاریخچهٔ مرورشان حذف شوند؟ این کار برگشت‌پذیر نیست.</string>
+    <string name="tts_ready">صدای انگلیسی آماده است.</string>
+    <string name="tts_install_steps">برای نصب صدای انگلیسی: تنظیمات گوشی ← زبان و ورودی ← خروجی تبدیل متن به گفتار ← موتور Google ← نصب داده‌های صوتی.</string>
     <string name="io_error_corrupt">فایل خراب است؛ هیچ تغییری انجام نشد.</string>
     <string name="io_error_version">این فایل با نسخهٔ جدیدتری از اپ ساخته شده است.</string>
     <string name="io_no_space">فضای کافی نیست</string>

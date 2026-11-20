@@ -85,13 +85,17 @@ fun HomeScreen(
             )
         }
 
-        item {
-            TodayHero(
-                state = state,
-                now = now,
-                onStartReview = onStartReview,
-                onFreePractice = onFreePractice,
-            )
+        // With an empty deck the hero would claim the day is done, which is
+        // wrong: the empty state below is the only thing worth showing.
+        if (state.totalWords > 0) {
+            item {
+                TodayHero(
+                    state = state,
+                    now = now,
+                    onStartReview = onStartReview,
+                    onFreePractice = onFreePractice,
+                )
+            }
         }
 
         if (state.totalWords == 0 && !state.loading) {

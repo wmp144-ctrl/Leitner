@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
@@ -62,6 +63,7 @@ fun LibraryScreen(
     val colors = MaterialTheme.colorScheme
     val now = Clock.System.now()
     var sortMenu by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -166,7 +168,7 @@ fun LibraryScreen(
                 TextButton(onClick = { viewModel.setSuspended(true) }) {
                     Text(stringResource(R.string.library_suspend))
                 }
-                TextButton(onClick = viewModel::deleteSelected) {
+                TextButton(onClick = { confirmDelete = true }) {
                     Text(stringResource(R.string.action_delete), color = colors.error)
                 }
                 TextButton(onClick = viewModel::clearSelection) {
@@ -179,11 +181,15 @@ fun LibraryScreen(
             EmptyState(
                 title = if (state.query.isBlank()) stringResource(R.string.library_empty)
                 else stringResource(R.string.library_empty_search),
-                message = stringResource(R.string.home_empty_hint),
+                message = if (state.query.isBlank()) stringResource(R.string.home_empty_hint)
+                else stringResource(R.string.library_empty_search_hint),
             )
         } else {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                // The list is the last child of a Column: weight keeps it inside
+                // the remaining height instead of taking the full screen and
+                // losing its last rows behind the header.
+                modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 contentPadding = PaddingValues(top = Spacing.xs, bottom = Spacing.xxxl),
             ) {
@@ -244,5 +250,25 @@ fun LibraryScreen(
                 }
             }
         }
+    }
+
+    // Deleting a batch is irreversible, so it asks first (undo only covers the
+    // current review session, not library deletes).
+    if (confirmDelete) {
+        AlertDialog(
+            onDismissRequest = { confirmDelete = false },
+            title = { Text(stringResource(R.string.library_delete_confirm)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmDelete = false
+                    viewModel.deleteSelected()
+                }) { Text(stringResource(R.string.action_delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDelete = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
     }
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -55,6 +56,9 @@ fun AddWordScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // Edge-to-edge: reserve the IME height so the save button can be
+            // scrolled above the keyboard.
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(Spacing.screen),
         verticalArrangement = Arrangement.spacedBy(Spacing.md),
@@ -101,18 +105,18 @@ fun AddWordScreen(
             ) {
                 Text(
                     text = stringResource(R.string.word_pos) + ": " +
-                        (posLabel(state.pos).ifEmpty { "—" }),
+                        posLabel(state.pos).ifEmpty { "—" },
                 )
             }
             DropdownMenu(
                 expanded = posExpanded,
                 onDismissRequest = { posExpanded = false },
             ) {
-                posOptions.forEach { (key, label) ->
+                posOptionKeys.forEach { (key, labelRes) ->
                     DropdownMenuItem(
-                        text = { Text(label) },
+                        text = { Text(if (labelRes == 0) "—" else stringResource(labelRes)) },
                         onClick = {
-                            viewModel.setPos(key)
+                            viewModel.setPos(key.ifEmpty { null })
                             posExpanded = false
                         },
                     )
@@ -207,23 +211,26 @@ fun AddWordScreen(
     }
 }
 
+/** Labels live in strings.xml so a changed wording only has one source. */
+@Composable
 private fun posLabel(key: String?): String = when (key) {
-    "noun" -> "اسم"
-    "verb" -> "فعل"
-    "adj" -> "صفت"
-    "adv" -> "قید"
-    "phrase" -> "عبارت"
-    "prep" -> "حرف اضافه"
+    "noun" -> stringResource(R.string.word_pos_noun)
+    "verb" -> stringResource(R.string.word_pos_verb)
+    "adj" -> stringResource(R.string.word_pos_adj)
+    "adv" -> stringResource(R.string.word_pos_adv)
+    "phrase" -> stringResource(R.string.word_pos_phrase)
+    "prep" -> stringResource(R.string.word_pos_preposition)
+    "other" -> stringResource(R.string.word_pos_other)
     else -> ""
 }
 
-private val posOptions = listOf(
-    null to "—",
-    "noun" to "اسم",
-    "verb" to "فعل",
-    "adj" to "صفت",
-    "adv" to "قید",
-    "phrase" to "عبارت",
-    "prep" to "حرف اضافه",
-    "other" to "دیگر",
+private val posOptionKeys = listOf(
+    "" to 0,
+    "noun" to R.string.word_pos_noun,
+    "verb" to R.string.word_pos_verb,
+    "adj" to R.string.word_pos_adj,
+    "adv" to R.string.word_pos_adv,
+    "phrase" to R.string.word_pos_phrase,
+    "prep" to R.string.word_pos_preposition,
+    "other" to R.string.word_pos_other,
 )
