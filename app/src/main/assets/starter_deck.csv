@@ -22,12 +22,12 @@ rank,term,meaning_fa,pos,ipa,example_en,example_fa,level
 21,life,زندگی,noun,/laɪf/,Life is short.,زندگی کوتاه است.,A1
 22,hand,دست,noun,/hænd/,Wash your hands.,دست‌هایت را بشور.,A1
 23,eye,چشم,noun,/aɪ/,Look me in the eye.,به چشمانم نگاه کن.,A1
-24,door,در,noun,/dɔːr/,Close the door, please.,لطفاً در را ببند.,A1
+24,door,در,noun,/dɔːr/,"Close the door, please.",لطفاً در را ببند.,A1
 25,word,کلمه|واژه,noun,/wɜːrd/,I learn ten words a day.,روزی ده کلمه یاد می‌گیرم.,A1
 26,eat,خوردن,verb,/iːt/,We eat at seven.,ساعت هفت غذا می‌خوریم.,A1
 27,drink,نوشیدن,verb,/drɪŋk/,Drink more water.,آب بیشتری بنوش.,A1
 28,go,رفتن,verb,/ɡoʊ/,I go home at five.,ساعت پنج به خانه می‌روم.,A1
-29,come,آمدن,verb,/kʌm/,Come here, please.,لطفاً اینجا بیا.,A1
+29,come,آمدن,verb,/kʌm/,"Come here, please.",لطفاً اینجا بیا.,A1
 30,see,دیدن,verb,/siː/,I can see the sea.,دریا را می‌بینم.,A1
 31,know,دانستن|شناختن,verb,/noʊ/,Do you know her?,او را می‌شناسی؟,A1
 32,want,خواستن,verb,/wɑːnt/,I want a coffee.,یک قهوه می‌خواهم.,A1
@@ -121,10 +121,10 @@ rank,term,meaning_fa,pos,ipa,example_en,example_fa,level
 120,crowded,شلوغ,adj,/ˈkraʊdɪd/,The bus was crowded.,اتوبوس شلوغ بود.,A2
 121,especially,به‌ویژه,adv,/ɪˈspeʃəli/,Especially on Fridays.,به‌ویژه جمعه‌ها.,A2
 122,probably,احتمالاً,adv,/ˈprɑːbəbli/,He is probably at home.,او احتمالاً خانه است.,A2
-123,however,با این حال,adv,/haʊˈevər/,However, I disagree.,با این حال موافق نیستم.,A2
+123,however,با این حال,adv,/haʊˈevər/,"However, I disagree.",با این حال موافق نیستم.,A2
 124,therefore,بنابراین,adv,/ˈðerfɔːr/,It rained; therefore we stayed.,باران آمد؛ بنابراین ماندیم.,A2
 125,instead,به جای آن,adv,/ɪnˈsted/,Use tea instead.,به جایش چای بنوش.,A2
-126,although,اگرچه,conj,/ɔːlˈðoʊ/,Although tired, she ran.,اگرچه خسته بود، دوید.,A2
+126,although,اگرچه,conj,/ɔːlˈðoʊ/,"Although tired, she ran.",اگرچه خسته بود، دوید.,A2
 127,unless,مگر اینکه,conj,/ənˈles/,Don't go unless necessary.,مگر لازم باشد نرو.,A2
 128,while,در حالی که,conj,/waɪl/,He called while I studied.,وقتی درس می‌خواندم زنگ زد.,A2
 129,amount,مقدار,noun,/əˈmaʊnt/,A small amount is enough.,مقدار کمی کافی است.,B1
@@ -149,3 +149,456 @@ rank,term,meaning_fa,pos,ipa,example_en,example_fa,level
 148,tendency,گرایش,noun,/ˈtendənsi/,We have a tendency to forget.,ما گرایش داریم فراموش کنیم.,B1
 149,accurate,دقیق,adj,/ˈækjərət/,The schedule is accurate.,زمان‌بندی دقیق است.,B1
 150,effective,مؤثر,adj,/ɪˈfektɪv/,Spaced review is effective.,مرور فاصله‌دار مؤثر است.,B1
+151,hello,سلام,interj,/həˈloʊ/,"Hello, how are you?",سلام، چطوری؟,A1
+152,goodbye,خداحافظ,interj,/ɡʊdˈbaɪ/,"Goodbye, see you tomorrow.",خداحافظ، فردا می‌بینمت.,A1
+153,thanks,تشکر,noun,/θæŋks/,Thanks for your help.,ممنون از کمکت.,A1
+154,mother,مادر,noun,/ˈmʌðər/,My mother cooks well.,مادرم خوب آشپزی می‌کند.,A1
+155,father,پدر,noun,/ˈfɑːðər/,His father works downtown.,پدرش مرکز شهر کار می‌کند.,A1
+156,brother,برادر,noun,/ˈbrʌðər/,I have one brother.,یک برادر دارم.,A1
+157,sister,خواهر,noun,/ˈsɪstər/,Her sister is a doctor.,خواهرش پزشک است.,A1
+158,room,اتاق,noun,/ruːm/,This room is clean.,این اتاق تمیز است.,A1
+159,kitchen,آشپزخانه,noun,/ˈkɪtʃɪn/,The kitchen is upstairs.,آشپزخانه طبقهٔ بالا است.,A1
+160,table,میز,noun,/ˈteɪbl/,Put the cup on the table.,لیوان را روی میز بگذار.,A1
+161,chair,صندلی,noun,/tʃer/,This chair is comfortable.,این صندلی راحت است.,A1
+162,window,پنجره,noun,/ˈwɪndoʊ/,"Open the window, please.",لطفاً پنجره را باز کن.,A1
+163,bread,نان,noun,/bred/,We buy fresh bread daily.,هر روز نان تازه می‌خریم.,A1
+164,milk,شیر,noun,/mɪlk/,The milk is in the fridge.,شیر در یخچال است.,A1
+165,rice,برنج,noun,/raɪs/,We eat rice for lunch.,ناهار برنج می‌خوریم.,A1
+166,tea,چای,noun,/tiː/,Would you like some tea?,چای میل داری؟,A1
+167,apple,سیب,noun,/ˈæpl/,She ate an apple.,او یک سیب خورد.,A1
+168,egg,تخم‌مرغ,noun,/eɡ/,I need two eggs.,دو تخم‌مرغ لازم دارم.,A1
+169,meat,گوشت,noun,/miːt/,He does not eat meat.,او گوشت نمی‌خورد.,A1
+170,sugar,شکر,noun,/ˈʃʊɡər/,"No sugar in my tea, please.",لطفاً چایم بدون شکر.,A1
+171,salt,نمک,noun,/sɔːlt/,Add a little salt.,کمی نمک اضافه کن.,A1
+172,red,قرمز,adj,/red/,She wore a red coat.,او کت قرمز پوشید.,A1
+173,blue,آبی,adj,/bluː/,The sky is blue today.,امروز آسمان آبی است.,A1
+174,green,سبز,adj,/ɡriːn/,I like green tea.,من چای سبز دوست دارم.,A1
+175,black,سیاه,adj,/blæk/,He drives a black car.,او ماشین سیاه می‌راند.,A1
+176,white,سفید,adj,/waɪt/,The walls are white.,دیوارها سفید هستند.,A1
+177,yellow,زرد,adj,/ˈjeloʊ/,The leaves turn yellow.,برگ‌ها زرد می‌شوند.,A1
+178,fast,سریع,adj,/fæst/,That train is fast.,آن قطار سریع است.,A1
+179,slow,آهسته,adj,/sloʊ/,Traffic is slow this morning.,امروز صبح ترافیک کند است.,A1
+180,morning,صبح,noun,/ˈmɔːrnɪŋ/,I run every morning.,هر صبح می‌دوم.,A1
+181,head,سر,noun,/hed/,My head hurts a little.,سرم کمی درد می‌کند.,A1
+182,teacher,معلم,noun,/ˈtiːtʃər/,Our teacher is patient.,معلم ما صبور است.,A1
+183,student,دانش‌آموز,noun,/ˈstuːdnt/,She is a good student.,او دانش‌آموز خوبی است.,A1
+184,pen,خودکار,noun,/pen/,Can I borrow your pen?,می‌توانم خودکارت را قرض بگیرم؟,A1
+185,phone,تلفن,noun,/foʊn/,My phone is charging.,گوشی‌ام در حال شارژ است.,A1
+186,street,خیابان,noun,/striːt/,The street is very narrow.,خیابان خیلی باریک است.,A1
+187,shop,فروشگاه,noun,/ʃɑːp/,The shop opens at nine.,فروشگاه ساعت نه باز می‌شود.,A1
+188,bus,اتوبوس,noun,/bʌs/,I take the bus to work.,با اتوبوس به سر کار می‌روم.,A1
+189,train,قطار,noun,/treɪn/,The train leaves at six.,قطار ساعت شش حرکت می‌کند.,A1
+190,sleep,خوابیدن,verb,/sliːp/,I sleep seven hours.,هفت ساعت می‌خوابم.,A1
+191,walk,راه رفتن,verb,/wɔːk/,They walk in the park.,آن‌ها در پارک قدم می‌زنند.,A1
+192,read,خواندن,verb,/riːd/,I read before bed.,قبل از خواب می‌خوانم.,A1
+193,write,نوشتن,verb,/raɪt/,Write your name here.,نامت را اینجا بنویس.,A1
+194,listen,گوش دادن,verb,/ˈlɪsn/,Listen to this song.,به این آهنگ گوش کن.,A1
+195,speak,صحبت کردن,verb,/spiːk/,Do you speak English?,انگلیسی صحبت می‌کنی؟,A1
+196,buy,خریدن,verb,/baɪ/,I need to buy milk.,باید شیر بخرم.,A1
+197,live,زندگی کردن,verb,/lɪv/,We live near the river.,ما نزدیک رودخانه زندگی می‌کنیم.,A1
+198,play,بازی کردن,verb,/pleɪ/,The kids play outside.,بچه‌ها بیرون بازی می‌کنند.,A1
+199,start,شروع کردن,verb,/stɑːrt/,The class starts at nine.,کلاس ساعت نه شروع می‌شود.,A1
+200,finish,تمام کردن,verb,/ˈfɪnɪʃ/,I finish work at five.,ساعت پنج کارم تمام می‌شود.,A1
+201,learn,یاد گرفتن,verb,/lɜːrn/,Children learn fast.,بچه‌ها سریع یاد می‌گیرند.,A1
+202,watch,تماشا کردن,verb,/wɑːtʃ/,We watch films on Fridays.,جمعه‌ها فیلم تماشا می‌کنیم.,A1
+203,holiday,تعطیلات,noun,/ˈhɑːlədeɪ/,We spent the holiday at home.,تعطیلات را در خانه گذراندیم.,A2
+204,ticket,بلیت,noun,/ˈtɪkɪt/,I booked two tickets.,دو بلیت رزرو کردم.,A2
+205,airport,فرودگاه,noun,/ˈerpɔːrt/,The airport is far from here.,فرودگاه از اینجا دور است.,A2
+206,station,ایستگاه,noun,/ˈsteɪʃn/,Meet me at the station.,در ایستگاه منتظرم باش.,A2
+207,hotel,هتل,noun,/hoʊˈtel/,The hotel has a view.,هتل منظره دارد.,A2
+208,map,نقشه,noun,/mæp/,Let us check the map.,بیا نقشه را ببینیم.,A2
+209,luggage,چمدان,noun,/ˈlʌɡɪdʒ/,My luggage is heavy.,چمدانم سنگین است.,A2
+210,passport,گذرنامه,noun,/ˈpæspɔːrt/,Do not forget your passport.,گذرنامه‌ات را فراموش نکن.,A2
+211,journey,سفر,noun,/ˈdʒɜːrni/,The journey took six hours.,سفر شش ساعت طول کشید.,A2
+212,guide,راهنما,noun,/ɡaɪd/,Our guide spoke slowly.,راهنمای ما آهسته صحبت کرد.,A2
+213,beach,ساحل,noun,/biːtʃ/,The beach was empty.,ساحل خالی بود.,A2
+214,mountain,کوه,noun,/ˈmaʊntn/,We climbed the mountain.,کوه را بالا رفتیم.,A2
+215,river,رودخانه,noun,/ˈrɪvər/,The river is frozen.,رودخانه یخ زده است.,A2
+216,forest,جنگل,noun,/ˈfɔːrɪst/,The forest is very quiet.,جنگل خیلی آرام است.,A2
+217,lake,دریاچه,noun,/leɪk/,They swam in the lake.,آن‌ها در دریاچه شنا کردند.,A2
+218,island,جزیره,noun,/ˈaɪlənd/,The island is small.,جزیره کوچک است.,A2
+219,weather,آب و هوا,noun,/ˈweðər/,The weather changed suddenly.,آب و هوا ناگهان عوض شد.,A2
+220,rain,باران,noun,/reɪn/,The rain stopped at noon.,باران ظهر قطع شد.,A2
+221,snow,برف,noun,/snoʊ/,Snow covered the road.,برف جاده را پوشاند.,A2
+222,wind,باد,noun,/wɪnd/,The wind is strong today.,امروز باد شدید است.,A2
+223,cloud,ابر,noun,/klaʊd/,A dark cloud appeared.,ابر تیره‌ای پیدا شد.,A2
+224,sunny,آفتابی,adj,/ˈsʌni/,It is sunny this afternoon.,امروز بعدازظهر آفتابی است.,A2
+225,storm,طوفان,noun,/stɔːrm/,The storm damaged the roof.,طوفان به پشت‌بام آسیب زد.,A2
+226,temperature,دما,noun,/ˈtemprətʃər/,The temperature dropped quickly.,دما سریع افتاد.,A2
+227,season,فصل,noun,/ˈsiːzn/,Autumn is my favorite season.,پاییز فصل مورد علاقهٔ من است.,A2
+228,spring,بهار,noun,/sprɪŋ/,Flowers bloom in spring.,گل‌ها در بهار می‌شکفند.,A2
+229,autumn,پاییز,noun,/ˈɔːtəm/,Leaves fall in autumn.,برگ‌ها در پاییز می‌ریزند.,A2
+230,summer,تابستان,noun,/ˈsʌmər/,Summer here is hot.,تابستان اینجا گرم است.,A2
+231,winter,زمستان,noun,/ˈwɪntər/,We ski in winter.,زمستان اسکی می‌کنیم.,A2
+232,doctor,پزشک,noun,/ˈdɑːktər/,The doctor checked my heart.,پزشک قلبم را معاینه کرد.,A2
+233,medicine,دارو,noun,/ˈmedɪsn/,Take this medicine twice daily.,این دارو را روزی دو بار بخور.,A2
+234,hospital,بیمارستان,noun,/ˈhɑːspɪtl/,The hospital is nearby.,بیمارستان نزدیک است.,A2
+235,pain,درد,noun,/peɪn/,I have a pain in my back.,کمرم درد می‌کند.,A2
+236,fever,تب,noun,/ˈfiːvər/,The child has a fever.,کودک تب دارد.,A2
+237,headache,سردرد,noun,/ˈhedeɪk/,A headache stopped my work.,سردرد کارم را متوقف کرد.,A2
+238,tired,خسته,adj,/ˈtaɪərd/,I feel tired after work.,بعد از کار خسته‌ام.,A2
+239,sick,بیمار,adj,/sɪk/,She stayed home when sick.,او وقتی بیمار بود خانه ماند.,A2
+240,healthy,سالم,adj,/ˈhelθi/,Walking keeps you healthy.,پیاده‌روی تو را سالم نگه می‌دارد.,A2
+241,hungry,گرسنه,adj,/ˈhʌŋɡri/,The children are hungry.,بچه‌ها گرسنه‌اند.,A2
+242,thirsty,تشنه,adj,/ˈθɜːrsti/,I am thirsty after running.,بعد از دویدن تشنه‌ام.,A2
+243,delicious,خوشمزه,adj,/dɪˈlɪʃəs/,This soup is delicious.,این سوپ خوشمزه است.,A2
+244,breakfast,صبحانه,noun,/ˈbrekfəst/,Breakfast is ready.,صبحانه آماده است.,A2
+245,lunch,ناهار,noun,/lʌntʃ/,We had lunch outside.,بیرون ناهار خوردیم.,A2
+246,dinner,شام,noun,/ˈdɪnər/,Dinner is served at eight.,شام ساعت هشت سرو می‌شود.,A2
+247,restaurant,رستوران,noun,/ˈrestərɑːnt/,This restaurant is new.,این رستوران تازه باز شده است.,A2
+248,menu,منو,noun,/ˈmenjuː/,Can I see the menu?,می‌توانم منو را ببینم؟,A2
+249,waiter,پیشخدمت,noun,/ˈweɪtər/,The waiter brought water.,پیشخدمت آب آورد.,A2
+250,bill,صورت‌حساب,noun,/bɪl/,Please bring the bill.,لطفاً صورت‌حساب را بیاور.,A2
+251,cook,آشپزی کردن,verb,/kʊk/,He cooks on weekends.,او آخر هفته آشپزی می‌کند.,A2
+252,taste,چشیدن,verb,/teɪst/,Taste the soup first.,اول سوپ را بچش.,A2
+253,sweet,شیرین,adj,/swiːt/,This cake is too sweet.,این کیک خیلی شیرین است.,A2
+254,spicy,تند,adj,/ˈspaɪsi/,The food is very spicy.,غذا خیلی تند است.,A2
+255,fresh,تازه,adj,/freʃ/,We bought fresh fruit.,میوهٔ تازه خریدیم.,A2
+256,fruit,میوه,noun,/fruːt/,Fruit is good for you.,میوه برایت خوب است.,A2
+257,vegetable,سبزیجات,noun,/ˈvedʒtəbl/,Add more vegetables to dinner.,سبزیجات بیشتری به شام اضافه کن.,A2
+258,cheese,پنیر,noun,/tʃiːz/,He likes cheese on bread.,او پنیر روی نان دوست دارد.,A2
+259,butter,کره,noun,/ˈbʌtər/,Melt the butter first.,اول کره را آب کن.,A2
+260,coffee,قهوه,noun,/ˈkɔːfi/,I drink coffee without sugar.,قهوه را بدون شکر می‌نوشم.,A2
+261,juice,آبمیوه,noun,/dʒuːs/,The juice is cold.,آبمیوه سرد است.,A2
+262,bottle,بطری,noun,/ˈbɑːtl/,Fill the bottle with water.,بطری را آب کن.,A2
+263,cup,فنجان,noun,/kʌp/,She held a warm cup.,او فنجان گرمی در دست داشت.,A2
+264,plate,بشقاب,noun,/pleɪt/,Put the plate on the table.,بشقاب را روی میز بگذار.,A2
+265,knife,چاقو,noun,/naɪf/,This knife is sharp.,این چاقو تیز است.,A2
+266,spoon,قاشق,noun,/spuːn/,I need a clean spoon.,قاشق تمیزی لازم دارم.,A2
+267,job,شغل,noun,/dʒɑːb/,She found a new job.,او شغل تازه‌ای پیدا کرد.,A2
+268,office,دفتر,noun,/ˈɔːfɪs/,The office is on the third floor.,دفتر در طبقهٔ سوم است.,A2
+269,meeting,جلسه,noun,/ˈmiːtɪŋ/,The meeting starts at ten.,جلسه ساعت ده شروع می‌شود.,A2
+270,manager,مدیر,noun,/ˈmænɪdʒər/,The manager approved the plan.,مدیر طرح را تأیید کرد.,A2
+271,salary,حقوق,noun,/ˈsæləri/,The salary is paid monthly.,حقوق ماهانه پرداخت می‌شود.,A2
+272,interview,مصاحبه,noun,/ˈɪntərvjuː/,My interview went well.,مصاحبه‌ام خوب پیش رفت.,A2
+273,company,شرکت,noun,/ˈkʌmpəni/,The company hired ten people.,شرکت ده نفر استخدام کرد.,A2
+274,customer,مشتری,noun,/ˈkʌstəmər/,The customer asked for help.,مشتری کمک خواست.,A2
+275,business,کسب‌وکار,noun,/ˈbɪznəs/,Business is slow this month.,کسب‌وکار این ماه کند است.,A2
+276,market,بازار,noun,/ˈmɑːrkɪt/,We shop at the market.,از بازار خرید می‌کنیم.,A2
+277,price,قیمت,noun,/praɪs/,The price went up.,قیمت بالا رفت.,A2
+278,cheap,ارزان,adj,/tʃiːp/,This one is cheaper.,این یکی ارزان‌تر است.,A2
+279,expensive,گران,adj,/ɪkˈspensɪv/,That hotel is expensive.,آن هتل گران است.,A2
+280,pay,پرداخت کردن,verb,/peɪ/,You can pay by card.,می‌توانی با کارت پرداخت کنی.,A2
+281,sell,فروختن,verb,/sel/,They sell used bikes.,آن‌ها دوچرخهٔ دست‌دوم می‌فروشند.,A2
+282,spend,خرج کردن,verb,/spend/,We spend too much on food.,ما برای غذا زیاد خرج می‌کنیم.,A2
+283,save,پس‌انداز کردن,verb,/seɪv/,She saves a little each month.,او هر ماه کمی پس‌انداز می‌کند.,A2
+284,cost,هزینه داشتن,verb,/kɔːst/,How much does it cost?,چقدر هزینه دارد؟,A2
+285,beautiful,زیبا,adj,/ˈbjuːtɪfl/,The garden is beautiful.,باغ زیباست.,A2
+286,ugly,زشت,adj,/ˈʌɡli/,The new sign looks ugly.,تابلوی جدید زشت به نظر می‌رسد.,A2
+287,clean,تمیز,adj,/kliːn/,The kitchen is clean.,آشپزخانه تمیز است.,A2
+288,dirty,کثیف,adj,/ˈdɜːrti/,My shoes are dirty.,کفش‌هایم کثیف است.,A2
+289,noisy,پر سر و صدا,adj,/ˈnɔɪzi/,The office is noisy today.,دفتر امروز پر سر و صداست.,A2
+290,busy,مشغول,adj,/ˈbɪzi/,She is busy until five.,او تا ساعت پنج مشغول است.,A2
+291,free,آزاد,adj,/friː/,Are you free tonight?,امشب آزادی؟,A2
+292,full,پر,adj,/fʊl/,The bus is full.,اتوبوس پر است.,A2
+293,empty,خالی,adj,/ˈempti/,The room is empty.,اتاق خالی است.,A2
+294,heavy,سنگین,adj,/ˈhevi/,This box is heavy.,این جعبه سنگین است.,A2
+295,light,سبک,adj,/laɪt/,The bag is light.,کیف سبک است.,A2
+296,strong,قوی,adj,/strɔːŋ/,The coffee is strong.,قهوه قوی است.,A2
+297,weak,ضعیف,adj,/wiːk/,The signal is weak here.,سیگنال اینجا ضعیف است.,A2
+298,rich,ثروتمند,adj,/rɪtʃ/,The soil here is rich.,خاک اینجا حاصلخیز است.,A2
+299,poor,فقیر,adj,/pʊr/,The family was poor.,آن خانواده فقیر بود.,A2
+300,dangerous,خطرناک,adj,/ˈdeɪndʒərəs/,This road is dangerous.,این جاده خطرناک است.,A2
+301,safe,امن,adj,/seɪf/,The area is safe.,این منطقه امن است.,A2
+302,interesting,جالب,adj,/ˈɪntrəstɪŋ/,The story is interesting.,داستان جالب است.,A2
+303,boring,خسته‌کننده,adj,/ˈbɔːrɪŋ/,The film was boring.,فیلم خسته‌کننده بود.,A2
+304,funny,خنده‌دار,adj,/ˈfʌni/,He told a funny story.,او داستان خنده‌داری گفت.,A2
+305,serious,جدی,adj,/ˈsɪriəs/,This is a serious problem.,این مشکل جدی است.,A2
+306,polite,مؤدب,adj,/pəˈlaɪt/,The staff are polite.,کارکنان مؤدب‌اند.,A2
+307,late,دیر,adj,/leɪt/,The bus is late again.,اتوبوس باز هم دیر است.,A2
+308,early,زود,adj,/ˈɜːrli/,I woke up early.,زود بیدار شدم.,A2
+309,ready,آماده,adj,/ˈredi/,Dinner is ready.,شام آماده است.,A2
+310,wrong,نادرست,adj,/rɔːŋ/,I gave the wrong answer.,پاسخ نادرست دادم.,A2
+311,right,درست,adj,/raɪt/,Your answer is right.,پاسخ تو درست است.,A2
+312,same,یکسان,adj,/seɪm/,We wear the same size.,ما یک اندازه لباس می‌پوشیم.,A2
+313,different,متفاوت,adj,/ˈdɪfrənt/,Our plans are different.,طرح‌های ما متفاوت است.,A2
+314,begin,آغاز کردن,verb,/bɪˈɡɪn/,Let us begin the lesson.,بیا درس را آغاز کنیم.,A2
+315,continue,ادامه دادن,verb,/kənˈtɪnjuː/,Please continue reading.,لطفاً به خواندن ادامه بده.,A2
+316,stop,متوقف کردن,verb,/stɑːp/,The rain stopped at dusk.,باران هنگام غروب بند آمد.,A2
+317,try,تلاش کردن,verb,/traɪ/,Try again tomorrow.,فردا دوباره تلاش کن.,A2
+318,choose,انتخاب کردن,verb,/tʃuːz/,Choose one of these.,یکی از این‌ها را انتخاب کن.,A2
+319,mean,معنی داشتن,verb,/miːn/,What does this word mean?,این واژه چه معنایی دارد؟,A2
+320,agree,موافق بودن,verb,/əˈɡriː/,I agree with you.,با تو موافقم.,A2
+321,invite,دعوت کردن,verb,/ɪnˈvaɪt/,They invited ten friends.,آن‌ها ده دوست را دعوت کردند.,A2
+322,accept,پذیرفتن,verb,/əkˈsept/,She accepted the offer.,او پیشنهاد را پذیرفت.,A2
+323,refuse,رد کردن,verb,/rɪˈfjuːz/,He refused to wait.,او از منتظر ماندن سر باز زد.,A2
+324,promise,قول دادن,verb,/ˈprɑːmɪs/,I promise to call tonight.,قول می‌دهم امشب زنگ بزنم.,A2
+325,wait,منتظر ماندن,verb,/weɪt/,Wait here for a moment.,لحظه‌ای اینجا منتظر بمان.,A2
+326,prefer,ترجیح دادن,verb,/prɪˈfɜːr/,I prefer tea to coffee.,چای را به قهوه ترجیح می‌دهم.,A2
+327,enjoy,لذت بردن,verb,/ɪnˈdʒɔɪ/,We enjoyed the concert.,از کنسرت لذت بردیم.,A2
+328,hate,نفرت داشتن,verb,/heɪt/,I hate waiting in line.,از صف ایستادن بدم می‌آید.,A2
+329,feel,احساس کردن,verb,/fiːl/,I feel much better now.,الان خیلی بهتر حس می‌کنم.,A2
+330,think,فکر کردن,verb,/θɪŋk/,I think you are right.,فکر می‌کنم حق با توست.,A2
+331,believe,باور داشتن,verb,/bɪˈliːv/,I believe her story.,داستانش را باور دارم.,A2
+332,show,نشان دادن,verb,/ʃoʊ/,Show me the map.,نقشه را به من نشان بده.,A2
+333,ask,پرسیدن,verb,/æsk/,Ask the teacher politely.,مؤدبانه از معلم بپرس.,A2
+334,send,فرستادن,verb,/send/,Send me the file.,فایل را برایم بفرست.,A2
+335,bring,آوردن,verb,/brɪŋ/,Bring your notebook tomorrow.,فردا دفترت را بیاور.,A2
+336,put,گذاشتن,verb,/pʊt/,Put the keys on the desk.,کلیدها را روی میز بگذار.,A2
+337,keep,نگه داشتن,verb,/kiːp/,Keep the receipt.,رسید را نگه دار.,A2
+338,lose,گم کردن,verb,/luːz/,He lost his ticket.,او بلیتش را گم کرد.,A2
+339,win,بردن,verb,/wɪn/,Our team won the match.,تیم ما مسابقه را برد.,A2
+340,build,ساختن,verb,/bɪld/,They built a new school.,آن‌ها مدرسهٔ تازه‌ای ساختند.,A2
+341,break,شکستن,verb,/breɪk/,Do not break the glass.,لیوان را نشکن.,A2
+342,fix,تعمیر کردن,verb,/fɪks/,He fixed the bike.,او دوچرخه را تعمیر کرد.,A2
+343,carry,حمل کردن,verb,/ˈkæri/,She carried two bags.,او دو کیف حمل کرد.,A2
+344,hold,نگه داشتن (در دست),verb,/hoʊld/,"Hold the door, please.",لطفاً در را نگه دار.,A2
+345,move,جابه‌جا شدن,verb,/muːv/,We moved to a new flat.,به آپارتمان تازه‌ای اسباب کشی کردیم.,A2
+346,turn,چرخیدن,verb,/tɜːrn/,Turn left at the corner.,سر نبش به چپ بپیچ.,A2
+347,return,بازگشتن,verb,/rɪˈtɜːrn/,They returned after dinner.,بعد از شام برگشتند.,A2
+348,visit,دیدار کردن,verb,/ˈvɪzɪt/,We visit my aunt weekly.,هر هفته خاله‌ام را می‌بینیم.,A2
+349,meet,ملاقات کردن,verb,/miːt/,Let us meet at six.,بیا ساعت شش همدیگر را ببینیم.,A2
+350,follow,دنبال کردن,verb,/ˈfɑːloʊ/,Follow the signs.,تابلوها را دنبال کن.,A2
+351,grow,رشد کردن,verb,/ɡroʊ/,Plants grow in sunlight.,گیاهان در نور خورشید رشد می‌کنند.,A2
+352,happen,اتفاق افتادن,verb,/ˈhæpən/,What happened yesterday?,دیروز چه اتفاقی افتاد؟,A2
+353,offer,پیشنهاد کردن,verb,/ˈɔːfər/,She offered me a seat.,او جای نشستن به من پیشنهاد داد.,A2
+354,adapt,سازگار شدن,verb,/əˈdæpt/,Children adapt quickly.,کودکان سریع سازگار می‌شوند.,B1
+355,admit,اعتراف کردن,verb,/ədˈmɪt/,He admitted his mistake.,او اشتباهش را پذیرفت.,B1
+356,advantage,مزیت,noun,/ədˈvæntɪdʒ/,Practice has one clear advantage.,تمرین یک مزیت روشن دارد.,B1
+357,affect,تأثیر گذاشتن,verb,/əˈfekt/,Sleep affects memory.,خواب بر حافظه تأثیر می‌گذارد.,B1
+358,afford,توان مالی داشتن,verb,/əˈfɔːrd/,We cannot afford a new car.,توان مالی خرید ماشین تازه را نداریم.,B1
+359,aim,هدف,noun,/eɪm/,Our aim is steady progress.,هدف ما پیشرفت پیوسته است.,B1
+360,announce,اعلام کردن,verb,/əˈnaʊns/,They announced the results.,آن‌ها نتایج را اعلام کردند.,B1
+361,apply,به کار بردن,verb,/əˈplaɪ/,Apply this rule carefully.,این قاعده را با دقت به کار ببر.,B1
+362,argue,بحث کردن,verb,/ˈɑːrɡjuː/,They argued about money.,آن‌ها دربارهٔ پول بحث کردند.,B1
+363,arrange,ترتیب دادن,verb,/əˈreɪndʒ/,She arranged a meeting.,او جلسه‌ای ترتیب داد.,B1
+364,assume,فرض کردن,verb,/əˈsuːm/,Do not assume the answer.,پاسخ را فرض نکن.,B1
+365,attend,حضور یافتن,verb,/əˈtend/,He attends class daily.,او هر روز در کلاس حاضر می‌شود.,B1
+366,attention,توجه,noun,/əˈtenʃn/,Pay attention to detail.,به جزئیات توجه کن.,B1
+367,attitude,نگرش,noun,/ˈætɪtuːd/,A positive attitude helps.,نگرش مثبت کمک می‌کند.,B1
+368,attract,جذب کردن,verb,/əˈtrækt/,The city attracts many visitors.,شهر گردشگران زیادی را جذب می‌کند.,B1
+369,available,در دسترس,adj,/əˈveɪləbl/,The room is available now.,اتاق الان در دسترس است.,B1
+370,aware,آگاه,adj,/əˈwer/,She is aware of the risk.,او از خطر آگاه است.,B1
+371,balance,تعادل,noun,/ˈbæləns/,Find a balance between work and rest.,میان کار و استراحت تعادل پیدا کن.,B1
+372,behaviour,رفتار,noun,/bɪˈheɪvjər/,His behaviour surprised everyone.,رفتارش همه را شگفت‌زده کرد.,B1
+373,budget,بودجه,noun,/ˈbʌdʒɪt/,The budget is limited.,بودجه محدود است.,B1
+374,campaign,کارزار,noun,/kæmˈpeɪn/,They ran a short campaign.,آن‌ها کارزاری کوتاه اجرا کردند.,B1
+375,capacity,ظرفیت,noun,/kəˈpæsəti/,The hall has limited capacity.,سالن ظرفیت محدودی دارد.,B1
+376,career,حرفه,noun,/kəˈrɪr/,She changed her career.,او حرفه‌اش را عوض کرد.,B1
+377,cause,باعث شدن,verb,/kɔːz/,Lack of sleep causes mistakes.,کم‌خوابی باعث خطا می‌شود.,B1
+378,claim,ادعا کردن,verb,/kleɪm/,He claims he finished early.,او ادعا می‌کند زود تمام کرده است.,B1
+379,collect,جمع‌آوری کردن,verb,/kəˈlekt/,They collect old books.,آن‌ها کتاب‌های قدیمی جمع می‌کنند.,B1
+380,combine,ترکیب کردن,verb,/kəmˈbaɪn/,Combine study with practice.,مطالعه را با تمرین ترکیب کن.,B1
+381,comment,نظر دادن,verb,/ˈkɑːment/,She commented on the plan.,او دربارهٔ طرح نظر داد.,B1
+382,communicate,ارتباط برقرار کردن,verb,/kəˈmjuːnɪkeɪt/,They communicate by email.,آن‌ها با ایمیل ارتباط برقرار می‌کنند.,B1
+383,compete,رقابت کردن,verb,/kəmˈpiːt/,Teams compete for the prize.,تیم‌ها برای جایزه رقابت می‌کنند.,B1
+384,complain,شکایت کردن,verb,/kəmˈpleɪn/,He complained about the noise.,او از سر و صدا شکایت کرد.,B1
+385,complete,کامل کردن,verb,/kəmˈpliːt/,Complete the exercise today.,تمرین را امروز کامل کن.,B1
+386,concentrate,تمرکز کردن,verb,/ˈkɑːnsntreɪt/,I cannot concentrate here.,اینجا نمی‌توانم تمرکز کنم.,B1
+387,concern,نگرانی,noun,/kənˈsɜːrn/,Cost is the main concern.,هزینه نگرانی اصلی است.,B1
+388,conclude,نتیجه گرفتن,verb,/kənˈkluːd/,We concluded that he was right.,نتیجه گرفتیم که او درست می‌گفت.,B1
+389,condition,شرایط,noun,/kənˈdɪʃn/,The conditions are difficult.,شرایط دشوار است.,B1
+390,conduct,انجام دادن,verb,/kənˈdʌkt/,They conducted a small study.,آن‌ها مطالعهٔ کوچکی انجام دادند.,B1
+391,confidence,اعتماد به نفس,noun,/ˈkɑːnfɪdəns/,Practice builds confidence.,تمرین اعتماد به نفس می‌سازد.,B1
+392,confirm,تأیید کردن,verb,/kənˈfɜːrm/,Please confirm the time.,لطفاً زمان را تأیید کن.,B1
+393,conflict,تعارض,noun,/ˈkɑːnflɪkt/,The schedule created a conflict.,برنامه تعارض ایجاد کرد.,B1
+394,connect,وصل کردن,verb,/kəˈnekt/,Connect the two ideas.,دو ایده را به هم وصل کن.,B1
+395,consider,در نظر گرفتن,verb,/kənˈsɪdər/,Consider both options.,هر دو گزینه را در نظر بگیر.,B1
+396,contain,شامل بودن,verb,/kənˈteɪn/,The list contains ten words.,فهرست شامل ده واژه است.,B1
+397,contribute,سهم داشتن,verb,/kənˈtrɪbjuːt/,Many people contributed.,افراد زیادی سهم داشتند.,B1
+398,control,کنترل کردن,verb,/kənˈtroʊl/,Control your study time.,زمان مطالعه‌ات را کنترل کن.,B1
+399,convince,قانع کردن,verb,/kənˈvɪns/,He convinced me to try.,او مرا قانع کرد که تلاش کنم.,B1
+400,cooperate,همکاری کردن,verb,/koʊˈɑːpəreɪt/,The two teams cooperated.,دو تیم همکاری کردند.,B1
+401,create,خلق کردن,verb,/kriˈeɪt/,She created a study plan.,او برنامهٔ مطالعه‌ای ساخت.,B1
+402,culture,فرهنگ,noun,/ˈkʌltʃər/,Language carries culture.,زبان فرهنگ را منتقل می‌کند.,B1
+403,curious,کنجکاو,adj,/ˈkjʊriəs/,He is curious about everything.,او دربارهٔ همه‌چیز کنجکاو است.,B1
+404,current,کنونی,adj,/ˈkɜːrənt/,The current plan is working.,طرح کنونی کار می‌کند.,B1
+405,damage,آسیب,noun,/ˈdæmɪdʒ/,The storm caused damage.,طوفان آسیب رساند.,B1
+406,deal,کنار آمدن,verb,/diːl/,We dealt with the problem.,ما با مشکل کنار آمدیم.,B1
+407,debate,بحث و مناظره,noun,/dɪˈbeɪt/,The debate lasted an hour.,مناظره یک ساعت طول کشید.,B1
+408,decline,کاهش یافتن,verb,/dɪˈklaɪn/,Sales declined last month.,فروش ماه گذشته کاهش یافت.,B1
+409,define,تعریف کردن,verb,/dɪˈfaɪn/,Define the word in English.,واژه را به انگلیسی تعریف کن.,B1
+410,delay,تأخیر,noun,/dɪˈleɪ/,A short delay is likely.,تأخیر کوتاهی محتمل است.,B1
+411,deliver,تحویل دادن,verb,/dɪˈlɪvər/,They deliver every morning.,آن‌ها هر صبح تحویل می‌دهند.,B1
+412,demand,تقاضا,noun,/dɪˈmænd/,Demand for the course is high.,تقاضا برای این دوره بالاست.,B1
+413,depend,بستگی داشتن,verb,/dɪˈpend/,Success depends on practice.,موفقیت به تمرین بستگی دارد.,B1
+414,design,طراحی کردن,verb,/dɪˈzaɪn/,He designed the app alone.,او اپ را تنها طراحی کرد.,B1
+415,detail,جزئیات,noun,/ˈdiːteɪl/,Explain the detail briefly.,جزئیات را کوتاه توضیح بده.,B1
+416,develop,توسعه دادن,verb,/dɪˈveləp/,She developed a good habit.,او عادت خوبی در خود پرورش داد.,B1
+417,difference,تفاوت,noun,/ˈdɪfrəns/,The difference is small.,تفاوت کوچک است.,B1
+418,discover,کشف کردن,verb,/dɪˈskʌvər/,We discovered a simple trick.,ما ترفند ساده‌ای کشف کردیم.,B1
+419,discuss,بحث کردن درباره,verb,/dɪˈskʌs/,Let us discuss the results.,بیا دربارهٔ نتایج بحث کنیم.,B1
+420,distance,فاصله,noun,/ˈdɪstəns/,The distance is two kilometers.,فاصله دو کیلومتر است.,B1
+421,doubt,تردید,noun,/daʊt/,I have no doubt about it.,تردیدی در آن ندارم.,B1
+422,effect,اثر,noun,/ɪˈfekt/,Repetition has a strong effect.,تکرار اثر قوی دارد.,B1
+423,effort,تلاش,noun,/ˈefərt/,Small efforts add up.,تلاش‌های کوچک جمع می‌شوند.,B1
+424,encourage,تشویق کردن,verb,/ɪnˈkɜːrɪdʒ/,The teacher encourages questions.,معلم پرسیدن را تشویق می‌کند.,B1
+425,entire,کل,adj,/ɪnˈtaɪər/,He read the entire book.,او کل کتاب را خواند.,B1
+426,environment,محیط,noun,/ɪnˈvaɪrənmənt/,A quiet environment helps learning.,محیط آرام به یادگیری کمک می‌کند.,B1
+427,equal,برابر,adj,/ˈiːkwəl/,The two parts are equal.,دو بخش برابرند.,B1
+428,establish,بنا نهادن,verb,/ɪˈstæblɪʃ/,They established a routine.,آن‌ها روالی بنا نهادند.,B1
+429,estimate,تخمین زدن,verb,/ˈestɪmeɪt/,Estimate the time needed.,زمان لازم را تخمین بزن.,B1
+430,examine,بررسی کردن,verb,/ɪɡˈzæmɪn/,Examine your mistakes closely.,اشتباه‌هایت را دقیق بررسی کن.,B1
+431,exist,وجود داشتن,verb,/ɪɡˈzɪst/,Many such tools exist.,ابزارهای زیادی از این نوع وجود دارند.,B1
+432,expect,انتظار داشتن,verb,/ɪkˈspekt/,I expect a short delay.,انتظار تأخیر کوتاهی دارم.,B1
+433,expert,متخصص,noun,/ˈekspɜːrt/,Ask an expert for advice.,از یک متخصص مشورت بگیر.,B1
+434,express,بیان کردن,verb,/ɪkˈspres/,Express your idea simply.,ایده‌ات را ساده بیان کن.,B1
+435,extend,گسترش دادن,verb,/ɪkˈstend/,They extended the deadline.,آن‌ها مهلت را تمدید کردند.,B1
+436,fail,شکست خوردن,verb,/feɪl/,He failed the first test.,او در آزمون اول شکست خورد.,B1
+437,familiar,آشنا,adj,/fəˈmɪliər/,The word looks familiar.,واژه آشنا به نظر می‌رسد.,B1
+438,figure,رقم,noun,/ˈfɪɡjər/,The figure is not final.,این رقم نهایی نیست.,B1
+439,focus,تمرکز,noun,/ˈfoʊkəs/,Focus is more important than speed.,تمرکز از سرعت مهم‌تر است.,B1
+440,force,وادار کردن,verb,/fɔːrs/,Do not force the pace.,ریتم را به زور تغییر نده.,B1
+441,function,کارکرد,noun,/ˈfʌŋkʃn/,Each part has a function.,هر بخش کارکردی دارد.,B1
+442,gain,به دست آوردن,verb,/ɡeɪn/,You gain speed with practice.,با تمرین سرعت به دست می‌آوری.,B1
+443,general,کلی,adj,/ˈdʒenrəl/,This is a general rule.,این یک قاعدهٔ کلی است.,B1
+444,generate,تولید کردن,verb,/ˈdʒenəreɪt/,Questions generate discussion.,پرسش‌ها بحث تولید می‌کنند.,B1
+445,guarantee,تضمین کردن,verb,/ˌɡærənˈtiː/,Nobody can guarantee results.,هیچ‌کس نمی‌تواند نتیجه را تضمین کند.,B1
+446,handle,از عهده برآمدن,verb,/ˈhændl/,She handled the problem well.,او خوب از عهدهٔ مشکل برآمد.,B1
+447,harm,آسیب رساندن,verb,/hɑːrm/,Stress can harm memory.,استرس می‌تواند به حافظه آسیب بزند.,B1
+448,identify,شناسایی کردن,verb,/aɪˈdentɪfaɪ/,Identify your weak words.,واژه‌های ضعفت را شناسایی کن.,B1
+449,ignore,نادیده گرفتن,verb,/ɪɡˈnɔːr/,Do not ignore small errors.,خطاهای کوچک را نادیده نگیر.,B1
+450,imagine,تصور کردن,verb,/ɪˈmædʒɪn/,Imagine using the word today.,تصور کن امروز این واژه را به کار ببری.,B1
+451,include,شامل شدن,verb,/ɪnˈkluːd/,The price includes tax.,قیمت شامل مالیات است.,B1
+452,increase,افزایش دادن,verb,/ɪnˈkriːs/,Increase the limit slowly.,سقف را آهسته افزایش بده.,B1
+453,independent,مستقل,adj,/ˌɪndɪˈpendənt/,She works as an independent editor.,او ویراستار مستقلی است.,B1
+454,indicate,نشان دادن,verb,/ˈɪndɪkeɪt/,The chart indicates growth.,نمودار رشد را نشان می‌دهد.,B1
+455,individual,فردی,adj,/ˌɪndɪˈvɪdʒuəl/,Each individual learns differently.,هر فرد متفاوت یاد می‌گیرد.,B1
+456,influence,نفوذ,noun,/ˈɪnfluəns/,Friends influence our habits.,دوست‌ها بر عادت‌های ما نفوذ دارند.,B1
+457,inform,اطلاع دادن,verb,/ɪnˈfɔːrm/,Please inform the team.,لطفاً تیم را مطلع کن.,B1
+458,initial,اولیه,adj,/ɪˈnɪʃl/,The initial results look good.,نتایج اولیه خوب به نظر می‌رسند.,B1
+459,injury,آسیب جسمی,noun,/ˈɪndʒəri/,He recovered from a knee injury.,او از آسیب زانو بهبود یافت.,B1
+460,insist,اصرار کردن,verb,/ɪnˈsɪst/,She insisted on paying.,او اصرار کرد که پول بدهد.,B1
+461,inspire,الهام بخشیدن,verb,/ɪnˈspaɪər/,His story inspired us.,داستان او به ما الهام داد.,B1
+462,intend,قصد داشتن,verb,/ɪnˈtend/,I intend to finish today.,قصد دارم امروز تمام کنم.,B1
+463,introduce,معرفی کردن,verb,/ˌɪntrəˈduːs/,Let me introduce a new rule.,اجازه بده قاعدهٔ تازه‌ای معرفی کنم.,B1
+464,invest,سرمایه‌گذاری کردن,verb,/ɪnˈvest/,Invest time in the basics.,در پایه‌ها زمان سرمایه‌گذاری کن.,B1
+465,involve,درگیر کردن,verb,/ɪnˈvɑːlv/,The task involves listening.,این کار مستلزم گوش دادن است.,B1
+466,judge,قضاوت کردن,verb,/dʒʌdʒ/,Do not judge too early.,زود قضاوت نکن.,B1
+467,knowledge,دانش,noun,/ˈnɑːlɪdʒ/,Knowledge grows with use.,دانش با کاربرد رشد می‌کند.,B1
+468,lack,کمبود,noun,/læk/,A lack of time is common.,کمبود زمان رایج است.,B1
+469,likely,محتمل,adj,/ˈlaɪkli/,Rain is likely tonight.,امشب باران محتمل است.,B1
+470,limit,محدود کردن,verb,/ˈlɪmɪt/,Limit new cards to ten.,کارت‌های تازه را به ده محدود کن.,B1
+471,maintain,حفظ کردن,verb,/meɪnˈteɪn/,Maintain a steady pace.,ریتم پیوسته‌ای را حفظ کن.,B1
+472,major,عمده,adj,/ˈmeɪdʒər/,This is a major change.,این تغییر عمده‌ای است.,B1
+473,manage,مدیریت کردن,verb,/ˈmænɪdʒ/,He manages three projects.,او سه پروژه را مدیریت می‌کند.,B1
+474,measure,اندازه گرفتن,verb,/ˈmeʒər/,Measure progress weekly.,پیشرفت را هفتگی بسنج.,B1
+475,mind,ذهن,noun,/maɪnd/,A clear mind learns faster.,ذهن آرام سریع‌تر یاد می‌گیرد.,B1
+476,modern,مدرن,adj,/ˈmɑːdərn/,Modern tools save effort.,ابزارهای مدرن تلاش را کم می‌کنند.,B1
+477,natural,طبیعی,adj,/ˈnætʃrəl/,Forgetting is natural.,فراموش کردن طبیعی است.,B1
+478,necessary,ضروری,adj,/ˈnesəseri/,Rest is necessary for memory.,استراحت برای حافظه ضروری است.,B1
+479,notice,متوجه شدن,verb,/ˈnoʊtɪs/,I noticed a small mistake.,متوجه اشتباه کوچکی شدم.,B1
+480,obtain,به دست آوردن,verb,/əbˈteɪn/,You can obtain the file free.,می‌توانی فایل را رایگان به دست آوری.,B1
+481,obvious,واضح,adj,/ˈɑːbviəs/,The reason is obvious.,دلیل واضح است.,B1
+482,occur,رخ دادن,verb,/əˈkɜːr/,The error occurred twice.,این خطا دو بار رخ داد.,B1
+483,opportunity,فرصت,noun,/ˌɑːpərˈtuːnəti/,Every review is an opportunity.,هر مرور یک فرصت است.,B1
+484,oppose,مخالفت کردن,verb,/əˈpoʊz/,They opposed the new rule.,آن‌ها با قاعدهٔ تازه مخالفت کردند.,B1
+485,option,گزینه,noun,/ˈɑːpʃn/,You have two options.,دو گزینه داری.,B1
+486,ordinary,معمولی,adj,/ˈɔːrdneri/,It was an ordinary day.,روز معمولی بود.,B1
+487,organize,سازمان دادن,verb,/ˈɔːrɡənaɪz/,Organize your notes by topic.,یادداشت‌هایت را بر اساس موضوع مرتب کن.,B1
+488,original,اصلی,adj,/əˈrɪdʒɪnl/,The original plan was simpler.,طرح اصلی ساده‌تر بود.,B1
+489,particular,خاص,adj,/pərˈtɪkjələr/,Is there a particular reason?,دلیل خاصی وجود دارد؟,B1
+490,patient,صبور,adj,/ˈpeɪʃnt/,Be patient with new words.,با واژه‌های تازه صبور باش.,B1
+491,perform,عملکرد داشتن,verb,/pərˈfɔːrm/,He performed better this time.,او این بار بهتر عمل کرد.,B1
+492,period,دوره,noun,/ˈpɪriəd/,Study for a short period.,برای دورهٔ کوتاهی مطالعه کن.,B1
+493,permit,اجازه دادن,verb,/pərˈmɪt/,The app permits offline use.,اپ استفادهٔ آفلاین را اجازه می‌دهد.,B1
+494,personal,شخصی,adj,/ˈpɜːrsənl/,Keep a personal list.,فهرست شخصی نگه دار.,B1
+495,persuade,متقاعد کردن,verb,/pərˈsweɪd/,He persuaded them to wait.,او آن‌ها را متقاعد کرد صبر کنند.,B1
+496,physical,جسمی,adj,/ˈfɪzɪkl/,Physical exercise boosts mood.,ورزش جسمی خلق را بالا می‌برد.,B1
+497,policy,سیاست,noun,/ˈpɑːləsi/,The company changed its policy.,شرکت سیاستش را تغییر داد.,B1
+498,popular,محبوب,adj,/ˈpɑːpjələr/,This song is popular now.,این آهنگ الان محبوب است.,B1
+499,position,موقعیت,noun,/pəˈzɪʃn/,She applied for a new position.,او برای موقعیت تازه‌ای درخواست داد.,B1
+500,positive,مثبت,adj,/ˈpɑːzətɪv/,Positive feedback motivates learners.,بازخورد مثبت زبان‌آموزان را برمی‌انگیزد.,B1
+501,practical,عملی,adj,/ˈpræktɪkl/,Give a practical example.,مثال عملی بزن.,B1
+502,predict,پیش‌بینی کردن,verb,/prɪˈdɪkt/,FSRS predicts the next review.,FSRS مرور بعدی را پیش‌بینی می‌کند.,B1
+503,present,ارائه دادن,verb,/prɪˈzent/,She presented the results.,او نتایج را ارائه داد.,B1
+504,pressure,فشار,noun,/ˈpreʃər/,Study without pressure.,بدون فشار مطالعه کن.,B1
+505,prevent,جلوگیری کردن,verb,/prɪˈvent/,Sleep prevents forgetting.,خواب از فراموشی جلوگیری می‌کند.,B1
+506,previous,پیشین,adj,/ˈpriːviəs/,The previous answer was wrong.,پاسخ پیشین نادرست بود.,B1
+507,principle,اصل,noun,/ˈprɪnsəpl/,Learn one principle at a time.,هر بار یک اصل یاد بگیر.,B1
+508,private,خصوصی,adj,/ˈpraɪvət/,All data stays private.,همهٔ داده‌ها خصوصی می‌مانند.,B1
+509,process,فرایند,noun,/ˈprɑːses/,Learning is a slow process.,یادگیری فرایندی کند است.,B1
+510,produce,تولید کردن,verb,/prəˈduːs/,The factory produces parts.,کارخانه قطعات تولید می‌کند.,B1
+511,profit,سود,noun,/ˈprɑːfɪt/,The shop made a small profit.,فروشگاه سود کمی کرد.,B1
+512,project,پروژه,noun,/ˈprɑːdʒekt/,The project took a month.,پروژه یک ماه طول کشید.,B1
+513,prove,اثبات کردن,verb,/pruːv/,The test proved the point.,آزمون مطلب را اثبات کرد.,B1
+514,public,عمومی,adj,/ˈpʌblɪk/,This is public information.,این اطلاعات عمومی است.,B1
+515,quality,کیفیت,noun,/ˈkwɑːləti/,Quality beats quantity.,کیفیت از کمیت بهتر است.,B1
+516,raise,بالا بردن,verb,/reɪz/,Raise the limit gradually.,سقف را تدریجی بالا ببر.,B1
+517,range,محدوده,noun,/reɪndʒ/,The price range is wide.,محدودهٔ قیمت گسترده است.,B1
+518,rare,کمیاب,adj,/rer/,Such errors are rare.,چنین خطاهایی کمیاب‌اند.,B1
+519,rate,نرخ,noun,/reɪt/,The success rate improved.,نرخ موفقیت بهتر شد.,B1
+520,reach,رسیدن به,verb,/riːtʃ/,We reached the target early.,زودتر به هدف رسیدیم.,B1
+521,react,واکنش نشان دادن,verb,/riˈækt/,How did she react?,او چه واکنشی نشان داد؟,B1
+522,realize,پی بردن,verb,/ˈriːəlaɪz/,I realized my mistake later.,بعداً به اشتباهم پی بردم.,B1
+523,recognize,شناختن,verb,/ˈrekəɡnaɪz/,I recognized the word at once.,واژه را فوراً شناختم.,B1
+524,recommend,توصیه کردن,verb,/ˌrekəˈmend/,I recommend short sessions.,جلسه‌های کوتاه را توصیه می‌کنم.,B1
+525,reduce,کاهش دادن,verb,/rɪˈduːs/,Reduce the daily limit.,سقف روزانه را کاهش بده.,B1
+526,refer,اشاره کردن,verb,/rɪˈfɜːr/,The note refers to page two.,یادداشت به صفحهٔ دو اشاره می‌کند.,B1
+527,reflect,بازتاب دادن,verb,/rɪˈflekt/,The numbers reflect progress.,اعداد پیشرفت را بازتاب می‌دهند.,B1
+528,regret,پشیمانی,noun,/rɪˈɡret/,He felt no regret.,او پشیمانی حس نکرد.,B1
+529,regular,منظم,adj,/ˈreɡjələr/,Regular review is key.,مرور منظم کلید است.,B1
+530,relate,مرتبط بودن,verb,/rɪˈleɪt/,The two facts relate closely.,این دو واقعیت نزدیک به هم مرتبط‌اند.,B1
+531,release,منتشر کردن,verb,/rɪˈliːs/,They released a new version.,آن‌ها نسخهٔ تازه‌ای منتشر کردند.,B1
+532,rely,تکیه کردن,verb,/rɪˈlaɪ/,Do not rely on luck.,به شانس تکیه نکن.,B1
+533,remain,باقی ماندن,verb,/rɪˈmeɪn/,Three cards remain.,سه کارت باقی مانده است.,B1
+534,remind,یادآوری کردن,verb,/rɪˈmaɪnd/,Remind me at eight.,ساعت هشت یادم بیاور.,B1
+535,remove,حذف کردن,verb,/rɪˈmuːv/,Remove the wrong entry.,مدخل نادرست را حذف کن.,B1
+536,repair,تعمیر,noun,/rɪˈper/,The repair took two days.,تعمیر دو روز طول کشید.,B1
+537,replace,جایگزین کردن,verb,/rɪˈpleɪs/,Replace the old card.,کارت قدیمی را جایگزین کن.,B1
+538,reply,پاسخ دادن,verb,/rɪˈplaɪ/,She replied within a minute.,او در کمتر از یک دقیقه پاسخ داد.,B1
+539,report,گزارش,noun,/rɪˈpɔːrt/,The report is short.,گزارش کوتاه است.,B1
+540,represent,نمایندگی کردن,verb,/ˌreprɪˈzent/,The sample represents the group.,نمونه نمایندهٔ گروه است.,B1
+541,require,نیاز داشتن,verb,/rɪˈkwaɪər/,This task requires focus.,این کار به تمرکز نیاز دارد.,B1
+542,resist,مقاومت کردن,verb,/rɪˈzɪst/,Resist the urge to peek.,در برابر وسوسهٔ نگاه کردن مقاومت کن.,B1
+543,resource,منبع,noun,/ˈriːsɔːrs/,The app needs no online resource.,اپ به منبع آنلاین نیاز ندارد.,B1
+544,respect,احترام گذاشتن,verb,/rɪˈspekt/,Respect your own pace.,به ریتم خودت احترام بگذار.,B1
+545,respond,پاسخ دادن,verb,/rɪˈspɑːnd/,He responded politely.,او مؤدبانه پاسخ داد.,B1
+546,responsible,مسئول,adj,/rɪˈspɑːnsəbl/,You are responsible for the plan.,تو مسئول طرح هستی.,B1
+547,reveal,آشکار کردن,verb,/rɪˈviːl/,The study revealed a pattern.,مطالعه الگویی را آشکار کرد.,B1
+548,review,مرور,noun,/rɪˈvjuː/,A short review is enough.,مرور کوتاه کافی است.,B1
+549,risk,ریسک,noun,/rɪsk/,There is little risk here.,اینجا ریسک کمی وجود دارد.,B1
+550,role,نقش,noun,/roʊl/,Sleep plays a key role.,خواب نقش کلیدی دارد.,B1
+551,satisfy,راضی کردن,verb,/ˈsætɪsfaɪ/,The answer satisfied the teacher.,پاسخ معلم را راضی کرد.,B1
+552,scale,مقیاس,noun,/skeɪl/,Rate it on a small scale.,با مقیاس کوچکی امتیاز بده.,B1
+553,search,جست‌وجو,noun,/sɜːrtʃ/,The search returned nothing.,جست‌وجو چیزی برنگرداند.,B1
+554,seek,جستن,verb,/siːk/,Seek feedback often.,مکرر بازخورد بگیر.,B1
+555,select,برگزیدن,verb,/sɪˈlekt/,Select ten new words.,ده واژهٔ تازه برگزین.,B1
+556,sense,حس,noun,/sens/,A sense of progress helps.,حس پیشرفت کمک می‌کند.,B1
+557,separate,جدا کردن,verb,/ˈsepəreɪt/,Separate study from testing.,مطالعه را از آزمون جدا کن.,B1
+558,serve,خدمت کردن,verb,/sɜːrv/,This tool serves one purpose.,این ابزار یک هدف را خدمت می‌کند.,B1
+559,settle,حل کردن,verb,/ˈsetl/,They settled the dispute.,آن‌ها اختلاف را حل کردند.,B1
+560,share,به اشتراک گذاشتن,verb,/ʃer/,Share the file with me.,فایل را با من به اشتراک بگذار.,B1
+561,shift,تغییر,noun,/ʃɪft/,A small shift in habit helps.,تغییر کوچکی در عادت کمک می‌کند.,B1
+562,significant,قابل توجه,adj,/sɪɡˈnɪfɪkənt/,The gain was significant.,پیشرفت قابل توجه بود.,B1
+563,situation,وضعیت,noun,/ˌsɪtʃuˈeɪʃn/,The situation improved slowly.,وضعیت آهسته بهتر شد.,B1
+564,skill,مهارت,noun,/skɪl/,Reading is a skill.,خواندن یک مهارت است.,B1
+565,solution,راه‌حل,noun,/səˈluːʃn/,They found a simple solution.,آن‌ها راه‌حل ساده‌ای یافتند.,B1
+566,specific,مشخص,adj,/spəˈsɪfɪk/,Give a specific example.,مثال مشخصی بزن.,B1
+567,standard,استاندارد,noun,/ˈstændərd/,The standard is high.,استاندارد بالاست.,B1
+568,statement,گزاره,noun,/ˈsteɪtmənt/,The statement is false.,این گزاره نادرست است.,B1
+569,strategy,راهبرد,noun,/ˈstrætədʒi/,My strategy is daily review.,راهبرد من مرور روزانه است.,B1
+570,subject,موضوع,noun,/ˈsʌbdʒɪkt/,"Change the subject, please.",لطفاً موضوع را عوض کن.,B1
+571,succeed,موفق شدن,verb,/səkˈsiːd/,She succeeded after months.,او پس از ماه‌ها موفق شد.,B1
+572,suffer,رنج بردن,verb,/ˈsʌfər/,He suffered from headaches.,او از سردرد رنج می‌برد.,B1
+573,support,پشتیبانی کردن,verb,/səˈpɔːrt/,The team supported the idea.,تیم از ایده پشتیبانی کرد.,B1
+574,suppose,گمان کردن,verb,/səˈpoʊz/,I suppose you are right.,گمان می‌کنم حق با توست.,B1
+575,surface,سطح,noun,/ˈsɜːrfɪs/,Clean the table surface.,سطح میز را پاک کن.,B1
+576,survive,زنده ماندن,verb,/sərˈvaɪv/,The plant survived the winter.,گیاه زمستان را زنده ماند.,B1
+577,system,سیستم,noun,/ˈsɪstəm/,The system works offline.,سیستم آفلاین کار می‌کند.,B1
+578,target,هدف,noun,/ˈtɑːrɡɪt/,The target is twenty words.,هدف بیست واژه است.,B1
+579,task,وظیفه,noun,/tæsk/,This task takes five minutes.,این وظیفه پنج دقیقه وقت می‌برد.,B1
+580,technique,تکنیک,noun,/tekˈniːk/,This technique improves recall.,این تکنیک یادآوری را بهتر می‌کند.,B1
+581,tend,گرایش داشتن,verb,/tend/,We tend to overestimate memory.,ما گرایش داریم حافظه را بیش از واقع بدانیم.,B1
+582,theory,نظریه,noun,/ˈθɪri/,The theory is well tested.,نظریه خوب آزموده شده است.,B1
+583,threat,تهدید,noun,/θret/,Forgetting is a real threat.,فراموشی تهدیدی واقعی است.,B1
+584,topic,موضوع,noun,/ˈtɑːpɪk/,Choose a useful topic.,موضوع مفیدی انتخاب کن.,B1
+585,total,کل,adj,/ˈtoʊtl/,The total is forty minutes.,کل چهل دقیقه است.,B1
+586,treat,درمان کردن,verb,/triːt/,The doctor treated the wound.,پزشک زخم را درمان کرد.,B1
+587,trend,روند,noun,/trend/,The trend is positive.,روند مثبت است.,B1
+588,trust,اعتماد,noun,/trʌst/,Trust the schedule.,به برنامه اعتماد کن.,B1
+589,truth,حقیقت,noun,/truːθ/,Tell the truth simply.,حقیقت را ساده بگو.,B1
+590,typical,معمول,adj,/ˈtɪpɪkl/,This is a typical mistake.,این اشتباه معمولی است.,B1
+591,unique,بی‌همتا,adj,/juˈniːk/,Each language is unique.,هر زبان بی‌همتاست.,B1
+592,value,ارزش,noun,/ˈvæljuː/,The value is in daily use.,ارزش در استفادهٔ روزانه است.,B1
+593,variety,تنوع,noun,/vəˈraɪəti/,Use a variety of examples.,از تنوعی از مثال‌ها استفاده کن.,B1
+594,view,دیدگاه,noun,/vjuː/,I respect your view.,به دیدگاهت احترام می‌گذارم.,B1
+595,volume,حجم,noun,/ˈvɑːljuːm/,The volume of work doubled.,حجم کار دو برابر شد.,B1
+596,warn,هشدار دادن,verb,/wɔːrn/,The app warns about leeches.,اپ دربارهٔ کارت‌های سخت هشدار می‌دهد.,B1
+597,waste,هدر دادن,verb,/weɪst/,Do not waste a review.,یک مرور را هدر نده.,B1
+598,wealth,ثروت,noun,/welθ/,Time is a kind of wealth.,زمان نوعی ثروت است.,B1
+599,weight,وزن,noun,/weɪt/,Check the weight of the bag.,وزن کیف را بسنج.,B1
+600,whole,تمام,adj,/hoʊl/,Read the whole page.,تمام صفحه را بخوان.,B1
+601,wide,گسترده,adj,/waɪd/,The road is wide.,جاده گسترده است.,B1
+602,willing,مایل,adj,/ˈwɪlɪŋ/,She is willing to help.,او مایل به کمک است.,B1
+603,worth,ارزنده,adj,/wɜːrθ/,The effort is worth it.,این تلاش ارزنده است.,B1

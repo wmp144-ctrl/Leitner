@@ -17,8 +17,8 @@ class SeedDeckTest {
     }
 
     @Test
-    fun `starter deck has at least one hundred entries`() {
-        assertThat(SeedDeck.parse(csv).size).isAtLeast(100)
+    fun `starter deck reaches the five hundred entries the PRD asks for`() {
+        assertThat(SeedDeck.parse(csv).size).isAtLeast(500)
     }
 
     @Test
