@@ -41,6 +41,16 @@ echo "sdk.dir=/path/to/android-sdk" > local.properties
 ./gradlew lintRelease          # بازرسی استاتیک (۰ خطا)
 ```
 
+نسخه در [`version.properties`](version.properties) است و Gradle آن را می‌خواند.
+برای هر انتشار، یک فرمان نسخه را بالا می‌برد، `CHANGELOG.md` را می‌نویسد و
+بستهٔ AAB/APK را می‌سازد:
+
+```bash
+python3 tools/release.py bump --type patch --note "رفع باگ کارت مرور" --build
+```
+
+راهنمای کامل: [`docs/RELEASING.md`](docs/RELEASING.md)
+
 امضای نسخهٔ ریلیز از فایل `keystore.properties` در ریشه خوانده می‌شود (در گیت
 نیست). بدون آن، بیلد ریلیز بدون امضا ساخته می‌شود.
 

@@ -19,6 +19,15 @@ val keystoreProperties = Properties().apply {
     }
 }
 
+// The version lives in version.properties so tools/release.py can bump it in one
+// place; a release never edits this build file.
+val versionProperties = Properties().apply {
+    val file = rootProject.file("version.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val appVersionCode = versionProperties.getProperty("versionCode")?.toIntOrNull() ?: 1
+val appVersionName = versionProperties.getProperty("versionName") ?: "1.0.0"
+
 android {
     namespace = "ir.wazhebox"
     compileSdk = 36
@@ -27,8 +36,8 @@ android {
         applicationId = "ir.wazhebox"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = appVersionCode
+        versionName = appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
