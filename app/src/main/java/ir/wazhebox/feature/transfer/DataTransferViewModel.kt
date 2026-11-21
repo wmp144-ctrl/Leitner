@@ -34,6 +34,7 @@ data class TransferUiState(
 class DataTransferViewModel @Inject constructor(
     private val dataTransfer: DataTransferRepository,
     private val settingsRepository: SettingsRepository,
+    private val widgetUpdater: ir.wazhebox.widget.WidgetUpdater,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -66,6 +67,9 @@ class DataTransferViewModel @Inject constructor(
                 dataTransfer.importCsv(text)
             }.onSuccess { report ->
                 _state.value = _state.value.copy(busy = false, report = report)
+                // The widget reads the database itself, so it needs a nudge after
+                // words change here as well as after a session.
+                runCatching { widgetUpdater.refresh() }
             }.onFailure { error ->
                 _state.value = _state.value.copy(busy = false, error = error.message)
             }
@@ -93,6 +97,7 @@ class DataTransferViewModel @Inject constructor(
             val result = runCatching {
                 dataTransfer.restoreBackup(readUri(uri), merge = _state.value.restoreMode == RestoreMode.MERGE)
             }.getOrNull()
+            if (result is BackupResult.Success) runCatching { widgetUpdater.refresh() }
             _state.value = when (result) {
                 is BackupResult.Success -> _state.value.copy(busy = false, message = "restored")
                 is BackupResult.Corrupt, null -> _state.value.copy(busy = false, error = "corrupt")

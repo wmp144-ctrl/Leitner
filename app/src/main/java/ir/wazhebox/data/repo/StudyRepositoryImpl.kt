@@ -59,41 +59,31 @@ class StudyRepositoryImpl @Inject constructor(
         )
     }
 
-    private suspend fun liveItems(freePractice: Boolean): List<StudyItem> =
-        wordDao.allWithCards().mapNotNull { row ->
-            val word = row.word.toDomain()
-            if (word.suspended) return@mapNotNull null
-            val cards = row.cards.filter { it.state != CardState.SUSPENDED.name }
-            if (cards.isEmpty()) return@mapNotNull null
-            // EN_FA is the recognition card; the reverse card joins once unlocked.
-            val primary = cards.firstOrNull { it.direction == Direction.EN_FA.name }
-                ?: cards.minByOrNull { it.dueAt }
-                ?: return@mapNotNull null
-            StudyItem(word = word, card = primary.toDomain())
-        }
-
-    override suspend fun buildSession(freePractice: Boolean): List<StudyItem> {
-        val (sessionConfig, _) = sessionConfig(freePractice)
-        val items = if (freePractice) {
-            allDirections(freePractice = true)
-        } else {
-            liveItems(freePractice = false)
-        }
-        return SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
-    }
-
-    private suspend fun allDirections(freePractice: Boolean): List<StudyItem> =
+    /**
+     * Every card of every live word, one item per card.
+     *
+     * An earlier version kept only the recognition (EN_FA) card, which meant the
+     * reverse card that §10.1 unlocks never entered a real session at all: the
+     * word was already represented by its EN_FA card. One item per card keeps
+     * both directions reviewable, the way a deck of cards actually works.
+     */
+    private suspend fun liveItems(): List<StudyItem> =
         wordDao.allWithCards().flatMap { row ->
             val word = row.word.toDomain()
             if (word.suspended) return@flatMap emptyList()
             row.cards
                 .filter { it.state != CardState.SUSPENDED.name }
-                .map { StudyItem(word, it.toDomain()) }
+                .map { StudyItem(word = word, card = it.toDomain()) }
         }
+
+    override suspend fun buildSession(freePractice: Boolean): List<StudyItem> {
+        val (sessionConfig, _) = sessionConfig(freePractice)
+        return SessionBuilder.buildQueue(liveItems(), clock.now(), sessionConfig)
+    }
 
     override suspend fun workload(freePractice: Boolean): Workload {
         val (sessionConfig, _) = sessionConfig(freePractice)
-        val items = liveItems(freePractice)
+        val items = liveItems()
         val queue = SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
         return Workload(
             dueCount = queue.size,
@@ -176,6 +166,7 @@ class StudyRepositoryImpl @Inject constructor(
             leechSuggestion = lapses >= (if (schedulerConfig.leechThreshold > 0) schedulerConfig.leechThreshold else 4),
             faEnCardCreated = faEnCreated,
             clockAnomaly = result.clockAnomaly,
+            durationMs = durationMs,
         )
     }
 
@@ -239,6 +230,7 @@ class StudyRepositoryImpl @Inject constructor(
                 reviews = 1,
                 newWords = if (outcome.wasNew) 1 else 0,
                 correct = if (outcome.rating != Rating.AGAIN) 1 else 0,
+                totalMs = outcome.durationMs,
             )
         }
     }
@@ -246,9 +238,18 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun suspendCard(cardId: Long, suspended: Boolean) {
         val entity = cardDao.byId(cardId) ?: return
         val now = clock.now().toEpochMillis()
+        // A resumed card goes back to the state its history implies: a card that
+        // was never answered is still new, anything that has a stability is a
+        // review card. The old version made every resumed card a review card,
+        // which pushed untouched words straight into the review queue.
+        val resumedState = if (entity.stability > 0.0 || entity.reps > 0) {
+            CardState.REVIEW
+        } else {
+            CardState.NEW
+        }
         cardDao.update(
             entity.copy(
-                state = if (suspended) CardState.SUSPENDED.name else CardState.REVIEW.name,
+                state = if (suspended) CardState.SUSPENDED.name else resumedState.name,
                 dueAt = if (suspended) entity.dueAt else now,
             ),
         )
@@ -257,7 +258,7 @@ class StudyRepositoryImpl @Inject constructor(
     override suspend fun stateOfCard(cardId: Long): Card? = cardDao.byId(cardId)?.toDomain()
 
     override suspend fun nextFreePracticeCard(excludeIds: Set<Long>): StudyItem? =
-        allDirections(freePractice = true)
+        liveItems()
             .filter { it.card.id !in excludeIds }
             .minByOrNull { it.card.dueAt }
 

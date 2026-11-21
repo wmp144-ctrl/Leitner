@@ -3,6 +3,7 @@ package ir.wazhebox.feature.library
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.wazhebox.domain.grading.TextNormalizer
 import ir.wazhebox.domain.model.Card
 import ir.wazhebox.domain.model.CardState
 import ir.wazhebox.domain.model.Word
@@ -35,6 +36,8 @@ data class LibraryRow(
     val card: Card?,
     val box: Int,
     val lapses: Int,
+    /** Term + meaning normalized once, so search ignores ي/ی and Arabic digits. */
+    val searchKey: String = "",
 )
 
 data class LibraryUiState(
@@ -65,16 +68,15 @@ class LibraryViewModel @Inject constructor(
                 card = card,
                 box = card?.box ?: 1,
                 lapses = card?.lapses ?: 0,
+                searchKey = TextNormalizer.normalize("${entry.word.term} ${entry.word.meaningFa}"),
             )
         }
-        val normalizedQuery = ui.query.trim().lowercase()
+        // Persian input often arrives with Arabic ي/ك or Arabic-Indic digits, and a
+        // plain contains() then found nothing for a word that is clearly there.
+        val normalizedQuery = TextNormalizer.normalize(ui.query)
         val filtered = rows
             .asSequence()
-            .filter { row ->
-                normalizedQuery.isEmpty() ||
-                    row.word.term.lowercase().contains(normalizedQuery) ||
-                    row.word.meaningFa.contains(normalizedQuery)
-            }
+            .filter { row -> normalizedQuery.isEmpty() || row.searchKey.contains(normalizedQuery) }
             .filter { row ->
                 when (ui.stateFilter) {
                     StateFilter.ALL -> true

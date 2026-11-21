@@ -214,13 +214,27 @@ class DataTransferRepositoryImpl @Inject constructor(
                 )
             }
         }
+        // The review log used to be left out, so a "backup" silently dropped the
+        // learner's retention history and every statistic that derives from it.
+        val reviews = db.reviewDao().all().map { review ->
+            BackupReview(
+                card_id = review.cardId,
+                reviewed_at = review.reviewedAt,
+                rating = review.rating,
+                verdict = review.verdict,
+                elapsed_days = review.elapsedDays,
+                scheduled_days = review.scheduledDays,
+                prev_state = review.prevState,
+                next_state = review.nextState,
+            )
+        }
         val settings = currentSettings()
         val backup = BackupFile(
             exported_at = Instant.fromEpochMilliseconds(clock.now().toEpochMilliseconds()).toString(),
             decks = decks,
             words = words,
             cards = cards,
-            reviews = emptyList(),
+            reviews = reviews,
             settings = BackupSettings(
                 daily_new_limit = settings.dailyNewLimit,
                 daily_review_limit = settings.dailyReviewLimit,
@@ -466,6 +480,8 @@ class DataTransferRepositoryImpl @Inject constructor(
             }
             file.reviews.forEach { review ->
                 val cardId = cardIdMap[review.card_id] ?: return@forEach
+                // Merging the same backup twice must not double the review count.
+                if (db.reviewDao().countAt(cardId, review.reviewed_at) > 0) return@forEach
                 db.reviewDao().insert(
                     ReviewEntity(
                         cardId = cardId,
@@ -497,4 +513,7 @@ private suspend fun WazheBoxDatabase.clearTables() {
     // cards and reviews (PRD §8.2).
     wordDao().deleteAllRows()
     deckDao().deleteAllRows()
+    // Daily counters describe the reviews that just went away; leaving them
+    // behind made the stats screen report history the new library never had.
+    statsDao().deleteAllRows()
 }

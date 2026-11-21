@@ -30,6 +30,8 @@ data class AddWordUiState(
     val duplicateId: Long? = null,
     val saving: Boolean = false,
     val saved: Boolean = false,
+    /** "Added, form cleared" confirmation for the add-and-next flow. */
+    val savedHint: Boolean = false,
     val deleted: Boolean = false,
     val loading: Boolean = true,
 )
@@ -96,10 +98,13 @@ class AddWordViewModel @Inject constructor(
             when (val result = wordRepository.addOrUpdate(draft, allowDuplicate)) {
                 is AddWordResult.Added, is AddWordResult.Updated -> {
                     _state.value = if (andNext && current.wordId == 0L) {
+                        // Add-and-next means "stay here for the next word", so it
+                        // must not set `saved` (the screen closes on that flag);
+                        // it used to drop the user out of the form instead.
                         AddWordUiState(
                             deckId = current.deckId,
                             loading = false,
-                            saved = true,
+                            savedHint = true,
                         )
                     } else {
                         _state.value.copy(saving = false, saved = true)
@@ -129,6 +134,7 @@ class AddWordViewModel @Inject constructor(
     fun consumeSaved() = update { it.copy(saved = false) }
 
     private fun update(block: (AddWordUiState) -> AddWordUiState) {
-        _state.value = block(_state.value)
+        // Editing a field makes the "added" confirmation stale.
+        _state.value = block(_state.value).copy(savedHint = false)
     }
 }

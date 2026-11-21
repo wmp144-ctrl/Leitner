@@ -80,6 +80,8 @@ data class GradeOutcome(
     val leechSuggestion: Boolean,
     val faEnCardCreated: Boolean,
     val clockAnomaly: Boolean,
+    /** Answer time, so undo can also take it back out of the daily total. */
+    val durationMs: Long = 0,
 )
 
 interface StudyRepository {

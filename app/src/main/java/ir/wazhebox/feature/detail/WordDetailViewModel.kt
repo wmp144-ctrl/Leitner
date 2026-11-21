@@ -9,6 +9,7 @@ import ir.wazhebox.domain.repo.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,7 +39,18 @@ class WordDetailViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WordDetailUiState())
 
     init {
-        viewModelScope.launch { tagsState.value = wordRepository.tagsFor(wordId) }
+        // Tags were read once, so editing them and coming back showed the old
+        // chips. They are reloaded whenever the word's updatedAt moves.
+        viewModelScope.launch {
+            var seen: kotlinx.datetime.Instant? = null
+            wordRepository.observeWord(wordId).collect { entry ->
+                val updated = entry?.word?.updatedAt
+                if (updated != seen) {
+                    seen = updated
+                    tagsState.value = wordRepository.tagsFor(wordId)
+                }
+            }
+        }
     }
 
     fun delete(onDeleted: () -> Unit) {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -135,7 +136,9 @@ fun BoxBadge(box: Int, modifier: Modifier = Modifier) {
     val label = if (box >= 6) stringResource(R.string.review_box, PersianText.number(box)) else PersianText.number(box)
     Box(
         modifier = modifier
-            .size(28.dp)
+            // A fixed 28dp square clipped the longer "جعبه ۶" label; a minimum
+            // size keeps the circle for digits and grows into a pill for the text.
+            .defaultMinSize(minWidth = 28.dp, minHeight = 28.dp)
             .clip(CircleShape)
             .background(
                 if (box >= 6) MaterialTheme.colorScheme.primaryContainer
@@ -148,6 +151,8 @@ fun BoxBadge(box: Int, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.labelMedium,
             color = if (box >= 6) MaterialTheme.colorScheme.onPrimaryContainer
             else MaterialTheme.colorScheme.onSecondaryContainer,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
         )
     }
 }

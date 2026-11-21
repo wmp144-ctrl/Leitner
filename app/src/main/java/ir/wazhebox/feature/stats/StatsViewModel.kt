@@ -42,14 +42,15 @@ class StatsViewModel @Inject constructor(
     ) { daily, words, _ ->
         val today = statsRepository.today()
         val retention = statsRepository.retention()
+        val series = padToDays(daily, today.studyDay)
         StatsUiState(
             today = today,
-            last30 = daily,
+            last30 = series,
             retention = retention,
             boxes = statsRepository.boxDistribution(),
             totalWords = words,
             totalReviews = statsRepository.totalReviews(),
-            streak = streakOf(daily),
+            streak = streakOf(series, today.studyDay),
             loading = false,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), StatsUiState())
@@ -58,15 +59,39 @@ class StatsViewModel @Inject constructor(
         refresh.value = refresh.value + 1
     }
 
-    private fun streakOf(daily: List<DailyStat>): Int {
+    /**
+     * The DAO only returns days that have a row, which made the "last 30 days"
+     * chart collapse to the days that were actually studied and hid every quiet
+     * day in between. The chart needs the full window, zeros included.
+     */
+    private fun padToDays(daily: List<DailyStat>, end: kotlinx.datetime.LocalDate): List<DailyStat> {
+        val byDay = daily.associateBy { it.studyDay }
+        return (DAYS - 1 downTo 0).map { offset ->
+            val day = end.minus(offset, kotlinx.datetime.DateTimeUnit.DAY)
+            byDay[day] ?: DailyStat(studyDay = day)
+        }
+    }
+
+    private fun streakOf(daily: List<DailyStat>, today: kotlinx.datetime.LocalDate): Int {
         val activeDays = daily.filter { it.reviewsDone > 0 }.map { it.studyDay }.toSet()
         if (activeDays.isEmpty()) return 0
-        var day = daily.maxOf { it.studyDay }
+        // Counting from "the newest row" showed a zero streak every morning, before
+        // the first review of the day. Today not being studied yet is a grace day.
+        val yesterday = today.minus(1, kotlinx.datetime.DateTimeUnit.DAY)
+        var day = when {
+            today in activeDays -> today
+            yesterday in activeDays -> yesterday
+            else -> return 0
+        }
         var streak = 0
         while (day in activeDays) {
             streak++
             day = day.minus(1, kotlinx.datetime.DateTimeUnit.DAY)
         }
         return streak
+    }
+
+    private companion object {
+        const val DAYS = 30
     }
 }

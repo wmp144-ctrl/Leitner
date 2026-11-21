@@ -244,6 +244,7 @@
     <string name="io_restore_mode">نحوهٔ بازیابی</string>
     <string name="io_restore_merge">ادغام با داده‌های موجود</string>
     <string name="io_restore_replace">جایگزینی کامل</string>
+    <string name="io_restore_replace_confirm">همهٔ دک‌ها، لغت‌ها و تاریخچهٔ مرور فعلی پاک می‌شوند و فقط محتوای این پشتیبان می‌ماند. ادامه می‌دهی؟</string>
     <string name="io_restore_preview">%1$s دک، %2$s لغت، %3$s مرور</string>
     <string name="io_export_done">فایل ساخته شد: %1$s</string>
     <string name="io_saved">فایل ذخیره شد.</string>

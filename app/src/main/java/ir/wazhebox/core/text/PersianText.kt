@@ -1,6 +1,7 @@
 package ir.wazhebox.core.text
 
 import kotlinx.datetime.LocalDate
+import kotlin.math.roundToInt
 
 /** Persian digits, alphabet, and Jalali dates (PRD §18.3 rule 5, §23). */
 object PersianText {
@@ -24,8 +25,9 @@ object PersianText {
 
     fun number(value: Long): String = toPersianDigits(value.toString())
 
+    // Rounded, not truncated: 0.999 showing as ۹۹٪ made a correct answer look wrong.
     fun percent(value: Double): String =
-        toPersianDigits(((value * 100).toInt()).toString()) + "٪"
+        toPersianDigits((value * 100).roundToInt().toString()) + "٪"
 
     /** Jalali date for display; storage stays Gregorian/UTC. */
     fun jalaliDate(date: LocalDate): String {

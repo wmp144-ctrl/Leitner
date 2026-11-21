@@ -99,6 +99,13 @@ class WordRepositoryImpl @Inject constructor(
             } else {
                 val existing = wordDao.byId(draft.id)
                     ?: return@withTransaction AddWordResult.Invalid(InvalidReason.EMPTY_TERM)
+                // Renaming a word to one that already exists in the deck would hit
+                // the unique (deck_id, term_norm) index and crash the screen, so the
+                // edit path asks the same duplicate question the insert path does.
+                val duplicate = wordDao.findByTermNorm(draft.deckId, norm)
+                if (duplicate != null && duplicate.id != existing.id && !allowDuplicate) {
+                    return@withTransaction AddWordResult.Duplicate(duplicate.id)
+                }
                 wordDao.update(
                     existing.copy(
                         term = term,

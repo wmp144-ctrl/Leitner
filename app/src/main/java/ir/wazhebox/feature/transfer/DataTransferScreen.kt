@@ -13,6 +13,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -44,6 +48,7 @@ fun DataTransferScreen(
     viewModel: DataTransferViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var confirmReplace by remember { mutableStateOf(false) }
 
     val createCsv = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("text/csv"),
@@ -160,7 +165,15 @@ fun DataTransferScreen(
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.io_preview_backup)) }
             Button(
-                onClick = { openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                onClick = {
+                    // Replace wipes the database, so it asks first; merge is additive
+                    // and only overwrites the fields the backup carries.
+                    if (state.restoreMode == RestoreMode.REPLACE) {
+                        confirmReplace = true
+                    } else {
+                        openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.settings_restore)) }
@@ -230,6 +243,25 @@ fun DataTransferScreen(
         }
 
         androidx.compose.foundation.layout.Spacer(Modifier.padding(Spacing.xl))
+    }
+
+    if (confirmReplace) {
+        AlertDialog(
+            onDismissRequest = { confirmReplace = false },
+            title = { Text(stringResource(R.string.io_restore_replace)) },
+            text = { Text(stringResource(R.string.io_restore_replace_confirm)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmReplace = false
+                    openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                }) { Text(stringResource(R.string.io_restore_replace), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmReplace = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
     }
 }
 

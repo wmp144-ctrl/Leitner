@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
@@ -70,6 +71,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // The home numbers are a snapshot of the queue; coming back from a session
+    // (or from an import) has to refetch them, otherwise "left today" kept the
+    // count it had before the reviews were written.
+    LifecycleResumeEffect(Unit) {
+        viewModel.refresh()
+        onPauseOrDispose { }
+    }
     val importing by viewModel.importing.collectAsStateWithLifecycle()
     val importReport by viewModel.importReport.collectAsStateWithLifecycle()
     val importError by viewModel.importError.collectAsStateWithLifecycle()

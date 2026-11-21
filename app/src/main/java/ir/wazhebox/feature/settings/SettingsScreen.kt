@@ -173,7 +173,13 @@ fun SettingsScreen(
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                 (1..7).forEach { day ->
                     val labels = listOf("ش", "ی", "د", "س", "چ", "پ", "ج")
-                    TextButton(onClick = { viewModel.setReminderDay(day, day !in settings.reminderDays) }) {
+                    TextButton(
+                        // The last active day cannot be switched off (it would silence
+                        // the reminder for good), so the button is disabled instead of
+                        // silently doing nothing.
+                        enabled = !(day in settings.reminderDays && settings.reminderDays.size == 1),
+                        onClick = { viewModel.setReminderDay(day, day !in settings.reminderDays) },
+                    ) {
                         Text(
                             text = labels[day - 1],
                             color = if (day in settings.reminderDays) MaterialTheme.colorScheme.primary

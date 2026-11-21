@@ -171,6 +171,12 @@ interface ReviewDao {
     @Query("SELECT * FROM reviews ORDER BY reviewed_at DESC LIMIT 1")
     suspend fun last(): ReviewEntity?
 
+    @Query("SELECT * FROM reviews ORDER BY reviewed_at ASC")
+    suspend fun all(): List<ReviewEntity>
+
+    @Query("SELECT COUNT(*) FROM reviews WHERE card_id = :cardId AND reviewed_at = :reviewedAt")
+    suspend fun countAt(cardId: Long, reviewedAt: Long): Int
+
     @Query("UPDATE reviews SET undone = 1 WHERE id = :id")
     suspend fun markUndone(id: Long)
 
@@ -245,11 +251,12 @@ interface StatsDao {
         UPDATE daily_stats SET
           reviews_done = MAX(0, reviews_done - :reviews),
           new_introduced = MAX(0, new_introduced - :newWords),
-          correct_count = MAX(0, correct_count - :correct)
+          correct_count = MAX(0, correct_count - :correct),
+          total_time_ms = MAX(0, total_time_ms - :totalMs)
         WHERE study_day = :day
         """,
     )
-    suspend fun decrement(day: String, reviews: Int, newWords: Int, correct: Int)
+    suspend fun decrement(day: String, reviews: Int, newWords: Int, correct: Int, totalMs: Long)
 
     @Query("SELECT * FROM daily_stats WHERE study_day = :day")
     suspend fun forDay(day: String): DailyStatEntity?
@@ -259,4 +266,7 @@ interface StatsDao {
 
     @Query("SELECT * FROM daily_stats ORDER BY study_day DESC LIMIT :limit")
     suspend fun recent(limit: Int): List<DailyStatEntity>
+
+    @Query("DELETE FROM daily_stats")
+    suspend fun deleteAllRows()
 }

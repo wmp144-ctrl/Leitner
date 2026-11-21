@@ -44,6 +44,8 @@ data class ReviewUiState(
     val empty: Boolean = false,
     val hapticsEnabled: Boolean = true,
     val swipeEnabled: Boolean = false,
+    /** A rating is being written; further taps are ignored, not graded twice. */
+    val saving: Boolean = false,
 )
 
 @HiltViewModel
@@ -83,7 +85,11 @@ class ReviewViewModel @Inject constructor(
     }
 
     private suspend fun load() {
-        val items = studyRepository.buildSession(freePractice).toMutableList()
+        // A failed query used to leave the spinner up forever; an empty session is
+        // a recoverable, visible state.
+        val items = runCatching { studyRepository.buildSession(freePractice) }
+            .getOrDefault(emptyList())
+            .toMutableList()
         queue.clear()
         queue.addAll(items)
         sessionStartedAt = System.currentTimeMillis()
@@ -102,7 +108,14 @@ class ReviewViewModel @Inject constructor(
 
     fun checkAnswer() {
         val current = _state.value.current ?: return
-        val accepted = current.word.meanings
+        // FA_EN asks for the English word and shows the Persian meaning, so the
+        // answers it accepts are the term itself. Comparing against the meanings
+        // (as the old version did) marked every reverse answer wrong.
+        val accepted = if (current.card.direction == Direction.FA_EN) {
+            listOf(current.word.term)
+        } else {
+            current.word.meanings
+        }
         val result = AnswerGrader.grade(
             input = _state.value.typed,
             acceptedAnswers = accepted,
@@ -133,6 +146,9 @@ class ReviewViewModel @Inject constructor(
     }
 
     fun rate(rating: Rating) {
+        // Tapping two ratings in a row used to write two reviews for one card:
+        // the queue only moved on after the first write finished.
+        if (_state.value.saving) return
         val current = _state.value.current ?: return
         val typedAnswer = _state.value.typed
         val verdict = _state.value.grade?.verdict
@@ -141,10 +157,12 @@ class ReviewViewModel @Inject constructor(
 
         if (freePractice) {
             // Free practice must not touch the schedule (PRD §9.4 rule 6).
+            _state.value = _state.value.copy(saving = true)
             advance(current, countCorrect = rating != Rating.AGAIN, durationMs = duration)
             return
         }
 
+        _state.value = _state.value.copy(saving = true)
         viewModelScope.launch {
             val outcome = studyRepository.grade(
                 cardId = current.card.id,
@@ -154,7 +172,7 @@ class ReviewViewModel @Inject constructor(
                 durationMs = duration,
             )
             if (outcome == null) {
-                _state.value = _state.value.copy(saveError = true)
+                _state.value = _state.value.copy(saveError = true, saving = false)
                 return@launch
             }
             undoStack.addLast(
@@ -203,6 +221,7 @@ class ReviewViewModel @Inject constructor(
             leechWordId = leech,
             clockAnomaly = clockAnomaly,
             saveError = false,
+            saving = false,
         )
         if (!finished) showNext()
     }
@@ -213,15 +232,7 @@ class ReviewViewModel @Inject constructor(
             _state.value = _state.value.copy(finished = true, current = null, remaining = 0)
             return
         }
-        val settings = settingsSnapshot
-        val previews = Rating.entries.associateWith { rating ->
-            Scheduler.schedule(
-                card = next.card,
-                rating = rating,
-                now = kotlinx.datetime.Clock.System.now(),
-                config = settings,
-            ).intervalDays
-        }
+        val previews = previewsFor(next)
         questionStartedAt = System.currentTimeMillis()
         _state.value = _state.value.copy(
             current = next,
@@ -235,6 +246,17 @@ class ReviewViewModel @Inject constructor(
 
     /** Scheduler config is read once per queue load; changing it mid-session is out of scope. */
     private var settingsSnapshot: SchedulerConfig = SchedulerConfig()
+
+    /** Interval shown on each rating tile for the given card. */
+    private fun previewsFor(item: StudyItem): Map<Rating, Double> =
+        Rating.entries.associateWith { rating ->
+            Scheduler.schedule(
+                card = item.card,
+                rating = rating,
+                now = kotlinx.datetime.Clock.System.now(),
+                config = settingsSnapshot,
+            ).intervalDays
+        }
 
     private suspend fun loadSettings() {
         val settings = settingsRepository.settings.first()
@@ -253,9 +275,13 @@ class ReviewViewModel @Inject constructor(
         viewModelScope.launch {
             studyRepository.undo(entry.outcome)
             val restored = entry.item.copy(card = entry.outcome.cardBefore)
+            // A card that went back to a learning step was requeued at the end;
+            // restoring it at the front would have shown the same card twice.
+            queue.removeAll { it.card.id == restored.card.id }
             queue.addFirst(restored)
             _state.value = _state.value.copy(
                 current = restored,
+                intervalPreviews = previewsFor(restored),
                 remaining = queue.size,
                 reviewed = (_state.value.reviewed - 1).coerceAtLeast(0),
                 // Undoing a correct answer must also take it back out of the
@@ -268,6 +294,7 @@ class ReviewViewModel @Inject constructor(
                 grade = null,
                 finished = false,
                 leechWordId = null,
+                saving = false,
             )
             questionStartedAt = System.currentTimeMillis()
         }

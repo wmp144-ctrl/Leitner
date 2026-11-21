@@ -769,7 +769,9 @@ private fun SessionSummary(
             )
         }
         Spacer(Modifier.weight(1f))
-        NotificationPermissionRequest()
+        // Asking right after an empty summary was a prompt with nothing behind
+        // it: the reminder only makes sense once the user actually studies.
+        if (reviewed > 0) NotificationPermissionRequest()
         if (reviewed > 0) {
             OutlinedButton(
                 onClick = {

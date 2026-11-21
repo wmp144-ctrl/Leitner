@@ -190,6 +190,14 @@ fun AddWordScreen(
             ) { Text(stringResource(R.string.word_add_and_next)) }
         }
 
+        if (state.savedHint) {
+            Text(
+                text = stringResource(R.string.word_saved),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
+
         if (state.duplicateId != null) {
             AlertDialog(
                 onDismissRequest = viewModel::dismissDuplicate,
