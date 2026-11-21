@@ -232,16 +232,19 @@ class DataTransferRepositoryImpl @Inject constructor(
 
     override suspend fun importCsv(text: String): ImportReport {
         val deck = deckRepository.ensureDefaultDeck()
+        val markdown = CsvCodec.isMarkdownTable(text)
         val delimiter = CsvCodec.detectDelimiter(text)
-        val parsed = CsvCodec.parse(text, delimiter).filter { (_, cells) -> cells.any { it.isNotBlank() } }
+        val parsed = (if (markdown) CsvCodec.parseMarkdownTable(text) else CsvCodec.parse(text, delimiter))
+            .filter { (_, cells) -> cells.any { it.isNotBlank() } }
         if (parsed.isEmpty()) return ImportReport()
 
         val headerCells = parsed.first().second.map { it.trim().lowercase() }
         val hasHeader = headerCells.any { CsvCodec.HEADER_ALIASES.containsKey(it) }
-        val mapping = if (hasHeader) {
-            headerCells.map { CsvCodec.HEADER_ALIASES[it] }
-        } else {
-            listOf("term", "meaning_fa", "pos", "ipa", "example_en", "example_fa", "tags")
+        val mapping = when {
+            hasHeader -> headerCells.map { CsvCodec.HEADER_ALIASES[it] }
+            // `| term | meaning + examples | day |`
+            markdown -> listOf("term", "meaning_fa", "tags")
+            else -> listOf("term", "meaning_fa", "pos", "ipa", "example_en", "example_fa", "tags")
         }
         val unknown = if (hasHeader) {
             headerCells.filter { CsvCodec.HEADER_ALIASES[it] == null }
@@ -267,7 +270,8 @@ class DataTransferRepositoryImpl @Inject constructor(
                     return cells.getOrNull(index)?.trim()?.takeIf { it.isNotEmpty() }
                 }
                 val term = cell("term")
-                val meaning = cell("meaning_fa")
+                val blob = if (markdown) cell("meaning_fa")?.let { CsvCodec.splitMeaningBlob(it) } else null
+                val meaning = blob?.meaning ?: cell("meaning_fa")
                 when {
                     term.isNullOrBlank() && meaning.isNullOrBlank() -> Unit
                     term.isNullOrBlank() -> {
@@ -293,8 +297,8 @@ class DataTransferRepositoryImpl @Inject constructor(
                                     meaningFa = meaning,
                                     pos = cell("pos"),
                                     ipa = cell("ipa"),
-                                    exampleEn = cell("example_en"),
-                                    exampleFa = cell("example_fa"),
+                                    exampleEn = cell("example_en") ?: blob?.exampleEn,
+                                    exampleFa = cell("example_fa") ?: blob?.exampleFa,
                                     source = WordSource.CSV.name,
                                     createdAt = now,
                                     updatedAt = now,

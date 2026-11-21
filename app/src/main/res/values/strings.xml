@@ -291,11 +291,14 @@
 
     <!-- Widget -->
     <string name="widget_label">واژه‌باکس</string>
-    <string name="widget_description">یک کلمهٔ در حال یادگیری، بدون باز کردن اپ.</string>
-    <string name="widget_today_count">%1$s کارت امروز</string>
-    <string name="widget_review">مرور</string>
-    <string name="widget_next_word">کلمهٔ بعدی</string>
-    <string name="widget_done_today">امروز تمام شد ✓</string>
-    <string name="widget_tap_to_reveal">برای دیدن معنی ضربه بزن</string>
-    <string name="widget_start">شروع</string>
+    <string name="widget_description">چند واژهٔ امروز با ترجمه؛ هر روز خودش عوض می‌شود و با یک ضربه هم.</string>
+    <string name="widget_title">واژه‌های امروز</string>
+    <string name="widget_next_words">تازه</string>
+    <string name="widget_review_count">%1$s کارت برای مرور</string>
+    <string name="widget_no_reviews">مروری برای امروز نیست</string>
+    <string name="widget_page">صفحهٔ %1$s از %2$s</string>
+    <string name="widget_empty_title">هنوز واژه‌ای نداری</string>
+    <string name="widget_empty_body">برنامه را باز کن و فایل واژه‌ها را وارد کن.</string>
+    <string name="widget_error_title">واژه‌ها بالا نیامدند</string>
+    <string name="widget_error_body">برنامه را باز کن؛ ویجت بعد از باز شدن دوباره پر می‌شود.</string>
 </resources>

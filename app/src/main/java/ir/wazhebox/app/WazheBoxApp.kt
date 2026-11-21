@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import ir.wazhebox.core.notifications.NotificationChannels
 import ir.wazhebox.data.reminder.ReminderScheduler
+import ir.wazhebox.widget.WidgetRotationScheduler
 import ir.wazhebox.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +19,7 @@ class WazheBoxApp : Application() {
 
     @Inject lateinit var reminderScheduler: ReminderScheduler
     @Inject lateinit var widgetUpdater: WidgetUpdater
+    @Inject lateinit var widgetRotationScheduler: WidgetRotationScheduler
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -35,6 +37,7 @@ class WazheBoxApp : Application() {
         NotificationChannels.ensureCreated(this)
         scope.launch {
             runCatching { reminderScheduler.schedule() }
+            runCatching { widgetRotationScheduler.schedule() }
             runCatching { widgetUpdater.refresh() }
         }
     }

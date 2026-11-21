@@ -73,6 +73,48 @@ class CsvCodecTest {
     }
 
     @Test
+    fun `markdown table is detected and its separator row is skipped`() {
+        val text = "| term | معنی | day01 |\n| --- | --- | --- |\n| address | آدرس | day01 |\n"
+        assertThat(CsvCodec.isMarkdownTable(text)).isTrue()
+        val rows = CsvCodec.parseMarkdownTable(text)
+        assertThat(rows).hasSize(2)
+        assertThat(rows[1].second).containsExactly("address", "آدرس", "day01").inOrder()
+    }
+
+    @Test
+    fun `plain csv is not mistaken for a markdown table`() {
+        assertThat(CsvCodec.isMarkdownTable("term,meaning\nhouse,خانه\n")).isFalse()
+    }
+
+    @Test
+    fun `meaning blob splits meaning from its bilingual example`() {
+        val blob = CsvCodec.splitMeaningBlob(
+            "آدرس، نشانی<br><br><i>Can you write your address on this form?</i><br>می‌توانی آدرست را روی این فرم بنویسی؟",
+        )
+        assertThat(blob.meaning).isEqualTo("آدرس، نشانی")
+        assertThat(blob.exampleEn).isEqualTo("Can you write your address on this form?")
+        assertThat(blob.exampleFa).isEqualTo("می‌توانی آدرست را روی این فرم بنویسی؟")
+    }
+
+    @Test
+    fun `every row of the real vocab export parses into a usable word`() {
+        val text = javaClass.getResource("/vocab_v2_90_sample.csv")!!.readText()
+        val rows = CsvCodec.parseMarkdownTable(text)
+        assertThat(rows).hasSize(24)
+        rows.forEach { (_, cells) ->
+            assertThat(cells).hasSize(3)
+            assertThat(cells[0]).isNotEmpty()
+            assertThat(cells[2]).startsWith("day")
+            val blob = CsvCodec.splitMeaningBlob(cells[1])
+            assertThat(blob.meaning).isNotEmpty()
+            assertThat(blob.exampleEn).isNotNull()
+            assertThat(blob.exampleFa).isNotNull()
+        }
+        val address = CsvCodec.splitMeaningBlob(rows.first().second[1])
+        assertThat(address.meaning).isEqualTo("آدرس، نشانی")
+    }
+
+    @Test
     fun `header aliases map persian columns`() {
         assertThat(CsvCodec.HEADER_ALIASES["کلمه"]).isEqualTo("term")
         assertThat(CsvCodec.HEADER_ALIASES["معنی"]).isEqualTo("meaning_fa")

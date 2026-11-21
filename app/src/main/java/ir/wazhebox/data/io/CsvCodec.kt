@@ -79,6 +79,102 @@ object CsvCodec {
         return rows
     }
 
+    /**
+     * Pipe tables (`| term | meaning | day |`) are what chat tools export when a
+     * spreadsheet is pasted as Markdown. The first row is kept as data: the caller
+     * decides from its cells whether it is a header.
+     */
+    fun isMarkdownTable(text: String): Boolean {
+        val first = text.removePrefix(BOM)
+            .lineSequence()
+            .firstOrNull { it.isNotBlank() }
+            ?.trim()
+            .orEmpty()
+        return first.startsWith("|") && first.count { it == '|' } >= 2
+    }
+
+    /** Parses a pipe table, trimming cells and skipping `| --- |` separator rows. */
+    fun parseMarkdownTable(text: String): List<Pair<Int, List<String>>> {
+        val rows = mutableListOf<Pair<Int, List<String>>>()
+        text.removePrefix(BOM).lineSequence().forEachIndexed { index, raw ->
+            val line = raw.trim()
+            if (line.isEmpty() || !line.contains('|')) return@forEachIndexed
+            val cells = splitTableRow(line)
+            if (cells.isEmpty()) return@forEachIndexed
+            if (cells.all { it.isBlank() || isTableSeparator(it) }) return@forEachIndexed
+            rows += (index + 1) to cells
+        }
+        return rows
+    }
+
+    private fun splitTableRow(line: String): List<String> {
+        val body = line.removePrefix("|").removeSuffix("|")
+        val cells = mutableListOf<String>()
+        val current = StringBuilder()
+        var i = 0
+        while (i < body.length) {
+            val char = body[i]
+            when {
+                char == '\\' && i + 1 < body.length && body[i + 1] == '|' -> {
+                    current.append('|')
+                    i++
+                }
+                char == '|' -> {
+                    cells += current.toString().trim()
+                    current.clear()
+                }
+                else -> current.append(char)
+            }
+            i++
+        }
+        cells += current.toString().trim()
+        return cells
+    }
+
+    private fun isTableSeparator(cell: String): Boolean {
+        val compact = cell.trim().trim(':').replace(" ", "")
+        return compact.isNotEmpty() && compact.all { it == '-' || it == '=' }
+    }
+
+    data class MeaningBlob(val meaning: String, val exampleEn: String?, val exampleFa: String?)
+
+    /**
+     * A vocab export keeps the meaning, an English example and its translation in
+     * one HTML cell: `آدرس، نشانی<br><br><i>Write it here.</i><br>آدرس را اینجا بنویس.`
+     */
+    fun splitMeaningBlob(cell: String): MeaningBlob {
+        val italic = Regex("<i>(.*?)</i>", setOf(RegexOption.IGNORE_CASE, RegexOption.DOT_MATCHES_ALL))
+            .find(cell)
+            ?.groupValues
+            ?.get(1)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+        val lines = cell
+            .replace(Regex("(?i)<br\\s*/?>"), "\n")
+            .replace(Regex("(?i)</?i>"), "")
+            .replace(Regex("(?i)</?(b|strong|em|span)[^>]*>"), "")
+            .replace("&nbsp;", " ")
+            .lines()
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+
+        if (italic == null) {
+            return MeaningBlob(
+                meaning = lines.firstOrNull().orEmpty(),
+                exampleEn = lines.getOrNull(1),
+                exampleFa = lines.getOrNull(2),
+            )
+        }
+        val splitAt = lines.indexOfFirst { it.equals(italic, ignoreCase = true) }
+        val meaningCells = if (splitAt >= 0) lines.take(splitAt) else lines.filterNot { it.equals(italic, true) }
+        val tail = if (splitAt >= 0) lines.drop(splitAt + 1) else emptyList()
+        return MeaningBlob(
+            meaning = meaningCells.joinToString("، ").ifEmpty { cell.trim() },
+            exampleEn = italic,
+            exampleFa = tail.firstOrNull(),
+        )
+    }
+
     /** Column aliases: English header names and the Persian ones from §14.1. */
     val HEADER_ALIASES: Map<String, String> = mapOf(
         "term" to "term",
