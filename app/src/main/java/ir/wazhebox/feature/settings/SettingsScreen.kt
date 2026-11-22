@@ -2,6 +2,7 @@ package ir.wazhebox.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -170,10 +171,15 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 (1..7).forEach { day ->
                     val labels = listOf("ش", "ی", "د", "س", "چ", "پ", "ج")
                     TextButton(
+                        // Each day takes an equal share of the row: seven buttons at
+                        // their natural width did not fit a phone and the last two
+                        // (پنجشنبه, جمعه) were clipped off the screen entirely.
+                        modifier = Modifier.weight(1f),
+                        contentPadding = PaddingValues(0.dp),
                         // The last active day cannot be switched off (it would silence
                         // the reminder for good), so the button is disabled instead of
                         // silently doing nothing.

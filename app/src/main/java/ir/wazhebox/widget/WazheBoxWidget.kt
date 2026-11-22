@@ -486,7 +486,10 @@ class WidgetUpdater @Inject constructor(
             .map {
                 WidgetWord(
                     term = it.word.term.trim(),
-                    meaning = it.word.meaningFa.replace('\n', ' ').replace(WHITESPACE, " ").trim(),
+                    // The widget shows one meaning: the stored `|` separator used to
+                    // be rendered as part of the text there.
+                    meaning = it.word.meaningFa.substringBefore('|')
+                        .replace('\n', ' ').replace(WHITESPACE, " ").trim(),
                 )
             }
             .toList()

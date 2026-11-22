@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.wazhebox.R
 import ir.wazhebox.core.text.PersianText
+import ir.wazhebox.core.ui.rememberPickerLauncher
 import ir.wazhebox.core.ui.components.SectionCard
 import ir.wazhebox.core.ui.theme.Spacing
 import kotlinx.datetime.Clock
@@ -49,6 +50,9 @@ fun DataTransferScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var confirmReplace by remember { mutableStateOf(false) }
+    // Every picker launch goes through this so a device without a document
+    // provider shows a message instead of dying with an unhandled exception.
+    val picker = rememberPickerLauncher()
 
     val createCsv = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("text/csv"),
@@ -103,12 +107,12 @@ fun DataTransferScreen(
                 style = MaterialTheme.typography.titleMedium,
             )
             Button(
-                onClick = { createCsv.launch("wazhebox-export-$today.csv") },
+                onClick = { picker.launch { createCsv.launch("wazhebox-export-$today.csv") } },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.settings_export_csv)) }
             OutlinedButton(
-                onClick = { createJson.launch("wazhebox-backup-$today.json") },
+                onClick = { picker.launch { createJson.launch("wazhebox-backup-$today.json") } },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.settings_backup)) }
@@ -120,7 +124,11 @@ fun DataTransferScreen(
                 style = MaterialTheme.typography.titleMedium,
             )
             OutlinedButton(
-                onClick = { openCsv.launch(arrayOf("text/*", "text/csv", "text/comma-separated-values")) },
+                onClick = {
+                    picker.launch {
+                        openCsv.launch(arrayOf("text/*", "text/csv", "text/comma-separated-values"))
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.settings_import_csv)) }
@@ -160,7 +168,9 @@ fun DataTransferScreen(
                 }
             }
             OutlinedButton(
-                onClick = { openJsonPreview.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                onClick = {
+                    picker.launch { openJsonPreview.launch(arrayOf("application/json", "text/plain", "*/*")) }
+                },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.io_preview_backup)) }
@@ -171,7 +181,9 @@ fun DataTransferScreen(
                     if (state.restoreMode == RestoreMode.REPLACE) {
                         confirmReplace = true
                     } else {
-                        openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                        picker.launch {
+                            openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),
@@ -208,11 +220,23 @@ fun DataTransferScreen(
                 ReportLine(stringResource(R.string.io_tags_created, PersianText.number(report.tagsCreated)))
                 if (report.rejected.isNotEmpty()) {
                     OutlinedButton(
-                        onClick = { createReport.launch("wazhebox-import-report-$today.csv") },
+                        onClick = {
+                            picker.launch {
+                                createReport.launch("wazhebox-import-report-$today.csv")
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                     ) { Text(stringResource(R.string.io_download_report)) }
                 }
             }
+        }
+
+        if (picker.unavailable) {
+            Text(
+                text = stringResource(R.string.picker_missing),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+            )
         }
 
         state.error?.let { error ->
@@ -253,7 +277,9 @@ fun DataTransferScreen(
             confirmButton = {
                 TextButton(onClick = {
                     confirmReplace = false
-                    openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                    picker.launch {
+                        openJsonRestore.launch(arrayOf("application/json", "text/plain", "*/*"))
+                    }
                 }) { Text(stringResource(R.string.io_restore_replace), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {

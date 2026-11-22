@@ -289,7 +289,7 @@ fun ReviewScreen(
                         back = {
                             AnswerFace(
                                 term = word.term,
-                                meaning = word.meaningFa,
+                                meaning = word.meaningText,
                                 ipa = word.ipa,
                                 exampleEn = word.exampleEn,
                                 exampleFa = word.exampleFa,
@@ -307,7 +307,15 @@ fun ReviewScreen(
                     value = state.typed,
                     onValueChange = viewModel::typed,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(stringResource(R.string.review_answer_hint)) },
+                    label = {
+                        // A reversed card asks for the English word, not a meaning.
+                        Text(
+                            stringResource(
+                                if (direction == Direction.FA_EN) R.string.review_answer_hint_fa_en
+                                else R.string.review_answer_hint,
+                            ),
+                        )
+                    },
                     keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Done,
@@ -528,11 +536,24 @@ private fun AnswerDetails(
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
-            Verdict.WRONG, Verdict.REVEALED -> Text(
-                stringResource(R.string.review_wrong, meaning.split('|').first()),
+            // The face of the card already carries the answer (the meaning on
+            // EN_FA, the term on FA_EN), so a wrong typed answer only needs the
+            // judgement, not a second copy of the answer it used to print.
+            Verdict.WRONG -> Text(
+                stringResource(R.string.review_wrong_answer),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
             )
+            // A revealed cloze/listen card is the one case where the word itself
+            // is nowhere else on the card, and there the answer is the English
+            // term - not the Persian meaning it used to print.
+            Verdict.REVEALED -> if (direction == Direction.CLOZE || direction == Direction.LISTEN) {
+                Text(
+                    stringResource(R.string.review_wrong, term),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
             else -> Unit
         }
 

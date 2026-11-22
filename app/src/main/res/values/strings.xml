@@ -70,6 +70,7 @@
     <string name="review_remaining">%1$s مانده</string>
     <string name="review_box">جعبهٔ %1$s</string>
     <string name="review_answer_hint">معنی یا ترجمه را بنویس</string>
+    <string name="review_answer_hint_fa_en">واژهٔ انگلیسی را بنویس</string>
     <string name="review_check">بررسی</string>
     <string name="review_rating_again">فراموش کردم</string>
     <string name="review_rating_hard">سخت بود</string>
@@ -78,6 +79,7 @@
     <string name="review_correct">درست</string>
     <string name="review_typo">درست، فقط املایش: %1$s</string>
     <string name="review_wrong">پاسخ درست: %1$s</string>
+    <string name="review_wrong_answer">نادرست</string>
     <string name="review_keyboard_wrong">کیبورد فارسی است. کیبورد انگلیسی را روشن کن.</string>
     <string name="review_speak">تلفظ کلمه</string>
     <string name="review_tts_missing">صدای انگلیسی روی این گوشی نصب نیست</string>
@@ -256,6 +258,7 @@
     <string name="io_error_corrupt">فایل خراب است؛ هیچ تغییری انجام نشد.</string>
     <string name="io_error_version">این فایل با نسخهٔ جدیدتری از اپ ساخته شده است.</string>
     <string name="io_no_space">فضای کافی نیست</string>
+    <string name="picker_missing">برنامهٔ انتخاب فایل روی این دستگاه در دسترس نیست. یک برنامهٔ فایل‌ها نصب کن و دوباره تلاش کن.</string>
 
     <!-- Common -->
     <string name="common_loading">در حال بارگذاری…</string>

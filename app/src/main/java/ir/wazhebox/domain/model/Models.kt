@@ -99,6 +99,10 @@ data class Word(
     val primaryMeaning: String
         get() = meanings.firstOrNull() ?: meaningFa
 
+    /** The meanings as the user should read them: the stored `|` is a separator, not text. */
+    val meaningText: String
+        get() = meanings.joinToString("، ").ifEmpty { meaningFa }
+
     val hasExample: Boolean
         get() = !exampleEn.isNullOrBlank()
 }

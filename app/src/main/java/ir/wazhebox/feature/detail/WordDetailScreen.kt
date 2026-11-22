@@ -95,7 +95,7 @@ fun WordDetailScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Text(text = word.meaningFa, style = MaterialTheme.typography.titleLarge)
+            Text(text = word.meaningText, style = MaterialTheme.typography.titleLarge)
             if (!word.exampleEn.isNullOrBlank()) {
                 Text(text = BidiText.isolateLtr(word.exampleEn), style = MaterialTheme.typography.bodyLarge)
                 if (!word.exampleFa.isNullOrBlank()) {

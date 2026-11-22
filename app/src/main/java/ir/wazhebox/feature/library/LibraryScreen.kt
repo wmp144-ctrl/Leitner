@@ -238,7 +238,7 @@ fun LibraryScreen(
                                 overflow = TextOverflow.Ellipsis,
                             )
                             Text(
-                                text = row.word.meaningFa,
+                                text = row.word.meaningText,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colors.onSurfaceVariant,
                                 maxLines = 1,

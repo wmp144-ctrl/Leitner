@@ -180,10 +180,8 @@ private fun RetentionHero(state: StatsUiState) {
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
-                Text(
-                    text = stringResource(R.string.stats_retention),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                // The ring already carries the "یادآوری واقعی" label, so this
+                // column used to print the same title twice next to it.
                 if (hasData) {
                     Text(
                         text = stringResource(

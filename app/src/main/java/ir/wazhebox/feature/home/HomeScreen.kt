@@ -51,6 +51,7 @@ import ir.wazhebox.core.ui.components.BoxBadge
 import ir.wazhebox.core.ui.components.EmptyState
 import ir.wazhebox.core.ui.components.ProgressRing
 import ir.wazhebox.core.ui.components.StatCard
+import ir.wazhebox.core.ui.rememberPickerLauncher
 import ir.wazhebox.core.ui.dueLabel
 import ir.wazhebox.core.ui.jalaliDayLabel
 import ir.wazhebox.core.ui.theme.Spacing
@@ -87,6 +88,9 @@ fun HomeScreen(
     val openCsv = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let(viewModel::importCsv)
     }
+    // Without a document provider the raw launch throws on the main thread and
+    // closes the app, so the failure becomes a message instead.
+    val picker = rememberPickerLauncher()
 
     LazyColumn(
         modifier = Modifier
@@ -124,7 +128,11 @@ fun HomeScreen(
                         message = stringResource(R.string.home_empty_hint),
                         actionLabel = stringResource(R.string.home_import_csv),
                         onAction = {
-                            openCsv.launch(arrayOf("text/*", "text/csv", "text/comma-separated-values"))
+                            picker.launch {
+                                openCsv.launch(
+                                    arrayOf("text/*", "text/csv", "text/comma-separated-values"),
+                                )
+                            }
                         },
                     )
                     if (importing) {
@@ -162,9 +170,12 @@ fun HomeScreen(
                             }
                         }
                     }
-                    if (importError) {
+                    if (importError || picker.unavailable) {
                         Text(
-                            text = stringResource(R.string.home_import_error),
+                            text = stringResource(
+                                if (picker.unavailable) R.string.picker_missing
+                                else R.string.home_import_error,
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                         )
