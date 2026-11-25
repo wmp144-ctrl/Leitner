@@ -15,6 +15,7 @@ import ir.wazhebox.domain.model.Rating
 import ir.wazhebox.domain.model.StudyItem
 import ir.wazhebox.domain.model.Verdict
 import ir.wazhebox.domain.repo.GradeOutcome
+import ir.wazhebox.domain.repo.SessionSource
 import ir.wazhebox.domain.repo.StudyRepository
 import ir.wazhebox.domain.repo.Workload
 import ir.wazhebox.domain.scheduler.ScheduleResult
@@ -77,9 +78,32 @@ class StudyRepositoryImpl @Inject constructor(
                 .map { StudyItem(word = word, card = it.toDomain()) }
         }
 
-    override suspend fun buildSession(freePractice: Boolean, deckId: Long?): List<StudyItem> {
-        val (sessionConfig, _) = sessionConfig(freePractice)
-        return SessionBuilder.buildQueue(liveItems(deckId), clock.now(), sessionConfig)
+    override suspend fun buildSession(
+        freePractice: Boolean,
+        deckId: Long?,
+        source: SessionSource,
+    ): List<StudyItem> {
+        val items = liveItems(deckId)
+        if (source == SessionSource.DUE) {
+            val (sessionConfig, _) = sessionConfig(freePractice)
+            return SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
+        }
+        // A drill ignores due dates: these cards are exactly the ones that keep
+        // failing, so waiting for the scheduler would hide the problem.
+        val orderedIds = drillWordIds(source)
+        val rank = orderedIds.withIndex().associate { (index, id) -> id to index }
+        return items
+            .filter { it.word.id in rank }
+            .sortedBy { rank[it.word.id] }
+            .take(DRILL_LIMIT)
+    }
+
+    private suspend fun drillWordIds(source: SessionSource): List<Long> = when (source) {
+        SessionSource.TROUBLE -> wordDao.troubleWords(LEECH_LAPSES, DRILL_WORDS).map { it.word.id }
+        SessionSource.MISTAKES -> wordDao
+            .mistakeWords(clock.now().toEpochMillis() - MISTAKE_WINDOW_MS, DRILL_WORDS)
+            .map { it.word.id }
+        SessionSource.DUE -> emptyList()
     }
 
     override suspend fun workload(freePractice: Boolean, deckId: Long?): Workload {
@@ -262,6 +286,15 @@ class StudyRepositoryImpl @Inject constructor(
         liveItems()
             .filter { it.card.id !in excludeIds }
             .minByOrNull { it.card.dueAt }
+
+    private companion object {
+        /** The same floor the review screen uses for its "this word is hard" nudge. */
+        const val LEECH_LAPSES = 4
+        const val DRILL_WORDS = 200
+        /** Cards per drill: long enough to be worth starting, short enough to finish. */
+        const val DRILL_LIMIT = 120
+        const val MISTAKE_WINDOW_MS = 30L * 24 * 60 * 60 * 1000
+    }
 
     private suspend fun recordDailyStats(
         now: Instant,

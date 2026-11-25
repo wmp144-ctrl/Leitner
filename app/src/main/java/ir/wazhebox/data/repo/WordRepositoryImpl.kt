@@ -15,6 +15,7 @@ import ir.wazhebox.domain.model.WordSource
 import ir.wazhebox.domain.model.WordWithCards
 import ir.wazhebox.domain.repo.AddWordResult
 import ir.wazhebox.domain.repo.InvalidReason
+import ir.wazhebox.domain.repo.MistakeWord
 import ir.wazhebox.domain.repo.WordDraft
 import ir.wazhebox.domain.repo.WordRepository
 import kotlinx.coroutines.flow.Flow
@@ -164,6 +165,27 @@ class WordRepositoryImpl @Inject constructor(
                 ),
             )
             true
+        }
+
+    override fun observeTags(): Flow<List<String>> =
+        tagDao.observeAll().map { tags -> tags.map { it.name }.distinct() }
+
+    override fun observeWordTags(): Flow<Map<Long, List<String>>> =
+        tagDao.observeWordTags().map { rows ->
+            rows.groupBy({ it.wordId }, { it.name })
+        }
+
+    override suspend fun troubleWords(minLapses: Int, limit: Int): List<WordWithCards> =
+        wordDao.troubleWords(minLapses, limit).map { it.toDomain() }
+
+    override suspend fun mistakeWords(since: kotlinx.datetime.Instant, limit: Int): List<MistakeWord> =
+        wordDao.mistakeWords(since.toEpochMilliseconds(), limit).mapNotNull { row ->
+            val entry = wordDao.withCards(row.word.id)?.toDomain() ?: return@mapNotNull null
+            MistakeWord(
+                word = entry,
+                mistakes = row.mistakes,
+                lastAt = kotlinx.datetime.Instant.fromEpochMilliseconds(row.lastAt),
+            )
         }
 
     private suspend fun applyTags(wordId: Long, tags: List<String>) {

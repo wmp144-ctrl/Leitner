@@ -20,20 +20,27 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import java.io.File
 import javax.inject.Inject
 
 enum class RestoreMode { MERGE, REPLACE }
 
+/** What a preview is waiting for: the picked file is kept until confirmed. */
+enum class PendingImport { CSV, ANKI }
+
 data class TransferUiState(
     val busy: Boolean = false,
+    /** A dry run while [pending] is set; the applied report afterwards. */
     val report: ImportReport? = null,
     val restoreMode: RestoreMode = RestoreMode.MERGE,
     val message: String? = null,
     val error: String? = null,
     val previewText: String? = null,
     val autoBackups: List<AutoBackupFile> = emptyList(),
-    val ankiAdded: Int? = null,
     val ankiDecks: Int = 0,
+    val pending: PendingImport? = null,
+    /** How many words the just-finished import added (null when none). */
+    val importedWords: Int? = null,
 )
 
 @HiltViewModel
@@ -47,6 +54,10 @@ class DataTransferViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(TransferUiState())
     val state: StateFlow<TransferUiState> = _state.asStateFlow()
+
+    // A preview has to be able to run twice: once to count, once to write.
+    private var pendingCsvText: String? = null
+    private var pendingAnkiFile: File? = null
 
     init {
         refreshAutoBackups()
@@ -70,54 +81,135 @@ class DataTransferViewModel @Inject constructor(
 
     fun exportReport(uri: Uri, report: ImportReport) = write(uri) { report.rejectedCsv() }
 
+    /** Step one: read the file, count what it holds and show the numbers. */
     fun importCsv(uri: Uri) {
-        _state.value = _state.value.copy(busy = true, error = null, message = null, report = null)
+        _state.value = _state.value.copy(
+            busy = true,
+            error = null,
+            message = null,
+            report = null,
+            importedWords = null,
+        )
         viewModelScope.launch {
             runCatching {
                 val text = readUri(uri)
-                dataTransfer.importCsv(text)
-            }.onSuccess { report ->
-                _state.value = _state.value.copy(busy = false, report = report)
-                // The widget reads the database itself, so it needs a nudge after
-                // words change here as well as after a session.
-                runCatching { widgetUpdater.refresh() }
+                pendingCsvText = text
+                dataTransfer.importCsv(text, apply = false)
+            }.onSuccess { preview ->
+                _state.value = _state.value.copy(
+                    busy = false,
+                    report = preview,
+                    pending = PendingImport.CSV,
+                )
             }.onFailure { error ->
                 _state.value = _state.value.copy(busy = false, error = error.message)
             }
         }
     }
 
-    /** Anki .apkg: the zip is read straight from the document picker stream. */
+    /** Step one for .apkg: the zip is copied once, then read twice. */
     fun importAnki(uri: Uri) {
         _state.value = _state.value.copy(
             busy = true,
             error = null,
             message = null,
             report = null,
-            ankiAdded = null,
+            importedWords = null,
+            ankiDecks = 0,
         )
         viewModelScope.launch {
             val result = runCatching {
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.use { stream ->
-                        dataTransfer.importAnki(stream)
-                    } ?: error("open_failed")
-                }
+                val file = cacheAnki(uri)
+                pendingAnkiFile = file
+                dataTransfer.previewAnki(file)
             }.getOrNull()
             _state.value = when (result) {
-                is AnkiImportResult.Imported -> {
-                    runCatching { widgetUpdater.refresh() }
-                    _state.value.copy(
-                        busy = false,
-                        report = result.report,
-                        ankiAdded = result.report.added,
-                        ankiDecks = result.decks,
-                    )
-                }
+                is AnkiImportResult.Imported -> _state.value.copy(
+                    busy = false,
+                    report = result.report,
+                    ankiDecks = result.decks,
+                    pending = PendingImport.ANKI,
+                )
                 is AnkiImportResult.Unsupported -> _state.value.copy(busy = false, error = "anki_unsupported")
                 is AnkiImportResult.Corrupt, null -> _state.value.copy(busy = false, error = "anki_corrupt")
             }
         }
+    }
+
+    /** Step two: the user saw the counts and agreed, so write them. */
+    fun confirmImport() {
+        val kind = _state.value.pending ?: return
+        _state.value = _state.value.copy(busy = true, error = null)
+        viewModelScope.launch {
+            val result = runCatching {
+                when (kind) {
+                    PendingImport.CSV -> {
+                        val text = pendingCsvText ?: error("read_failed")
+                        AppliedImport(dataTransfer.importCsv(text, apply = true), 0)
+                    }
+                    PendingImport.ANKI -> {
+                        val file = pendingAnkiFile ?: error("read_failed")
+                        when (val imported = dataTransfer.importAnki(file)) {
+                            is AnkiImportResult.Imported ->
+                                AppliedImport(imported.report, imported.decks)
+                            else -> error("anki_corrupt")
+                        }
+                    }
+                }
+            }.getOrNull()
+            if (result == null) {
+                _state.value = _state.value.copy(busy = false, error = "import_failed")
+                return@launch
+            }
+            runCatching { widgetUpdater.refresh() }
+            clearPending()
+            _state.value = _state.value.copy(
+                busy = false,
+                report = result.report,
+                pending = null,
+                importedWords = result.report.added,
+                ankiDecks = result.decks,
+                message = "imported",
+                error = null,
+            )
+            refreshAutoBackups()
+        }
+    }
+
+    fun cancelImport() {
+        clearPending()
+        _state.value = _state.value.copy(pending = null, report = null)
+    }
+
+    fun undoLastImport() {
+        val batch = _state.value.report?.batchId ?: return
+        _state.value = _state.value.copy(busy = true, error = null)
+        viewModelScope.launch {
+            val removed = runCatching { dataTransfer.undoImport(batch) }.getOrDefault(0)
+            runCatching { widgetUpdater.refresh() }
+            _state.value = _state.value.copy(
+                busy = false,
+                report = null,
+                importedWords = null,
+                message = "import_undone:$removed",
+            )
+        }
+    }
+
+    private data class AppliedImport(val report: ImportReport, val decks: Int)
+
+    private fun clearPending() {
+        pendingCsvText = null
+        pendingAnkiFile?.delete()
+        pendingAnkiFile = null
+    }
+
+    private fun cacheAnki(uri: Uri): File = run {
+        val file = File(context.cacheDir, "anki-pending.apkg")
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            file.outputStream().use { output -> input.copyTo(output) }
+        } ?: error("open_failed")
+        file
     }
 
     fun previewBackup(uri: Uri) {
@@ -207,5 +299,10 @@ class DataTransferViewModel @Inject constructor(
     private suspend fun readUri(uri: Uri): String = withContext(Dispatchers.IO) {
         context.contentResolver.openInputStream(uri)?.bufferedReader(Charsets.UTF_8)?.use { it.readText() }
             ?: error("open_failed")
+    }
+
+    override fun onCleared() {
+        clearPending()
+        super.onCleared()
     }
 }

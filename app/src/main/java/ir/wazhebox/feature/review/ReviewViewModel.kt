@@ -14,6 +14,7 @@ import ir.wazhebox.domain.model.Rating
 import ir.wazhebox.domain.model.StudyItem
 import ir.wazhebox.domain.model.Verdict
 import ir.wazhebox.domain.repo.GradeOutcome
+import ir.wazhebox.domain.repo.SessionSource
 import ir.wazhebox.domain.repo.StudyRepository
 import ir.wazhebox.domain.scheduler.Scheduler
 import ir.wazhebox.domain.scheduler.SchedulerConfig
@@ -64,6 +65,14 @@ class ReviewViewModel @Inject constructor(
     private val deckId: Long? =
         (savedStateHandle.get<Long>("deckId") ?: 0L).takeIf { it > 0L }
 
+    /** The trouble screen starts a drill instead of the normal due queue. */
+    private val source: SessionSource =
+        when (savedStateHandle.get<Int>("source") ?: 0) {
+            1 -> SessionSource.TROUBLE
+            2 -> SessionSource.MISTAKES
+            else -> SessionSource.DUE
+        }
+
     private val _state = MutableStateFlow(ReviewUiState(freePractice = freePractice))
     val state: StateFlow<ReviewUiState> = _state.asStateFlow()
 
@@ -91,7 +100,7 @@ class ReviewViewModel @Inject constructor(
     private suspend fun load() {
         // A failed query used to leave the spinner up forever; an empty session is
         // a recoverable, visible state.
-        val items = runCatching { studyRepository.buildSession(freePractice, deckId) }
+        val items = runCatching { studyRepository.buildSession(freePractice, deckId, source) }
             .getOrDefault(emptyList())
             .toMutableList()
         queue.clear()

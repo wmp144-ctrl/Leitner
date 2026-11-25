@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
@@ -49,6 +50,7 @@ import ir.wazhebox.app.navigation.OnboardingRoute
 import ir.wazhebox.app.navigation.ReviewRoute
 import ir.wazhebox.app.navigation.SettingsRoute
 import ir.wazhebox.app.navigation.StatsRoute
+import ir.wazhebox.app.navigation.TroubleRoute
 import ir.wazhebox.app.navigation.TtsSettingsRoute
 import ir.wazhebox.app.navigation.WordDetailRoute
 import ir.wazhebox.core.ui.components.DrawerItem
@@ -61,6 +63,7 @@ import ir.wazhebox.feature.home.HomeScreen
 import ir.wazhebox.feature.library.LibraryScreen
 import ir.wazhebox.feature.onboarding.OnboardingScreen
 import ir.wazhebox.feature.review.ReviewScreen
+import ir.wazhebox.feature.trouble.TroubleScreen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
@@ -157,6 +160,11 @@ fun WazheBoxRoot(
                         onClick = { openScreen(AddWordRoute()) },
                     ),
                     DrawerItem(
+                        label = stringResource(R.string.nav_trouble),
+                        icon = Icons.Filled.Warning,
+                        onClick = { openScreen(TroubleRoute) },
+                    ),
+                    DrawerItem(
                         label = stringResource(R.string.settings_data),
                         icon = Icons.Filled.SwapVert,
                         onClick = { openScreen(DataTransferRoute) },
@@ -238,6 +246,17 @@ fun WazheBoxRoot(
                             onOpenDataTransfer = { navController.navigate(DataTransferRoute) },
                             onOpenTts = { navController.navigate(TtsSettingsRoute) },
                             onOpenAbout = { navController.navigate(AboutRoute) },
+                        )
+                    }
+                    composable<TroubleRoute> {
+                        TroubleScreen(
+                            onBack = { navController.popBackStack() },
+                            onPractice = { source ->
+                                navController.navigate(ReviewRoute(source = source))
+                            },
+                            onOpenWord = { wordId ->
+                                navController.navigate(WordDetailRoute(wordId))
+                            },
                         )
                     }
                     composable<DataTransferRoute> {

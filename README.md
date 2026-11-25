@@ -35,11 +35,20 @@
 echo "sdk.dir=/path/to/android-sdk" > local.properties
 
 ./gradlew assembleDebug        # APK دیباگ
-./gradlew testDebugUnitTest    # تست‌های واحد (۱۱۰ تست)
+./gradlew testDebugUnitTest    # تست‌های واحد (۱۲۷ تست)
 ./gradlew assembleRelease      # APK ریلیز با R8
 ./gradlew bundleRelease        # AAB برای آپلود در Google Play
 ./gradlew lintRelease          # بازرسی استاتیک (۰ خطا)
 ```
+
+### یکپارچه‌سازی پیوسته
+
+[`.github/workflows/android.yml`](.github/workflows/android.yml) روی هر push به `main` و
+هر pull request تست‌ها را اجرا می‌کند و APK دیباگ را به‌عنوان artifact می‌گذارد.
+با تگ `v*` همان ورک‌فلو نسخهٔ امضاشدهٔ release (APK + AAB) را می‌سازد؛ امضا از
+secretهای `ANDROID_KEYSTORE_BASE64`، `ANDROID_KEYSTORE_PASSWORD`،
+`ANDROID_KEY_ALIAS` و `ANDROID_KEY_PASSWORD` خوانده می‌شود و بدون آن‌ها بیلد
+release عمداً متوقف می‌شود.
 
 نسخه در [`version.properties`](version.properties) است و Gradle آن را می‌خواند.
 برای هر انتشار، یک فرمان نسخه را بالا می‌برد، `CHANGELOG.md` را می‌نویسد و

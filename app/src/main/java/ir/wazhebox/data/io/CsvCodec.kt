@@ -202,6 +202,8 @@ object CsvCodec {
         "sentence_fa" to "example_fa",
         "example_translation" to "example_fa",
         "ترجمه جمله" to "example_fa",
+        "deck" to "deck",
+        "دک" to "deck",
         "tags" to "tags",
         "برچسب" to "tags",
         "برچسب‌ها" to "tags",

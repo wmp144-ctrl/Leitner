@@ -18,7 +18,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -50,6 +49,7 @@ fun DataTransferScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var confirmReplace by remember { mutableStateOf(false) }
+    var confirmUndo by remember { mutableStateOf(false) }
     // Every picker launch goes through this so a device without a document
     // provider shows a message instead of dying with an unhandled exception.
     val picker = rememberPickerLauncher()
@@ -110,6 +110,11 @@ fun DataTransferScreen(
                 text = stringResource(R.string.io_export_title),
                 style = MaterialTheme.typography.titleMedium,
             )
+            Text(
+                text = stringResource(R.string.io_export_all_decks_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
             Button(
                 onClick = { picker.launch { createCsv.launch("wazhebox-export-$today.csv") } },
                 modifier = Modifier.fillMaxWidth(),
@@ -126,6 +131,11 @@ fun DataTransferScreen(
             Text(
                 text = stringResource(R.string.io_import_title),
                 style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = stringResource(R.string.io_import_preview_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             OutlinedButton(
                 onClick = {
@@ -150,6 +160,81 @@ fun DataTransferScreen(
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+
+        // A preview is a promise: nothing has been written until the user taps
+        // the confirm button below it.
+        if (state.pending != null && state.report != null) {
+            val preview = state.report!!
+            SectionCard {
+                Text(
+                    text = stringResource(R.string.io_preview_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                ReportLine(stringResource(R.string.io_rows_read, PersianText.number(preview.rowsRead)))
+                ReportLine(stringResource(R.string.io_preview_add, PersianText.number(preview.added)))
+                if (state.ankiDecks > 0) {
+                    ReportLine(stringResource(R.string.io_preview_decks, PersianText.number(state.ankiDecks)))
+                }
+                ReportLine(stringResource(R.string.io_rows_duplicate, PersianText.number(preview.duplicates)))
+                ReportLine(stringResource(R.string.io_rows_no_meaning, PersianText.number(preview.missingMeaning)))
+                ReportLine(stringResource(R.string.io_rows_no_term, PersianText.number(preview.missingTerm)))
+                Button(
+                    onClick = viewModel::confirmImport,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.busy,
+                ) { Text(stringResource(R.string.io_confirm_import)) }
+                TextButton(
+                    onClick = viewModel::cancelImport,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !state.busy,
+                ) { Text(stringResource(R.string.io_discard_import)) }
+            }
+        }
+
+        if (state.pending == null && state.report != null) {
+            val report = state.report!!
+            SectionCard {
+                Text(
+                    text = stringResource(R.string.io_import_report),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                state.importedWords?.let { added ->
+                    Text(
+                        text = stringResource(R.string.io_imported_now, PersianText.number(added)),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+                ReportLine(stringResource(R.string.io_rows_read, PersianText.number(report.rowsRead)))
+                ReportLine(stringResource(R.string.io_words_added, PersianText.number(report.added)))
+                ReportLine(stringResource(R.string.io_rows_duplicate, PersianText.number(report.duplicates)))
+                ReportLine(stringResource(R.string.io_rows_no_meaning, PersianText.number(report.missingMeaning)))
+                ReportLine(stringResource(R.string.io_rows_no_term, PersianText.number(report.missingTerm)))
+                ReportLine(stringResource(R.string.io_tags_created, PersianText.number(report.tagsCreated)))
+                if (report.batchId != null && state.importedWords != null) {
+                    OutlinedButton(
+                        onClick = { confirmUndo = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.busy,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.io_undo_import),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+                if (report.rejected.isNotEmpty()) {
+                    OutlinedButton(
+                        onClick = {
+                            picker.launch {
+                                createReport.launch("wazhebox-import-report-$today.csv")
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) { Text(stringResource(R.string.io_download_report)) }
+                }
+            }
         }
 
         SectionCard {
@@ -283,39 +368,6 @@ fun DataTransferScreen(
             }
         }
 
-        state.ankiAdded?.let { added ->
-            Text(
-                text = stringResource(R.string.io_anki_imported, PersianText.number(added)),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary,
-            )
-        }
-
-        state.report?.let { report ->
-            SectionCard {
-                Text(
-                    text = stringResource(R.string.io_import_report),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                ReportLine(stringResource(R.string.io_rows_read, PersianText.number(report.rowsRead)))
-                ReportLine(stringResource(R.string.io_words_added, PersianText.number(report.added)))
-                ReportLine(stringResource(R.string.io_rows_duplicate, PersianText.number(report.duplicates)))
-                ReportLine(stringResource(R.string.io_rows_no_meaning, PersianText.number(report.missingMeaning)))
-                ReportLine(stringResource(R.string.io_rows_no_term, PersianText.number(report.missingTerm)))
-                ReportLine(stringResource(R.string.io_tags_created, PersianText.number(report.tagsCreated)))
-                if (report.rejected.isNotEmpty()) {
-                    OutlinedButton(
-                        onClick = {
-                            picker.launch {
-                                createReport.launch("wazhebox-import-report-$today.csv")
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) { Text(stringResource(R.string.io_download_report)) }
-                }
-            }
-        }
-
         if (picker.unavailable) {
             Text(
                 text = stringResource(R.string.picker_missing),
@@ -331,6 +383,7 @@ fun DataTransferScreen(
                     "version" -> stringResource(R.string.io_error_version)
                     "anki_unsupported" -> stringResource(R.string.io_anki_unsupported)
                     "anki_corrupt" -> stringResource(R.string.io_anki_corrupt)
+                    "import_failed" -> stringResource(R.string.io_import_failed)
                     else -> stringResource(R.string.common_error)
                 },
                 color = MaterialTheme.colorScheme.error,
@@ -342,10 +395,15 @@ fun DataTransferScreen(
             Text(
                 // Every write path reports its own sentence: a restore that
                 // reused the export message looked like a broken export.
-                text = when (message) {
-                    "restored" -> stringResource(R.string.io_restored)
-                    "auto_restored" -> stringResource(R.string.backup_auto_restored)
-                    "auto_saved" -> stringResource(R.string.io_saved)
+                text = when {
+                    message.startsWith("import_undone:") -> stringResource(
+                        R.string.io_undo_done,
+                        PersianText.number(message.substringAfter(':').toIntOrNull() ?: 0),
+                    )
+                    message == "imported" -> stringResource(R.string.io_imported_done)
+                    message == "restored" -> stringResource(R.string.io_restored)
+                    message == "auto_restored" -> stringResource(R.string.backup_auto_restored)
+                    message == "auto_saved" -> stringResource(R.string.io_saved)
                     else -> stringResource(R.string.io_saved)
                 },
                 style = MaterialTheme.typography.bodyMedium,
@@ -374,6 +432,25 @@ fun DataTransferScreen(
             },
             dismissButton = {
                 TextButton(onClick = { confirmReplace = false }) {
+                    Text(stringResource(R.string.action_cancel))
+                }
+            },
+        )
+    }
+
+    if (confirmUndo) {
+        AlertDialog(
+            onDismissRequest = { confirmUndo = false },
+            title = { Text(stringResource(R.string.io_undo_import)) },
+            text = { Text(stringResource(R.string.io_undo_confirm)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmUndo = false
+                    viewModel.undoLastImport()
+                }) { Text(stringResource(R.string.io_undo_import), color = MaterialTheme.colorScheme.error) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmUndo = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
             },

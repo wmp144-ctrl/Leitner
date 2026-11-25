@@ -52,6 +52,35 @@ interface WordRepository {
     suspend fun tagsFor(wordId: Long): List<String>
     /** Adds a CLOZE or LISTEN card to an existing word. False when it already exists. */
     suspend fun createCard(wordId: Long, direction: ir.wazhebox.domain.model.Direction): Boolean
+
+    /** Every tag in the library, alphabetically. */
+    fun observeTags(): Flow<List<String>>
+
+    /** Word id to its tags, so library rows can be filtered by tag. */
+    fun observeWordTags(): Flow<Map<Long, List<String>>>
+
+    /** Words that keep coming back (lapses on their EN→FA card). */
+    suspend fun troubleWords(minLapses: Int = 4, limit: Int = 100): List<WordWithCards>
+
+    /** Words answered wrong since [since], most-missed first. */
+    suspend fun mistakeWords(since: kotlinx.datetime.Instant, limit: Int = 100): List<MistakeWord>
+}
+
+/** A word plus how often it was missed, for the trouble-words screen. */
+data class MistakeWord(
+    val word: WordWithCards,
+    val mistakes: Int,
+    val lastAt: kotlinx.datetime.Instant,
+)
+
+/** Where the review queue comes from. */
+enum class SessionSource {
+    /** Cards that are due now, the normal SRS session. */
+    DUE,
+    /** Leech words, regardless of their due date. */
+    TROUBLE,
+    /** Words missed recently, regardless of their due date. */
+    MISTAKES,
 }
 
 /** A deck with its word count, for the deck list. */
@@ -96,8 +125,15 @@ data class GradeOutcome(
 )
 
 interface StudyRepository {
-    /** [deckId] limits the session to one deck; null means every deck. */
-    suspend fun buildSession(freePractice: Boolean = false, deckId: Long? = null): List<StudyItem>
+    /**
+     * [deckId] limits the session to one deck; null means every deck.
+     * [source] picks a targeted drill instead of the normal due queue.
+     */
+    suspend fun buildSession(
+        freePractice: Boolean = false,
+        deckId: Long? = null,
+        source: SessionSource = SessionSource.DUE,
+    ): List<StudyItem>
     suspend fun workload(freePractice: Boolean = false, deckId: Long? = null): Workload
     suspend fun grade(
         cardId: Long,

@@ -34,6 +34,9 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): WazheBoxDatabase =
         Room.databaseBuilder(context, WazheBoxDatabase::class.java, WazheBoxDatabase.NAME)
+            // Destructive fallback is forbidden, so every version bump ships a
+            // written migration (PRD §8.3).
+            .addMigrations(WazheBoxDatabase.MIGRATION_1_2)
             .build()
 
     @Provides fun provideDeckDao(db: WazheBoxDatabase): DeckDao = db.deckDao()

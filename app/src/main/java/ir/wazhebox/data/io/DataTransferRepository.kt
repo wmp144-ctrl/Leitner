@@ -34,6 +34,10 @@ data class ImportReport(
     val tagsCreated: Int = 0,
     val unknownColumns: List<String> = emptyList(),
     val rejected: List<RejectedRow> = emptyList(),
+    /** True when the numbers are a dry run: nothing was written. */
+    val planned: Boolean = false,
+    /** Set after a real import so the run can be undone as a unit. */
+    val batchId: Long? = null,
 ) {
     fun rejectedCsv(): String {
         val rows = mutableListOf<List<String?>>()
@@ -118,11 +122,17 @@ data class BackupSettings(
 )
 
 interface DataTransferRepository {
+    /** Every deck, with a `deck` column so nothing is silently dropped. */
     suspend fun exportCsv(): String
     suspend fun exportBackupJson(): String
-    suspend fun importCsv(text: String): ImportReport
-    /** Reads an Anki .apkg zip straight from the picker stream. */
-    suspend fun importAnki(stream: java.io.InputStream): AnkiImportResult
+    /** [apply] false validates and counts only; the same report is returned. */
+    suspend fun importCsv(text: String, apply: Boolean = true): ImportReport
+    /** Reads an .apkg the caller already copied into the cache. */
+    suspend fun previewAnki(file: java.io.File): AnkiImportResult
+    suspend fun importAnki(file: java.io.File): AnkiImportResult
+    /** Deletes every word a given import run added. Returns the word count. */
+    suspend fun undoImport(batchId: Long): Int
+    suspend fun undoLastImport(): Int
     suspend fun previewBackup(text: String): BackupResult
     suspend fun restoreBackup(text: String, merge: Boolean): BackupResult
 }
@@ -150,17 +160,19 @@ class DataTransferRepositoryImpl @Inject constructor(
     private suspend fun currentSettings() = settingsRepository.settings.first()
 
     override suspend fun exportCsv(): String {
-        val deck = deckRepository.ensureDefaultDeck()
+        // Every deck is exported: filtering to the default deck silently dropped
+        // the words a user keeps in their other decks.
         val rows = mutableListOf<List<String?>>()
+        val deckNames = db.deckDao().observeAll().first().associate { it.id to it.name }
         rows += listOf(
-            "term", "meaning_fa", "pos", "ipa", "example_en", "example_fa",
+            "deck", "term", "meaning_fa", "pos", "ipa", "example_en", "example_fa",
             "tags", "box", "due_at", "reps", "lapses", "created_at",
         )
         val wordDao = db.wordDao()
         wordDao.allWithCards().forEach { row ->
-            if (row.word.deckId != deck.id) return@forEach
             val card = row.cards.firstOrNull { it.direction == Direction.EN_FA.name }
             rows += listOf(
+                deckNames[row.word.deckId].orEmpty(),
                 row.word.term,
                 row.word.meaningFa,
                 row.word.pos,
@@ -247,8 +259,11 @@ class DataTransferRepositoryImpl @Inject constructor(
         return json.encodeToString(backup)
     }
 
-    override suspend fun importCsv(text: String): ImportReport {
-        val deck = deckRepository.ensureDefaultDeck()
+    override suspend fun importCsv(text: String, apply: Boolean): ImportReport {
+        // A dry run must not create a deck, so the default deck is only created
+        // when rows are actually applied to an empty database.
+        val defaultDeckId = db.deckDao().defaultDeck()?.id
+            ?: if (apply) deckRepository.ensureDefaultDeck().id else 0L
         val markdown = CsvCodec.isMarkdownTable(text)
         val delimiter = CsvCodec.detectDelimiter(text)
         val parsed = (if (markdown) CsvCodec.parseMarkdownTable(text) else CsvCodec.parse(text, delimiter))
@@ -278,9 +293,11 @@ class DataTransferRepositoryImpl @Inject constructor(
         val tagsBefore = db.tagDao().count()
         val rejected = mutableListOf<RejectedRow>()
         val reportedTags = mutableSetOf<String>()
+        val batch = clock.now().toEpochMilliseconds()
+        val deckIdsByName = mutableMapOf<String, Long>()
 
-        db.withTransaction {
-            dataRows.forEach { (line, cells) ->
+        suspend fun run() {
+            for ((line, cells) in dataRows) {
                 fun cell(name: String): String? {
                     val index = mapping.indexOf(name)
                     if (index < 0) return null
@@ -300,15 +317,39 @@ class DataTransferRepositoryImpl @Inject constructor(
                         rejected += RejectedRow(line, term, "missing_meaning")
                     }
                     else -> {
+                        // Rows may name a deck; without one they land in the default.
+                        val deckName = cell("deck")
+                        val deckId = if (deckName == null) {
+                            defaultDeckId
+                        } else {
+                            deckIdsByName.getOrPut(deckName) {
+                                db.deckDao().byName(deckName)?.id ?: if (apply) {
+                                    val stamp = clock.now().toEpochMilliseconds()
+                                    db.deckDao().insert(
+                                        DeckEntity(
+                                            name = deckName,
+                                            description = "واردشده از CSV",
+                                            createdAt = stamp,
+                                            updatedAt = stamp,
+                                        ),
+                                    )
+                                } else {
+                                    0L
+                                }
+                            }
+                        }
                         val norm = TextNormalizer.normalizeKey(term)
-                        if (db.wordDao().findByTermNorm(deck.id, norm) != null) {
+                        if (deckId != 0L && db.wordDao().findByTermNorm(deckId, norm) != null) {
                             duplicates++
                             rejected += RejectedRow(line, term, "duplicate")
+                        } else if (!apply || deckId == 0L) {
+                            // Dry run: count the row, write nothing.
+                            added++
                         } else {
                             val now = clock.now().toEpochMilliseconds()
                             val wordId = db.wordDao().insert(
                                 WordEntity(
-                                    deckId = deck.id,
+                                    deckId = deckId,
                                     term = term,
                                     termNorm = norm,
                                     meaningFa = meaning,
@@ -319,6 +360,7 @@ class DataTransferRepositoryImpl @Inject constructor(
                                     source = WordSource.CSV.name,
                                     createdAt = now,
                                     updatedAt = now,
+                                    importBatch = batch,
                                 ),
                             )
                             db.cardDao().insert(
@@ -348,6 +390,8 @@ class DataTransferRepositoryImpl @Inject constructor(
             }
         }
 
+        if (apply) db.withTransaction { run() } else run()
+
         return ImportReport(
             rowsRead = dataRows.size,
             added = added,
@@ -358,11 +402,26 @@ class DataTransferRepositoryImpl @Inject constructor(
             tagsCreated = (db.tagDao().count() - tagsBefore).coerceAtLeast(reportedTags.size),
             unknownColumns = unknown,
             rejected = rejected,
+            planned = !apply,
+            batchId = if (apply) batch else null,
         )
     }
 
-    override suspend fun importAnki(stream: java.io.InputStream): AnkiImportResult =
-        ankiImporter.import(stream)
+    override suspend fun previewAnki(file: java.io.File): AnkiImportResult =
+        ankiImporter.import(file, apply = false)
+
+    override suspend fun importAnki(file: java.io.File): AnkiImportResult =
+        ankiImporter.import(file, apply = true)
+
+    override suspend fun undoImport(batchId: Long): Int = db.withTransaction {
+        // Deleting the words cascades to their cards, reviews and tag links.
+        db.wordDao().deleteImportBatch(batchId)
+    }
+
+    override suspend fun undoLastImport(): Int {
+        val batch = db.wordDao().lastImportBatch() ?: return 0
+        return undoImport(batch)
+    }
 
     private fun parseBackup(text: String): BackupFile? = runCatching {
         json.decodeFromString<BackupFile>(text)

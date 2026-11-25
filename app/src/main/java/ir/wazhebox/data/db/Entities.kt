@@ -49,6 +49,8 @@ data class WordEntity(
     val suspended: Boolean = false,
     @ColumnInfo(name = "created_at") val createdAt: Long,
     @ColumnInfo(name = "updated_at") val updatedAt: Long,
+    /** Set by a CSV/Anki import run, so that run can be taken back in one step. */
+    @ColumnInfo(name = "import_batch") val importBatch: Long? = null,
 )
 
 @Entity(
@@ -163,6 +165,19 @@ data class WordWithCardsRow(
     val enFa: CardEntity? get() = cards.firstOrNull { it.direction == "EN_FA" }
     val faEn: CardEntity? get() = cards.firstOrNull { it.direction == "FA_EN" }
 }
+
+/** One word's tag, flattened for the library's tag filter. */
+data class WordTagRow(
+    @ColumnInfo(name = "word_id") val wordId: Long,
+    val name: String,
+)
+
+/** A word and how often it was missed, for the trouble-words screen. */
+data class MistakeRow(
+    @Embedded val word: WordEntity,
+    val mistakes: Int,
+    @ColumnInfo(name = "last_at") val lastAt: Long,
+)
 
 /** Words per deck, for the deck list. */
 data class DeckWordCount(

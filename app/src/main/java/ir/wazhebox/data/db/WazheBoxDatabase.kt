@@ -4,6 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import ir.wazhebox.domain.model.CardState
 import ir.wazhebox.domain.model.Direction
 import ir.wazhebox.domain.model.Verdict
@@ -73,7 +75,17 @@ abstract class WazheBoxDatabase : RoomDatabase() {
     abstract fun statsDao(): StatsDao
 
     companion object {
-        const val VERSION = 1
+        const val VERSION = 2
         const val NAME = "wazhebox.db"
+
+        /**
+         * v2 only remembers which import run created a word, so that run can be
+         * undone. Existing rows keep a null batch, which means "added by hand".
+         */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE words ADD COLUMN import_batch INTEGER")
+            }
+        }
     }
 }

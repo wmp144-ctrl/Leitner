@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import androidx.room.withTransaction
 import dagger.hilt.android.qualifiers.ApplicationContext
+import io.airlift.compress.zstd.ZstdInputStream
 import ir.wazhebox.core.time.StudyClock
 import ir.wazhebox.data.db.CardEntity
 import ir.wazhebox.data.db.DeckEntity
@@ -22,15 +23,19 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import java.io.File
-import java.io.InputStream
+import java.io.FileInputStream
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /** What an .apkg import produced, so the screen can tell the three cases apart. */
 sealed interface AnkiImportResult {
+    /**
+     * [report] carries the counts; when it was a dry run the numbers are what
+     * *would* happen and no row has been written yet.
+     */
     data class Imported(val report: ImportReport, val decks: Int) : AnkiImportResult
-    /** The collection is stored as zstd (`collection.anki21b`), which this build cannot read. */
+    /** The archive holds neither a SQLite collection nor a readable zstd one. */
     data object Unsupported : AnkiImportResult
     data object Corrupt : AnkiImportResult
 }
@@ -89,6 +94,13 @@ object AnkiText {
     fun firstLine(text: String): String = text.lineSequence().firstOrNull()?.trim().orEmpty()
 }
 
+/** zstd decoding stays free of Android types, so it is testable on the JVM. */
+object AnkiArchive {
+    fun decompressZstd(source: java.io.InputStream, target: java.io.OutputStream) {
+        ZstdInputStream(source).use { input -> input.copyTo(target) }
+    }
+}
+
 private data class AnkiNote(
     val id: Long,
     val fields: List<String>,
@@ -105,6 +117,9 @@ private data class AnkiCollection(
  * Reads an Anki `.apkg` (a zip with an SQLite collection inside) and writes its
  * notes into the app's own database. Media files are ignored: the app has no
  * image pipeline, and an offline study session only needs the text.
+ *
+ * Modern Anki stores the collection zstd-compressed as `collection.anki21b`,
+ * which is decompressed here so a fresh export imports like an old one.
  */
 @Singleton
 class AnkiImporter @Inject constructor(
@@ -113,25 +128,27 @@ class AnkiImporter @Inject constructor(
     private val clock: StudyClock,
 ) {
 
-    suspend fun import(stream: InputStream): AnkiImportResult = withContext(Dispatchers.IO) {
-        val workDir = File(context.cacheDir, "anki-${System.currentTimeMillis()}")
-        workDir.mkdirs()
-        try {
-            when (val extracted = extractCollection(stream, workDir)) {
-                null -> AnkiImportResult.Corrupt
-                ExtractedCollection.UNSUPPORTED -> AnkiImportResult.Unsupported
-                else -> {
-                    val collection = readCollection((extracted as ExtractedCollection.Found).file)
-                        ?: return@withContext AnkiImportResult.Corrupt
-                    importNotes(collection)
+    /** [apply] false only counts what the archive holds; nothing is written. */
+    suspend fun import(file: File, apply: Boolean = true): AnkiImportResult =
+        withContext(Dispatchers.IO) {
+            val workDir = File(context.cacheDir, "anki-${System.currentTimeMillis()}")
+            workDir.mkdirs()
+            try {
+                when (val extracted = extractCollection(file, workDir)) {
+                    null -> AnkiImportResult.Corrupt
+                    ExtractedCollection.UNSUPPORTED -> AnkiImportResult.Unsupported
+                    is ExtractedCollection.Found -> {
+                        val collection = readCollection(extracted.file)
+                            ?: return@withContext AnkiImportResult.Corrupt
+                        importNotes(collection, apply)
+                    }
                 }
+            } catch (t: Throwable) {
+                AnkiImportResult.Corrupt
+            } finally {
+                workDir.deleteRecursively()
             }
-        } catch (t: Throwable) {
-            AnkiImportResult.Corrupt
-        } finally {
-            workDir.deleteRecursively()
         }
-    }
 
     private sealed interface ExtractedCollection {
         data class Found(val file: File) : ExtractedCollection
@@ -139,34 +156,38 @@ class AnkiImporter @Inject constructor(
     }
 
     /**
-     * Newer Anki writes `collection.anki21b` (zstd) instead of plain SQLite; that
-     * file cannot be opened here, so it is reported instead of being imported
-     * half-way. `collection.anki21` wins over `collection.anki2` when both exist.
+     * A plain SQLite collection is preferred when the archive carries both. An
+     * archive with only `collection.anki21b` is decompressed with the bundled
+     * zstd decoder; if that fails the caller reports the file as corrupt.
      */
-    private fun extractCollection(stream: InputStream, workDir: File): ExtractedCollection? {
-        var best: File? = null
-        var sawZstd = false
-        ZipInputStream(stream).use { zip ->
+    private fun extractCollection(apkg: File, workDir: File): ExtractedCollection? {
+        var plain: File? = null
+        var compressed: File? = null
+        ZipInputStream(FileInputStream(apkg)).use { zip ->
             while (true) {
                 val entry = zip.nextEntry ?: break
                 when (entry.name) {
+                    "collection.anki21", "collection.anki2" -> {
+                        val name = if (entry.name.endsWith("anki21")) "collection.anki21" else "collection.anki2"
+                        plain = writeEntry(zip, File(workDir, name))
+                    }
                     "collection.anki21b" -> {
-                        sawZstd = true
-                        return ExtractedCollection.UNSUPPORTED
-                    }
-                    "collection.anki21" -> {
-                        best = writeEntry(zip, File(workDir, "collection.anki21"))
-                        return ExtractedCollection.Found(best)
-                    }
-                    "collection.anki2" -> {
-                        if (best == null) best = writeEntry(zip, File(workDir, "collection.anki2"))
+                        compressed = writeEntry(zip, File(workDir, "collection.anki21b"))
                     }
                 }
                 zip.closeEntry()
             }
         }
-        val found = best ?: return if (sawZstd) ExtractedCollection.UNSUPPORTED else null
-        return ExtractedCollection.Found(found)
+        plain?.let { if (it.length() > 0) return ExtractedCollection.Found(it) }
+        val zstd = compressed ?: return null
+        val sqlite = File(workDir, "collection.anki21b.sqlite")
+        return runCatching {
+            FileInputStream(zstd).use { input ->
+                sqlite.outputStream().use { output -> AnkiArchive.decompressZstd(input, output) }
+            }
+            if (sqlite.length() == 0L) ExtractedCollection.UNSUPPORTED
+            else ExtractedCollection.Found(sqlite)
+        }.getOrElse { ExtractedCollection.UNSUPPORTED }
     }
 
     private fun writeEntry(zip: ZipInputStream, target: File): File {
@@ -220,16 +241,18 @@ class AnkiImporter @Inject constructor(
         }.getOrDefault(emptyMap())
     }
 
-    private suspend fun importNotes(collection: AnkiCollection): AnkiImportResult {
+    private suspend fun importNotes(collection: AnkiCollection, apply: Boolean): AnkiImportResult {
         var added = 0
         var duplicates = 0
         var missingTerm = 0
         var missingMeaning = 0
         val now = clock.now().toEpochMilliseconds()
+        val batch = now
         val deckIds = mutableMapOf<String, Long>()
+        val deckNamesUsed = mutableSetOf<String>()
         val rejected = mutableListOf<RejectedRow>()
 
-        db.withTransaction {
+        suspend fun run() {
             collection.notes.forEachIndexed { index, note ->
                 val front = note.fields.getOrNull(0).orEmpty()
                 val back = note.fields.getOrNull(1).orEmpty()
@@ -258,21 +281,32 @@ class AnkiImporter @Inject constructor(
                 val deckName = collection.deckNames[collection.deckOfNote[note.id]]
                     ?.takeIf { it.isNotBlank() }
                     ?: DEFAULT_DECK
-                val deckId = deckIds.getOrPut(deckName) {
-                    db.deckDao().byName(deckName)?.id ?: db.deckDao().insert(
-                        DeckEntity(
-                            name = deckName,
-                            description = "واردشده از Anki",
-                            createdAt = now,
-                            updatedAt = now,
-                        ),
-                    )
+                deckNamesUsed += deckName
+
+                val deckId: Long? = if (apply) {
+                    deckIds.getOrPut(deckName) {
+                        db.deckDao().byName(deckName)?.id ?: db.deckDao().insert(
+                            DeckEntity(
+                                name = deckName,
+                                description = "واردشده از Anki",
+                                createdAt = now,
+                                updatedAt = now,
+                            ),
+                        )
+                    }
+                } else {
+                    db.deckDao().byName(deckName)?.id
                 }
 
                 val norm = TextNormalizer.normalizeKey(term)
-                if (db.wordDao().findByTermNorm(deckId, norm) != null) {
+                if (deckId != null && db.wordDao().findByTermNorm(deckId, norm) != null) {
                     duplicates++
                     rejected += RejectedRow(index + 1, term, "duplicate")
+                    return@forEachIndexed
+                }
+                if (!apply || deckId == null) {
+                    // Dry run: nothing is written, so this row only counts.
+                    added++
                     return@forEachIndexed
                 }
 
@@ -286,6 +320,7 @@ class AnkiImporter @Inject constructor(
                         source = WordSource.ANKI.name,
                         createdAt = now,
                         updatedAt = now,
+                        importBatch = batch,
                     ),
                 )
                 db.cardDao().insert(
@@ -320,6 +355,8 @@ class AnkiImporter @Inject constructor(
             }
         }
 
+        if (apply) db.withTransaction { run() } else run()
+
         return AnkiImportResult.Imported(
             report = ImportReport(
                 rowsRead = collection.notes.size,
@@ -328,8 +365,10 @@ class AnkiImporter @Inject constructor(
                 missingMeaning = missingMeaning,
                 missingTerm = missingTerm,
                 rejected = rejected,
+                planned = !apply,
+                batchId = if (apply) batch else null,
             ),
-            decks = deckIds.size,
+            decks = deckNamesUsed.size,
         )
     }
 

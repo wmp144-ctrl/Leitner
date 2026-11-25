@@ -164,6 +164,35 @@ fun LibraryScreen(
             }
         }
 
+        // Tags travel with imported notes, so they get their own filter row.
+        if (state.tags.isNotEmpty()) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                contentPadding = PaddingValues(end = Spacing.xs),
+            ) {
+                item {
+                    FilterChip(
+                        selected = state.tagFilter == null,
+                        onClick = { viewModel.setTagFilter(null) },
+                        label = {
+                            Text(
+                                stringResource(R.string.library_tags_all),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+                items(state.tags) { tag ->
+                    FilterChip(
+                        selected = state.tagFilter == tag,
+                        onClick = { viewModel.setTagFilter(tag) },
+                        label = { Text(tag, style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
+            }
+        }
+
         // Five chips overflow a phone width, so the row scrolls instead of
         // clipping the last filter (a real bug in the previous layout).
         LazyRow(

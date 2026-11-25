@@ -117,6 +117,45 @@ interface WordDao {
     @Transaction
     @Query("SELECT * FROM words")
     suspend fun allWithCards(): List<WordWithCardsRow>
+
+    /** Words whose EN→FA card has lapsed often enough to be worth rewriting. */
+    @Transaction
+    @Query(
+        """
+        SELECT w.* FROM words w INNER JOIN cards c ON c.word_id = w.id
+        WHERE c.direction = 'EN_FA' AND c.lapses >= :minLapses
+        ORDER BY c.lapses DESC, w.term_norm ASC
+        LIMIT :limit
+        """,
+    )
+    suspend fun troubleWords(minLapses: Int, limit: Int): List<WordWithCardsRow>
+
+    /** Words that were answered wrong recently, most-missed first. */
+    @Transaction
+    @Query(
+        """
+        SELECT w.*, COUNT(*) AS mistakes, MAX(r.reviewed_at) AS last_at
+        FROM words w
+        INNER JOIN cards c ON c.word_id = w.id
+        INNER JOIN reviews r ON r.card_id = c.id
+        WHERE r.undone = 0 AND r.reviewed_at >= :since
+          AND (r.rating = 1 OR r.verdict IN ('WRONG', 'WRONG_KEYBOARD'))
+        GROUP BY w.id
+        ORDER BY mistakes DESC, last_at DESC
+        LIMIT :limit
+        """,
+    )
+    suspend fun mistakeWords(since: Long, limit: Int): List<MistakeRow>
+
+    /** Newest import run, so the user can take it back without a merge tool. */
+    @Query("SELECT MAX(import_batch) FROM words")
+    suspend fun lastImportBatch(): Long?
+
+    @Query("SELECT COUNT(*) FROM words WHERE import_batch = :batch")
+    suspend fun countImportBatch(batch: Long): Int
+
+    @Query("DELETE FROM words WHERE import_batch = :batch")
+    suspend fun deleteImportBatch(batch: Long): Int
 }
 
 @Dao
@@ -231,6 +270,19 @@ interface TagDao {
 
     @Query("SELECT * FROM tags ORDER BY name")
     suspend fun all(): List<TagEntity>
+
+    @Query("SELECT * FROM tags ORDER BY name")
+    fun observeAll(): Flow<List<TagEntity>>
+
+    /** Every tag with its word, so the library can filter without a second query. */
+    @Query(
+        """
+        SELECT t.name AS name, wt.word_id AS word_id
+        FROM word_tags wt INNER JOIN tags t ON t.id = wt.tag_id
+        ORDER BY t.name
+        """,
+    )
+    fun observeWordTags(): Flow<List<WordTagRow>>
 
     @Query("SELECT t.name FROM tags t INNER JOIN word_tags wt ON wt.tag_id = t.id WHERE wt.word_id = :wordId")
     suspend fun tagsForWord(wordId: Long): List<String>

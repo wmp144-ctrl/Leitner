@@ -281,7 +281,7 @@
     <string name="io_import_anki">ورود از Anki (.apkg)</string>
     <string name="io_import_anki_hint">فایل apkg آنکی را انتخاب کن؛ دک‌ها و واژه‌ها خوانده می‌شوند.</string>
     <string name="io_anki_imported">%1$s لغت از Anki اضافه شد</string>
-    <string name="io_anki_unsupported">این فایل apkg با نسخهٔ جدید آنکی ساخته شده و خوانده نشد.</string>
+    <string name="io_anki_unsupported">مجموعهٔ این فایل apkg خوانده نشد (نه SQLite بود و نه zstd قابل بازکردن).</string>
     <string name="io_anki_corrupt">فایل apkg خراب است یا مجموعهٔ آنکی داخلش نیست.</string>
 
     <!-- Backup -->
@@ -327,6 +327,38 @@
     <string name="io_error_version">این فایل با نسخهٔ جدیدتری از اپ ساخته شده است.</string>
     <string name="io_no_space">فضای کافی نیست</string>
     <string name="picker_missing">برنامهٔ انتخاب فایل روی این دستگاه در دسترس نیست. یک برنامهٔ فایل‌ها نصب کن و دوباره تلاش کن.</string>
+
+    <!-- Trouble words -->
+    <string name="nav_trouble">کلمات مشکل‌دار</string>
+    <string name="trouble_title">کلمات مشکل‌دار</string>
+    <string name="trouble_subtitle">کارت‌هایی که بیشتر از همه وقتت را می‌گیرند.</string>
+    <string name="trouble_tab_leech">بدقلق</string>
+    <string name="trouble_tab_mistakes">اشتباه‌های اخیر</string>
+    <string name="trouble_empty">چیزی اینجا نیست. آفرین!</string>
+    <string name="trouble_empty_leech">هیچ کارتی به آستانهٔ افت نرسیده است.</string>
+    <string name="trouble_empty_mistakes">در ۳۰ روز گذشته پاسخ غلطی ثبت نشده است.</string>
+    <string name="trouble_lapses">%1$s افت</string>
+    <string name="trouble_mistakes">%1$s بار غلط</string>
+    <string name="trouble_last_missed">آخرین اشتباه: %1$s</string>
+    <string name="trouble_practice">تمرین این کلمات</string>
+    <string name="trouble_open">جزئیات</string>
+    <string name="trouble_suspended">معلق</string>
+    <string name="library_tags_all">همهٔ برچسب‌ها</string>
+
+    <!-- Import preview and undo -->
+    <string name="io_export_all_decks_hint">خروجی همهٔ دک‌ها در یک فایل، با ستون دک.</string>
+    <string name="io_import_preview_hint">اول پیش‌نمایش را می‌بینی، بعد تأیید می‌کنی.</string>
+    <string name="io_preview_title">پیش‌نمایش ورود</string>
+    <string name="io_preview_add">%1$s لغت افزوده می‌شود</string>
+    <string name="io_preview_decks">%1$s دک ساخته یا استفاده می‌شود</string>
+    <string name="io_confirm_import">تأیید و افزودن</string>
+    <string name="io_discard_import">انصراف</string>
+    <string name="io_imported_done">ایمپورت انجام شد.</string>
+    <string name="io_imported_now">%1$s لغت از این ایمپورت اضافه شد</string>
+    <string name="io_import_failed">ایمپورت انجام نشد؛ دوباره تلاش کن.</string>
+    <string name="io_undo_import">بازگرداندن این ایمپورت</string>
+    <string name="io_undo_confirm">همهٔ لغت‌هایی که این ایمپورت اضافه کرد (با کارت‌ها و تاریخچهٔ مرورشان) حذف شوند؟</string>
+    <string name="io_undo_done">%1$s لغت حذف شد.</string>
 
     <!-- Common -->
     <string name="common_loading">در حال بارگذاری…</string>

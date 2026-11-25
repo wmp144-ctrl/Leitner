@@ -38,12 +38,16 @@ data class LibraryRow(
     val lapses: Int,
     /** Term + meaning normalized once, so search ignores ي/ی and Arabic digits. */
     val searchKey: String = "",
+    /** Tags are imported with CSV and Anki notes, so they are worth filtering by. */
+    val tags: List<String> = emptyList(),
 )
 
 data class LibraryUiState(
     val rows: List<LibraryRow> = emptyList(),
     val decks: List<ir.wazhebox.domain.model.Deck> = emptyList(),
     val deckFilter: Long? = null,
+    val tagFilter: String? = null,
+    val tags: List<String> = emptyList(),
     val query: String = "",
     val sort: LibrarySort = LibrarySort.NEWEST,
     val stateFilter: StateFilter = StateFilter.ALL,
@@ -63,8 +67,10 @@ class LibraryViewModel @Inject constructor(
     val state: StateFlow<LibraryUiState> = combine(
         wordRepository.observeLibrary(),
         deckRepository.observeDecks(),
+        wordRepository.observeWordTags(),
+        wordRepository.observeTags(),
         filters,
-    ) { words, decks, ui ->
+    ) { words, decks, tagsByWord, allTags, ui ->
         val rows = words.map { entry ->
             val card = entry.enFa ?: entry.cards.minByOrNull { it.dueAt }
             LibraryRow(
@@ -73,6 +79,7 @@ class LibraryViewModel @Inject constructor(
                 box = card?.box ?: 1,
                 lapses = card?.lapses ?: 0,
                 searchKey = TextNormalizer.normalize("${entry.word.term} ${entry.word.meaningFa}"),
+                tags = tagsByWord[entry.word.id].orEmpty(),
             )
         }
         // Persian input often arrives with Arabic ي/ك or Arabic-Indic digits, and a
@@ -94,6 +101,7 @@ class LibraryViewModel @Inject constructor(
             }
             .filter { row -> ui.boxFilter == null || row.box == ui.boxFilter }
             .filter { row -> ui.deckFilter == null || row.word.deckId == ui.deckFilter }
+            .filter { row -> ui.tagFilter == null || ui.tagFilter in row.tags }
             .let { sequence ->
                 when (ui.sort) {
                     LibrarySort.NEWEST -> sequence.sortedByDescending { it.word.createdAt }
@@ -103,7 +111,7 @@ class LibraryViewModel @Inject constructor(
                 }
             }
             .toList()
-        ui.copy(rows = filtered, decks = decks, loading = false)
+        ui.copy(rows = filtered, decks = decks, tags = allTags, loading = false)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryUiState())
 
     fun setQuery(query: String) {
@@ -124,6 +132,10 @@ class LibraryViewModel @Inject constructor(
 
     fun setDeckFilter(deckId: Long?) {
         filters.value = filters.value.copy(deckFilter = deckId)
+    }
+
+    fun setTagFilter(tag: String?) {
+        filters.value = filters.value.copy(tagFilter = tag)
     }
 
     fun toggleSelection(wordId: Long) {
