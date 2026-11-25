@@ -143,6 +143,29 @@ class WordRepositoryImpl @Inject constructor(
 
     override suspend fun tagsFor(wordId: Long): List<String> = tagDao.tagsForWord(wordId)
 
+    override suspend fun createCard(wordId: Long, direction: Direction): Boolean =
+        db.withTransaction {
+            val word = wordDao.byId(wordId) ?: return@withTransaction false
+            // A cloze card is only meaningful with a sentence to blank out.
+            if (direction == Direction.CLOZE && word.exampleEn.isNullOrBlank()) {
+                return@withTransaction false
+            }
+            if (cardDao.forWord(wordId).any { it.direction == direction.name }) {
+                return@withTransaction false
+            }
+            val now = clock.now().toEpochMillis()
+            cardDao.insert(
+                CardEntity(
+                    wordId = wordId,
+                    direction = direction.name,
+                    state = CardState.NEW.name,
+                    dueAt = now,
+                    createdAt = now,
+                ),
+            )
+            true
+        }
+
     private suspend fun applyTags(wordId: Long, tags: List<String>) {
         tagDao.clearWordTags(wordId)
         tags.map { it.trim() }

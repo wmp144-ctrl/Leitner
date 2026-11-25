@@ -164,6 +164,12 @@ data class WordWithCardsRow(
     val faEn: CardEntity? get() = cards.firstOrNull { it.direction == "FA_EN" }
 }
 
+/** Words per deck, for the deck list. */
+data class DeckWordCount(
+    @ColumnInfo(name = "deck_id") val deckId: Long,
+    @ColumnInfo(name = "word_count") val wordCount: Int,
+)
+
 /** Counts for the home screen and the widget. */
 data class DueCounts(
     @ColumnInfo(name = "new_count") val newCount: Int,

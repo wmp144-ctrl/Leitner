@@ -10,6 +10,7 @@ import ir.wazhebox.domain.repo.InvalidReason
 import ir.wazhebox.domain.repo.WordDraft
 import ir.wazhebox.domain.repo.WordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ import javax.inject.Inject
 data class AddWordUiState(
     val wordId: Long = 0,
     val deckId: Long = 0,
+    val decks: List<ir.wazhebox.domain.model.Deck> = emptyList(),
     val term: String = "",
     val meaningFa: String = "",
     val pos: String? = null,
@@ -51,10 +53,12 @@ class AddWordViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             val deck = deckRepository.ensureDefaultDeck()
+            val decks = deckRepository.observeDecks().first().filterNot { it.archived }
             val existing = if (initialWordId > 0) wordRepository.word(initialWordId) else null
             val tags = if (existing != null) wordRepository.tagsFor(existing.word.id) else emptyList()
             _state.value = _state.value.copy(
                 deckId = existing?.word?.deckId ?: deck.id,
+                decks = decks,
                 term = existing?.word?.term ?: "",
                 meaningFa = existing?.word?.meaningFa ?: "",
                 pos = existing?.word?.pos,
@@ -71,6 +75,7 @@ class AddWordViewModel @Inject constructor(
     fun setTerm(value: String) = update { it.copy(term = value, error = null) }
     fun setMeaning(value: String) = update { it.copy(meaningFa = value, error = null) }
     fun setPos(value: String?) = update { it.copy(pos = value) }
+    fun setDeck(deckId: Long) = update { it.copy(deckId = deckId) }
     fun setIpa(value: String) = update { it.copy(ipa = value) }
     fun setExampleEn(value: String) = update { it.copy(exampleEn = value) }
     fun setExampleFa(value: String) = update { it.copy(exampleFa = value) }

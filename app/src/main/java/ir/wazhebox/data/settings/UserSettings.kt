@@ -2,6 +2,19 @@ package ir.wazhebox.data.settings
 
 import ir.wazhebox.domain.model.Level
 
+/** How the app picks its light/dark palette. */
+enum class ThemeMode {
+    SYSTEM,
+    LIGHT,
+    DARK,
+    ;
+
+    companion object {
+        fun fromName(name: String?): ThemeMode =
+            entries.firstOrNull { it.name == name } ?: SYSTEM
+    }
+}
+
 /** Everything the user can change, with the PRD defaults (§9.2, §17, §18.5). */
 data class UserSettings(
     val onboardingCompleted: Boolean = false,
@@ -19,6 +32,8 @@ data class UserSettings(
     val reminderHour: Int = 20,
     val reminderMinute: Int = 0,
     val reminderDays: Set<Int> = setOf(1, 2, 3, 4, 5, 6, 7),
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val amoled: Boolean = false,
     val lastBackupAt: Long? = null,
     val lastBackupReminderAt: Long? = null,
     val ttsChecked: Boolean = false,

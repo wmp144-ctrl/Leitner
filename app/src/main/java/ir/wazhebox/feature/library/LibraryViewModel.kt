@@ -42,6 +42,8 @@ data class LibraryRow(
 
 data class LibraryUiState(
     val rows: List<LibraryRow> = emptyList(),
+    val decks: List<ir.wazhebox.domain.model.Deck> = emptyList(),
+    val deckFilter: Long? = null,
     val query: String = "",
     val sort: LibrarySort = LibrarySort.NEWEST,
     val stateFilter: StateFilter = StateFilter.ALL,
@@ -53,14 +55,16 @@ data class LibraryUiState(
 @HiltViewModel
 class LibraryViewModel @Inject constructor(
     private val wordRepository: WordRepository,
+    private val deckRepository: ir.wazhebox.domain.repo.DeckRepository,
 ) : ViewModel() {
 
     private val filters = MutableStateFlow(LibraryUiState())
 
     val state: StateFlow<LibraryUiState> = combine(
         wordRepository.observeLibrary(),
+        deckRepository.observeDecks(),
         filters,
-    ) { words, ui ->
+    ) { words, decks, ui ->
         val rows = words.map { entry ->
             val card = entry.enFa ?: entry.cards.minByOrNull { it.dueAt }
             LibraryRow(
@@ -89,6 +93,7 @@ class LibraryViewModel @Inject constructor(
                 }
             }
             .filter { row -> ui.boxFilter == null || row.box == ui.boxFilter }
+            .filter { row -> ui.deckFilter == null || row.word.deckId == ui.deckFilter }
             .let { sequence ->
                 when (ui.sort) {
                     LibrarySort.NEWEST -> sequence.sortedByDescending { it.word.createdAt }
@@ -98,7 +103,7 @@ class LibraryViewModel @Inject constructor(
                 }
             }
             .toList()
-        ui.copy(rows = filtered, loading = false)
+        ui.copy(rows = filtered, decks = decks, loading = false)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LibraryUiState())
 
     fun setQuery(query: String) {
@@ -115,6 +120,10 @@ class LibraryViewModel @Inject constructor(
 
     fun setBoxFilter(box: Int?) {
         filters.value = filters.value.copy(boxFilter = box)
+    }
+
+    fun setDeckFilter(deckId: Long?) {
+        filters.value = filters.value.copy(deckFilter = deckId)
     }
 
     fun toggleSelection(wordId: Long) {

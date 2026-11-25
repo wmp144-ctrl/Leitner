@@ -121,6 +121,8 @@ interface DataTransferRepository {
     suspend fun exportCsv(): String
     suspend fun exportBackupJson(): String
     suspend fun importCsv(text: String): ImportReport
+    /** Reads an Anki .apkg zip straight from the picker stream. */
+    suspend fun importAnki(stream: java.io.InputStream): AnkiImportResult
     suspend fun previewBackup(text: String): BackupResult
     suspend fun restoreBackup(text: String, merge: Boolean): BackupResult
 }
@@ -135,6 +137,7 @@ class DataTransferRepositoryImpl @Inject constructor(
     private val db: WazheBoxDatabase,
     private val settingsRepository: SettingsRepository,
     private val deckRepository: DeckRepositoryImpl,
+    private val ankiImporter: AnkiImporter,
     private val clock: StudyClock,
 ) : DataTransferRepository {
 
@@ -357,6 +360,9 @@ class DataTransferRepositoryImpl @Inject constructor(
             rejected = rejected,
         )
     }
+
+    override suspend fun importAnki(stream: java.io.InputStream): AnkiImportResult =
+        ankiImporter.import(stream)
 
     private fun parseBackup(text: String): BackupFile? = runCatching {
         json.decodeFromString<BackupFile>(text)

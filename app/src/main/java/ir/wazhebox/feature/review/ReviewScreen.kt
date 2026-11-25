@@ -223,6 +223,7 @@ fun ReviewScreen(
                         when (direction) {
                             Direction.FA_EN -> stringResource(R.string.review_direction_fa_en)
                             Direction.CLOZE -> stringResource(R.string.review_direction_cloze)
+                            Direction.LISTEN -> stringResource(R.string.review_direction_listen)
                             else -> stringResource(R.string.review_direction_en_fa)
                         },
                     )
@@ -282,6 +283,7 @@ fun ReviewScreen(
                             QuestionFace(
                                 term = word.term,
                                 meaning = word.primaryMeaning,
+                                clozeSentence = word.clozeSentence,
                                 direction = direction,
                                 onSpeak = viewModel::speak,
                             )
@@ -293,6 +295,7 @@ fun ReviewScreen(
                                 ipa = word.ipa,
                                 exampleEn = word.exampleEn,
                                 exampleFa = word.exampleFa,
+                                clozeSentence = word.clozeFullSentence,
                                 direction = direction,
                                 grade = state.grade,
                                 gradeAnswer = state.grade?.matchedAnswer,
@@ -302,17 +305,20 @@ fun ReviewScreen(
                 }
             }
 
-            if (direction == Direction.FA_EN && !state.showAnswer) {
+            if (direction.isTypedAnswer && !state.showAnswer) {
                 OutlinedTextField(
                     value = state.typed,
                     onValueChange = viewModel::typed,
                     modifier = Modifier.fillMaxWidth(),
                     label = {
-                        // A reversed card asks for the English word, not a meaning.
+                        // Reverse and cloze cards ask for the English word.
                         Text(
                             stringResource(
-                                if (direction == Direction.FA_EN) R.string.review_answer_hint_fa_en
-                                else R.string.review_answer_hint,
+                                if (direction == Direction.FA_EN || direction == Direction.CLOZE) {
+                                    R.string.review_answer_hint_fa_en
+                                } else {
+                                    R.string.review_answer_hint
+                                },
                             ),
                         )
                     },
@@ -379,7 +385,7 @@ fun ReviewScreen(
             }
         }
 
-        if (direction == Direction.FA_EN && !state.showAnswer && state.typed.isNotBlank()) {
+        if (direction.isTypedAnswer && !state.showAnswer && state.typed.isNotBlank()) {
             Button(
                 onClick = viewModel::checkAnswer,
                 modifier = Modifier.fillMaxWidth(),
@@ -394,6 +400,7 @@ fun ReviewScreen(
 private fun QuestionFace(
     term: String,
     meaning: String,
+    clozeSentence: String?,
     direction: Direction,
     onSpeak: () -> Unit,
 ) {
@@ -415,48 +422,82 @@ private fun QuestionFace(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Spacing.md, Alignment.CenterVertically),
         ) {
-            if (direction != Direction.FA_EN) {
-                Text(
-                    text = BidiText.isolateLtr(term),
-                    style = EnglishWordStyle,
-                    textAlign = TextAlign.Center,
-                )
-                IconButton(onClick = onSpeak) {
-                    Icon(
-                        Icons.Filled.VolumeUp,
-                        contentDescription = stringResource(R.string.review_speak),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.TouchApp,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp),
+            when (direction) {
+                Direction.FA_EN -> {
+                    Text(
+                        text = meaning,
+                        style = PersianMeaningStyle,
+                        textAlign = TextAlign.Center,
                     )
                     Text(
-                        text = stringResource(R.string.review_tap_answer),
+                        text = stringResource(R.string.review_tap_word),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                 }
-            } else {
-                Text(
-                    text = meaning,
-                    style = PersianMeaningStyle,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = stringResource(R.string.review_tap_word),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                )
+                Direction.CLOZE -> {
+                    // The sentence with the gap is the whole question; the word
+                    // itself is what the learner has to supply.
+                    Text(
+                        text = clozeSentence ?: term,
+                        style = EnglishWordStyle,
+                        textAlign = TextAlign.Center,
+                    )
+                    Text(
+                        text = stringResource(R.string.review_cloze_hint),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Direction.LISTEN -> {
+                    IconButton(onClick = onSpeak, modifier = Modifier.size(72.dp)) {
+                        Icon(
+                            Icons.Filled.VolumeUp,
+                            contentDescription = stringResource(R.string.review_listen_play),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(48.dp),
+                        )
+                    }
+                    Text(
+                        text = stringResource(R.string.review_listen_hint),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                else -> {
+                    Text(
+                        text = BidiText.isolateLtr(term),
+                        style = EnglishWordStyle,
+                        textAlign = TextAlign.Center,
+                    )
+                    IconButton(onClick = onSpeak) {
+                        Icon(
+                            Icons.Filled.VolumeUp,
+                            contentDescription = stringResource(R.string.review_speak),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.TouchApp,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Text(
+                            text = stringResource(R.string.review_tap_answer),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
             }
         }
     }
@@ -470,6 +511,7 @@ private fun AnswerFace(
     ipa: String?,
     exampleEn: String?,
     exampleFa: String?,
+    clozeSentence: String?,
     direction: Direction,
     grade: ir.wazhebox.domain.grading.GradeResult?,
     gradeAnswer: String?,
@@ -489,10 +531,14 @@ private fun AnswerFace(
                 .padding(Spacing.xl),
             verticalArrangement = Arrangement.spacedBy(Spacing.sm),
         ) {
-            if (direction == Direction.FA_EN) {
-                Text(text = BidiText.isolateLtr(term), style = EnglishWordStyle)
-            } else {
-                Text(text = meaning, style = PersianMeaningStyle)
+            when (direction) {
+                Direction.FA_EN, Direction.LISTEN ->
+                    Text(text = BidiText.isolateLtr(term), style = EnglishWordStyle)
+                Direction.CLOZE -> Text(
+                    text = clozeSentence ?: term,
+                    style = EnglishWordStyle,
+                )
+                else -> Text(text = meaning, style = PersianMeaningStyle)
             }
             AnswerDetails(
                 term = term,
@@ -557,9 +603,12 @@ private fun AnswerDetails(
             else -> Unit
         }
 
+        val showsMeaning = direction == Direction.FA_EN ||
+            direction == Direction.CLOZE ||
+            direction == Direction.LISTEN
         Text(
-            text = if (direction == Direction.FA_EN) meaning else ipa ?: "",
-            style = if (direction == Direction.FA_EN) PersianMeaningStyle else MaterialTheme.typography.bodyLarge,
+            text = if (showsMeaning) meaning else ipa ?: "",
+            style = if (showsMeaning) PersianMeaningStyle else MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 

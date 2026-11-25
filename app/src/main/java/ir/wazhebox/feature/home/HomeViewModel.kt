@@ -38,6 +38,10 @@ data class HomeUiState(
     val nextDueAt: Instant? = null,
     val boxes: Map<Int, Int> = emptyMap(),
     val settings: UserSettings = UserSettings(),
+    /** Shown on home when the last backup is old or missing. */
+    val showBackupBanner: Boolean = false,
+    /** Days since the last backup; null when the user never took one. */
+    val backupAgeDays: Int? = null,
 )
 
 @HiltViewModel
@@ -62,6 +66,18 @@ class HomeViewModel @Inject constructor(
             val workload = studyRepository.workload()
             val today = statsRepository.today()
             runCatching { widgetUpdater.refresh() }
+            val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val backupAgeDays = settings.lastBackupAt?.let { last ->
+                ((now - last) / DAY_MS).toInt().coerceAtLeast(0)
+            }
+            // A fresh install has nothing to back up yet, so the banner waits
+            // until the user has actually opened the app a couple of times.
+            val backupOverdue = if (backupAgeDays == null) {
+                settings.appOpenedCount >= 2
+            } else {
+                backupAgeDays >= BACKUP_REMIND_DAYS
+            }
+            val snoozed = settings.lastBackupReminderAt?.let { now - it < DAY_MS * 3 } == true
             HomeUiState(
                 loading = false,
                 dueCount = workload.dueCount,
@@ -74,6 +90,8 @@ class HomeViewModel @Inject constructor(
                 nextDueAt = workload.nextDueAt,
                 boxes = statsRepository.boxDistribution(),
                 settings = settings,
+                showBackupBanner = backupOverdue && !snoozed,
+                backupAgeDays = backupAgeDays,
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
@@ -89,6 +107,16 @@ class HomeViewModel @Inject constructor(
 
     fun refresh() {
         refresh.value = refresh.value + 1
+    }
+
+    /** Hides the backup banner for three days. */
+    fun snoozeBackupReminder() {
+        viewModelScope.launch {
+            settingsRepository.setLastBackupReminderAt(
+                kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
+            )
+            refresh()
+        }
     }
 
     /**
@@ -115,5 +143,10 @@ class HomeViewModel @Inject constructor(
             }
             _importing.value = false
         }
+    }
+
+    private companion object {
+        const val DAY_MS = 24L * 60 * 60 * 1000
+        const val BACKUP_REMIND_DAYS = 14
     }
 }

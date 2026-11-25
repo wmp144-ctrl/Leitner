@@ -133,6 +133,37 @@ fun LibraryScreen(
             },
         )
 
+        // Deck scope: one chip per deck, only when the library has more than one.
+        if (state.decks.size > 1) {
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                contentPadding = PaddingValues(end = Spacing.xs),
+            ) {
+                item {
+                    FilterChip(
+                        selected = state.deckFilter == null,
+                        onClick = { viewModel.setDeckFilter(null) },
+                        label = {
+                            Text(
+                                stringResource(R.string.deck_all),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+                items(state.decks) { deck ->
+                    FilterChip(
+                        selected = state.deckFilter == deck.id,
+                        onClick = { viewModel.setDeckFilter(deck.id) },
+                        label = {
+                            Text(deck.name, style = MaterialTheme.typography.labelSmall)
+                        },
+                    )
+                }
+            }
+        }
+
         // Five chips overflow a phone width, so the row scrolls instead of
         // clipping the last filter (a real bug in the previous layout).
         LazyRow(

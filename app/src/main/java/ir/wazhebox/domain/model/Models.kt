@@ -105,6 +105,31 @@ data class Word(
 
     val hasExample: Boolean
         get() = !exampleEn.isNullOrBlank()
+
+    /**
+     * The example sentence with the term blanked out, for a cloze card. Null when
+     * there is no sentence to blank: a cloze card without a sentence has nothing
+     * to show.
+     */
+    val clozeSentence: String?
+        get() {
+            val sentence = exampleEn?.trim().orEmpty()
+            if (sentence.isEmpty()) return null
+            val matcher = Regex(Regex.escape(term), RegexOption.IGNORE_CASE)
+            return if (matcher.containsMatchIn(sentence)) {
+                matcher.replaceFirst(sentence, CLOZE_BLANK)
+            } else {
+                "$sentence $CLOZE_BLANK"
+            }
+        }
+
+    /** The sentence as written, used as the answer face of a cloze card. */
+    val clozeFullSentence: String?
+        get() = exampleEn?.trim()?.takeIf { it.isNotEmpty() }
+
+    companion object {
+        const val CLOZE_BLANK = "＿＿＿"
+    }
 }
 
 data class Card(
@@ -162,6 +187,7 @@ data class WordWithCards(
     val enFa: Card? get() = cards.firstOrNull { it.direction == Direction.EN_FA }
     val faEn: Card? get() = cards.firstOrNull { it.direction == Direction.FA_EN }
     val cloze: Card? get() = cards.firstOrNull { it.direction == Direction.CLOZE }
+    val listen: Card? get() = cards.firstOrNull { it.direction == Direction.LISTEN }
 }
 
 /** A card paired with its word, as used by the review queue. */

@@ -34,6 +34,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -69,6 +70,7 @@ fun HomeScreen(
     onStartReview: () -> Unit,
     onFreePractice: () -> Unit,
     onOpenMenu: () -> Unit,
+    onOpenData: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -105,6 +107,16 @@ fun HomeScreen(
                 totalWords = state.totalWords,
                 onOpenMenu = onOpenMenu,
             )
+        }
+
+        if (state.showBackupBanner) {
+            item {
+                BackupBanner(
+                    ageDays = state.backupAgeDays,
+                    onOpenData = onOpenData,
+                    onSnooze = viewModel::snoozeBackupReminder,
+                )
+            }
         }
 
         // With an empty deck the hero would claim the day is done, which is
@@ -181,6 +193,50 @@ fun HomeScreen(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * A quiet reminder that the only copy of the collection is on this phone.
+ * Snoozing hides it for three days, so it nags without becoming noise.
+ */
+@Composable
+private fun BackupBanner(
+    ageDays: Int?,
+    onOpenData: () -> Unit,
+    onSnooze: () -> Unit,
+) {
+    val colors = MaterialTheme.colorScheme
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .background(colors.secondaryContainer.copy(alpha = 0.6f))
+            .border(1.dp, colors.secondary.copy(alpha = 0.2f), MaterialTheme.shapes.large)
+            .padding(Spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+    ) {
+        Text(
+            text = stringResource(R.string.backup_banner_title),
+            style = MaterialTheme.typography.titleSmall,
+        )
+        Text(
+            text = if (ageDays == null) {
+                stringResource(R.string.backup_banner_never)
+            } else {
+                stringResource(R.string.backup_banner_body, PersianText.number(ageDays))
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = colors.onSurfaceVariant,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Button(onClick = onOpenData) {
+                Text(stringResource(R.string.backup_banner_action))
+            }
+            TextButton(onClick = onSnooze) {
+                Text(stringResource(R.string.backup_banner_later))
             }
         }
     }

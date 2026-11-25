@@ -20,6 +20,8 @@ data class WordDetailUiState(
     val tags: List<String> = emptyList(),
     val loading: Boolean = true,
     val deleted: Boolean = false,
+    /** A short code for the card-creation result; the screen localizes it. */
+    val cardMessage: String? = null,
 )
 
 @HiltViewModel
@@ -30,12 +32,14 @@ class WordDetailViewModel @Inject constructor(
 
     private val wordId: Long = savedStateHandle.get<Long>("wordId") ?: 0L
     private val tagsState = MutableStateFlow<List<String>>(emptyList())
+    private val cardMessage = MutableStateFlow<String?>(null)
 
     val state: StateFlow<WordDetailUiState> = combine(
         wordRepository.observeWord(wordId),
         tagsState,
-    ) { word, tags ->
-        WordDetailUiState(word = word, tags = tags, loading = false)
+        cardMessage,
+    ) { word, tags, message ->
+        WordDetailUiState(word = word, tags = tags, loading = false, cardMessage = message)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WordDetailUiState())
 
     init {
@@ -57,6 +61,24 @@ class WordDetailViewModel @Inject constructor(
         viewModelScope.launch {
             wordRepository.delete(listOf(wordId))
             onDeleted()
+        }
+    }
+
+    fun dismissCardMessage() {
+        cardMessage.value = null
+    }
+
+    /** Adds a CLOZE or LISTEN card to this word. */
+    fun createCard(direction: ir.wazhebox.domain.model.Direction) {
+        viewModelScope.launch {
+            val entry = state.value.word
+            val created = wordRepository.createCard(wordId, direction)
+            cardMessage.value = when {
+                created -> "created"
+                direction == ir.wazhebox.domain.model.Direction.CLOZE &&
+                    entry?.word?.exampleEn.isNullOrBlank() -> "cloze_needs_example"
+                else -> "exists"
+            }
         }
     }
 

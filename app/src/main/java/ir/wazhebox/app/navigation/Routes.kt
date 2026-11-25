@@ -11,7 +11,7 @@ data object OnboardingRoute
 data object HomeRoute
 
 @Serializable
-data class ReviewRoute(val freePractice: Boolean = false)
+data class ReviewRoute(val freePractice: Boolean = false, val deckId: Long = 0)
 
 @Serializable
 data class WordDetailRoute(val wordId: Long)

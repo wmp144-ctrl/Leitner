@@ -32,6 +32,9 @@ class SettingsViewModel @Inject constructor(
     fun setStudyDayStartHour(value: Int) = launch { settingsRepository.setStudyDayStartHour(value) }
     fun setSpeechRate(value: Float) = launch { settingsRepository.setSpeechRate(value) }
     fun setHaptics(value: Boolean) = launch { settingsRepository.setHapticsEnabled(value) }
+    fun setThemeMode(value: ir.wazhebox.data.settings.ThemeMode) =
+        launch { settingsRepository.setThemeMode(value) }
+    fun setAmoled(value: Boolean) = launch { settingsRepository.setAmoled(value) }
     fun setSwipe(value: Boolean) = launch { settingsRepository.setSwipeEnabled(value) }
     fun setReminderEnabled(value: Boolean) = launch {
         settingsRepository.setReminderEnabled(value)

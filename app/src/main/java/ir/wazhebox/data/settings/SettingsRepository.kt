@@ -45,6 +45,8 @@ class SettingsRepository @Inject constructor(
         val LAST_BACKUP_REMINDER = longPreferencesKey("last_backup_reminder_at")
         val TTS_CHECKED = booleanPreferencesKey("tts_checked")
         val APP_OPENED = intPreferencesKey("app_opened_count")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val AMOLED = booleanPreferencesKey("amoled_dark")
     }
 
     val settings: Flow<UserSettings> = context.dataStore.data.map { prefs ->
@@ -73,6 +75,8 @@ class SettingsRepository @Inject constructor(
             lastBackupReminderAt = prefs[Keys.LAST_BACKUP_REMINDER],
             ttsChecked = prefs[Keys.TTS_CHECKED] ?: defaults.ttsChecked,
             appOpenedCount = prefs[Keys.APP_OPENED] ?: defaults.appOpenedCount,
+            themeMode = ThemeMode.fromName(prefs[Keys.THEME_MODE]),
+            amoled = prefs[Keys.AMOLED] ?: defaults.amoled,
         )
     }
 
@@ -124,6 +128,10 @@ class SettingsRepository @Inject constructor(
         edit { it[Keys.LAST_BACKUP_REMINDER] = epochMillis }
 
     suspend fun setTtsChecked(value: Boolean) = edit { it[Keys.TTS_CHECKED] = value }
+
+    suspend fun setThemeMode(value: ThemeMode) = edit { it[Keys.THEME_MODE] = value.name }
+
+    suspend fun setAmoled(value: Boolean) = edit { it[Keys.AMOLED] = value }
 
     suspend fun incrementAppOpened() = edit { prefs ->
         prefs[Keys.APP_OPENED] = (prefs[Keys.APP_OPENED] ?: 0) + 1

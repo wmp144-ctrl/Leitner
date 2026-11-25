@@ -68,6 +68,21 @@ private val DarkScheme = darkColorScheme(
     error = ErrorDark,
 )
 
+// AMOLED: the background and the base surface go to true black so an OLED panel
+// switches those pixels off, while the container tones stay a hair above black
+// so sheets and cards are still distinguishable.
+private val AmoledScheme = DarkScheme.copy(
+    background = Color.Black,
+    surface = Color.Black,
+    surfaceContainerLowest = Color.Black,
+    surfaceContainerLow = Color(0xFF08090D),
+    surfaceContainer = Color(0xFF0B0C11),
+    surfaceContainerHigh = Color(0xFF12141A),
+    surfaceContainerHighest = Color(0xFF191B23),
+    surfaceVariant = Color(0xFF15171E),
+    surfaceDim = Color.Black,
+)
+
 private val WazheBoxShapes = Shapes(
     extraSmall = RoundedCornerShape(12.dp),
     small = RoundedCornerShape(16.dp),
@@ -95,18 +110,23 @@ val MaterialTheme.accents: WazheBoxAccents
     get() = LocalAccents.current
 
 /**
- * App theme: always RTL (the only UI language in 1.0 is Persian, PRD §23) and
- * light by default, so the app sits on the white background the v2 design
- * calls for. Dynamic colour is off by default because it would replace the
- * brand palette on Android 12+; pass `dynamicColor = true` to opt back in.
+ * App theme: always RTL (the only UI language in 1.0 is Persian, PRD §23).
+ * [darkTheme] follows the user's choice (MainActivity reads it from settings),
+ * and [amoled] swaps the dark palette for a true-black one. Dynamic colour stays
+ * off because it would replace the brand palette on Android 12+.
  */
 @Composable
 fun WazheBoxTheme(
     darkTheme: Boolean = false,
     dynamicColor: Boolean = false,
+    amoled: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = if (darkTheme) DarkScheme else LightScheme
+    val colorScheme = when {
+        darkTheme && amoled -> AmoledScheme
+        darkTheme -> DarkScheme
+        else -> LightScheme
+    }
 
     CompositionLocalProvider(
         LocalLayoutDirection provides LayoutDirection.Rtl,

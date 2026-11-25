@@ -50,13 +50,24 @@ interface WordRepository {
     suspend fun setSuspended(words: List<Long>, suspended: Boolean)
     suspend fun setTags(wordId: Long, tags: List<String>)
     suspend fun tagsFor(wordId: Long): List<String>
+    /** Adds a CLOZE or LISTEN card to an existing word. False when it already exists. */
+    suspend fun createCard(wordId: Long, direction: ir.wazhebox.domain.model.Direction): Boolean
 }
+
+/** A deck with its word count, for the deck list. */
+data class DeckSummary(
+    val deck: Deck,
+    val wordCount: Int,
+)
 
 interface DeckRepository {
     suspend fun ensureDefaultDeck(): Deck
     fun observeDecks(): Flow<List<Deck>>
+    fun observeDecksWithCounts(): Flow<List<DeckSummary>>
     suspend fun createDeck(name: String, description: String? = null): Long
+    suspend fun renameDeck(id: Long, name: String, description: String? = null)
     suspend fun archiveDeck(id: Long)
+    suspend fun unarchiveDeck(id: Long)
     suspend fun deleteDeck(id: Long)
 }
 
@@ -85,8 +96,9 @@ data class GradeOutcome(
 )
 
 interface StudyRepository {
-    suspend fun buildSession(freePractice: Boolean = false): List<StudyItem>
-    suspend fun workload(freePractice: Boolean = false): Workload
+    /** [deckId] limits the session to one deck; null means every deck. */
+    suspend fun buildSession(freePractice: Boolean = false, deckId: Long? = null): List<StudyItem>
+    suspend fun workload(freePractice: Boolean = false, deckId: Long? = null): Workload
     suspend fun grade(
         cardId: Long,
         rating: Rating,

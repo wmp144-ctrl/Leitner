@@ -130,6 +130,7 @@ fun WordDetailScreen(
                         text = when (card.direction.name) {
                             "FA_EN" -> stringResource(R.string.review_direction_fa_en)
                             "CLOZE" -> stringResource(R.string.review_direction_cloze)
+                            "LISTEN" -> stringResource(R.string.review_direction_listen)
                             else -> stringResource(R.string.review_direction_en_fa)
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -146,6 +147,45 @@ fun WordDetailScreen(
                         )
                     }
                 }
+            }
+            // Extra card shapes for the same word: a gap in its own example
+            // sentence, and a card that is only the spoken word.
+            Text(
+                text = stringResource(R.string.detail_new_card),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                OutlinedButton(
+                    onClick = { viewModel.createCard(ir.wazhebox.domain.model.Direction.CLOZE) },
+                    modifier = Modifier.weight(1f),
+                    enabled = entry.cloze == null,
+                ) { Text(stringResource(R.string.detail_add_cloze)) }
+                OutlinedButton(
+                    onClick = { viewModel.createCard(ir.wazhebox.domain.model.Direction.LISTEN) },
+                    modifier = Modifier.weight(1f),
+                    enabled = entry.listen == null,
+                ) { Text(stringResource(R.string.detail_add_listen)) }
+            }
+            state.cardMessage?.let { code ->
+                Text(
+                    text = stringResource(
+                        when (code) {
+                            "created" -> R.string.detail_card_created
+                            "cloze_needs_example" -> R.string.detail_cloze_needs_example
+                            else -> R.string.detail_card_exists
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (code == "created") {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(Spacing.lg)) {
                 Column {

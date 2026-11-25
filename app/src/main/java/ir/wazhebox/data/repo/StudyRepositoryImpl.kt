@@ -67,23 +67,24 @@ class StudyRepositoryImpl @Inject constructor(
      * word was already represented by its EN_FA card. One item per card keeps
      * both directions reviewable, the way a deck of cards actually works.
      */
-    private suspend fun liveItems(): List<StudyItem> =
+    private suspend fun liveItems(deckId: Long? = null): List<StudyItem> =
         wordDao.allWithCards().flatMap { row ->
             val word = row.word.toDomain()
             if (word.suspended) return@flatMap emptyList()
+            if (deckId != null && word.deckId != deckId) return@flatMap emptyList()
             row.cards
                 .filter { it.state != CardState.SUSPENDED.name }
                 .map { StudyItem(word = word, card = it.toDomain()) }
         }
 
-    override suspend fun buildSession(freePractice: Boolean): List<StudyItem> {
+    override suspend fun buildSession(freePractice: Boolean, deckId: Long?): List<StudyItem> {
         val (sessionConfig, _) = sessionConfig(freePractice)
-        return SessionBuilder.buildQueue(liveItems(), clock.now(), sessionConfig)
+        return SessionBuilder.buildQueue(liveItems(deckId), clock.now(), sessionConfig)
     }
 
-    override suspend fun workload(freePractice: Boolean): Workload {
+    override suspend fun workload(freePractice: Boolean, deckId: Long?): Workload {
         val (sessionConfig, _) = sessionConfig(freePractice)
-        val items = liveItems()
+        val items = liveItems(deckId)
         val queue = SessionBuilder.buildQueue(items, clock.now(), sessionConfig)
         return Workload(
             dueCount = queue.size,

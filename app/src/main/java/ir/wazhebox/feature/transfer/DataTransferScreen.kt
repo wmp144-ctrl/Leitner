@@ -66,6 +66,10 @@ fun DataTransferScreen(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let(viewModel::importCsv) }
 
+    val openApkg = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri -> uri?.let(viewModel::importAnki) }
+
     val openJsonPreview = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
     ) { uri -> uri?.let(viewModel::previewBackup) }
@@ -132,6 +136,79 @@ fun DataTransferScreen(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !state.busy,
             ) { Text(stringResource(R.string.settings_import_csv)) }
+            OutlinedButton(
+                onClick = {
+                    picker.launch {
+                        openApkg.launch(arrayOf("application/zip", "application/octet-stream", "*/*"))
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.busy,
+            ) { Text(stringResource(R.string.io_import_anki)) }
+            Text(
+                text = stringResource(R.string.io_import_anki_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        SectionCard {
+            Text(
+                text = stringResource(R.string.backup_auto_title),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = stringResource(R.string.backup_auto_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(
+                onClick = viewModel::backupNow,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.busy,
+            ) { Text(stringResource(R.string.settings_backup)) }
+            if (state.autoBackups.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.backup_auto_none),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            } else {
+                state.autoBackups.forEach { backup ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(
+                                    R.string.backup_auto_item,
+                                    PersianText.jalaliShort(
+                                        kotlinx.datetime.Instant.fromEpochMilliseconds(backup.createdAt)
+                                            .toLocalDateTime(TimeZone.currentSystemDefault()).date,
+                                    ),
+                                    PersianText.number((backup.sizeBytes / 1024).coerceAtLeast(1)),
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                        TextButton(
+                            onClick = { viewModel.restoreAutoBackup(backup) },
+                            enabled = !state.busy,
+                        ) { Text(stringResource(R.string.backup_auto_restore)) }
+                        TextButton(
+                            onClick = { viewModel.deleteAutoBackup(backup) },
+                            enabled = !state.busy,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.action_delete),
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+                    }
+                }
+            }
         }
 
         SectionCard {
@@ -206,6 +283,14 @@ fun DataTransferScreen(
             }
         }
 
+        state.ankiAdded?.let { added ->
+            Text(
+                text = stringResource(R.string.io_anki_imported, PersianText.number(added)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+
         state.report?.let { report ->
             SectionCard {
                 Text(
@@ -244,6 +329,8 @@ fun DataTransferScreen(
                 text = when (error) {
                     "corrupt" -> stringResource(R.string.io_error_corrupt)
                     "version" -> stringResource(R.string.io_error_version)
+                    "anki_unsupported" -> stringResource(R.string.io_anki_unsupported)
+                    "anki_corrupt" -> stringResource(R.string.io_anki_corrupt)
                     else -> stringResource(R.string.common_error)
                 },
                 color = MaterialTheme.colorScheme.error,
@@ -253,11 +340,14 @@ fun DataTransferScreen(
 
         state.message?.let { message ->
             Text(
-                // "exported" and "restored" used to both render the export
-                // message with an empty file name, so a restore looked like a
-                // broken export.
-                text = if (message == "restored") stringResource(R.string.io_restored)
-                else stringResource(R.string.io_saved),
+                // Every write path reports its own sentence: a restore that
+                // reused the export message looked like a broken export.
+                text = when (message) {
+                    "restored" -> stringResource(R.string.io_restored)
+                    "auto_restored" -> stringResource(R.string.backup_auto_restored)
+                    "auto_saved" -> stringResource(R.string.io_saved)
+                    else -> stringResource(R.string.io_saved)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.primary,
             )

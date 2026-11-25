@@ -4,7 +4,9 @@ import android.app.Application
 import android.content.res.Configuration
 import dagger.hilt.android.HiltAndroidApp
 import ir.wazhebox.core.notifications.NotificationChannels
+import ir.wazhebox.data.backup.AutoBackupManager
 import ir.wazhebox.data.reminder.ReminderScheduler
+import ir.wazhebox.data.settings.SettingsRepository
 import ir.wazhebox.widget.WidgetRotationScheduler
 import ir.wazhebox.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +22,8 @@ class WazheBoxApp : Application() {
     @Inject lateinit var reminderScheduler: ReminderScheduler
     @Inject lateinit var widgetUpdater: WidgetUpdater
     @Inject lateinit var widgetRotationScheduler: WidgetRotationScheduler
+    @Inject lateinit var autoBackupManager: AutoBackupManager
+    @Inject lateinit var settingsRepository: SettingsRepository
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -36,6 +40,9 @@ class WazheBoxApp : Application() {
 
         NotificationChannels.ensureCreated(this)
         scope.launch {
+            runCatching { settingsRepository.incrementAppOpened() }
+            // One automatic backup a day, kept in the app's private files.
+            runCatching { autoBackupManager.runIfDue() }
             runCatching { reminderScheduler.schedule() }
             runCatching { widgetRotationScheduler.schedule() }
             runCatching { widgetUpdater.refresh() }

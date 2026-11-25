@@ -60,6 +60,10 @@ class ReviewViewModel @Inject constructor(
     private val freePractice: Boolean =
         savedStateHandle.get<Boolean>("freePractice") ?: false
 
+    /** 0 means every deck; a deck card starts a single-deck session. */
+    private val deckId: Long? =
+        (savedStateHandle.get<Long>("deckId") ?: 0L).takeIf { it > 0L }
+
     private val _state = MutableStateFlow(ReviewUiState(freePractice = freePractice))
     val state: StateFlow<ReviewUiState> = _state.asStateFlow()
 
@@ -87,7 +91,7 @@ class ReviewViewModel @Inject constructor(
     private suspend fun load() {
         // A failed query used to leave the spinner up forever; an empty session is
         // a recoverable, visible state.
-        val items = runCatching { studyRepository.buildSession(freePractice) }
+        val items = runCatching { studyRepository.buildSession(freePractice, deckId) }
             .getOrDefault(emptyList())
             .toMutableList()
         queue.clear()
@@ -111,10 +115,10 @@ class ReviewViewModel @Inject constructor(
         // FA_EN asks for the English word and shows the Persian meaning, so the
         // answers it accepts are the term itself. Comparing against the meanings
         // (as the old version did) marked every reverse answer wrong.
-        val accepted = if (current.card.direction == Direction.FA_EN) {
-            listOf(current.word.term)
-        } else {
-            current.word.meanings
+        val accepted = when (current.card.direction) {
+            // Both reverse and cloze cards ask for the English word.
+            Direction.FA_EN, Direction.CLOZE -> listOf(current.word.term)
+            else -> current.word.meanings
         }
         val result = AnswerGrader.grade(
             input = _state.value.typed,
@@ -233,6 +237,9 @@ class ReviewViewModel @Inject constructor(
             return
         }
         val previews = previewsFor(next)
+        // A listening card is useless until it makes a sound, so it speaks as
+        // soon as it appears; the speaker button replays it.
+        if (next.card.direction == Direction.LISTEN) speakWord(next.word.term)
         questionStartedAt = System.currentTimeMillis()
         _state.value = _state.value.copy(
             current = next,
@@ -302,9 +309,13 @@ class ReviewViewModel @Inject constructor(
 
     fun speak() {
         val word = _state.value.current?.word ?: return
+        speakWord(word.term)
+    }
+
+    private fun speakWord(term: String) {
         viewModelScope.launch {
             val settings = settingsRepository.settings.first()
-            tts.speak(word.term, settings.speechRate)
+            runCatching { tts.speak(term, settings.speechRate) }
         }
     }
 
@@ -334,4 +345,4 @@ class ReviewViewModel @Inject constructor(
 
 /** Direction helpers used by the review screen. */
 val Direction.isTypedAnswer: Boolean
-    get() = this == Direction.FA_EN
+    get() = this == Direction.FA_EN || this == Direction.CLOZE

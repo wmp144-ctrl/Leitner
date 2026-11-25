@@ -5,8 +5,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import ir.wazhebox.core.ui.theme.WazheBoxTheme
+import ir.wazhebox.data.settings.ThemeMode
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 
@@ -25,7 +30,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            WazheBoxTheme {
+            // The theme lives in settings, so the activity collects it here, above
+            // the NavHost; the root screen uses the same ViewModel instance.
+            val rootViewModel: RootViewModel = hiltViewModel()
+            val appTheme by rootViewModel.theme.collectAsStateWithLifecycle()
+            val systemDark = isSystemInDarkTheme()
+            val dark = when (appTheme.mode) {
+                ThemeMode.SYSTEM -> systemDark
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+            WazheBoxTheme(darkTheme = dark, amoled = appTheme.amoled) {
                 WazheBoxRoot(newIntents = newIntents)
             }
         }

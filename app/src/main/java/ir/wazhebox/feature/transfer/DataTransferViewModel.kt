@@ -6,6 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import ir.wazhebox.data.backup.AutoBackupFile
+import ir.wazhebox.data.backup.AutoBackupManager
+import ir.wazhebox.data.io.AnkiImportResult
 import ir.wazhebox.data.io.BackupResult
 import ir.wazhebox.data.io.DataTransferRepository
 import ir.wazhebox.data.io.ImportReport
@@ -28,18 +31,26 @@ data class TransferUiState(
     val message: String? = null,
     val error: String? = null,
     val previewText: String? = null,
+    val autoBackups: List<AutoBackupFile> = emptyList(),
+    val ankiAdded: Int? = null,
+    val ankiDecks: Int = 0,
 )
 
 @HiltViewModel
 class DataTransferViewModel @Inject constructor(
     private val dataTransfer: DataTransferRepository,
     private val settingsRepository: SettingsRepository,
+    private val autoBackupManager: AutoBackupManager,
     private val widgetUpdater: ir.wazhebox.widget.WidgetUpdater,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransferUiState())
     val state: StateFlow<TransferUiState> = _state.asStateFlow()
+
+    init {
+        refreshAutoBackups()
+    }
 
     fun setRestoreMode(mode: RestoreMode) {
         _state.value = _state.value.copy(restoreMode = mode)
@@ -76,6 +87,39 @@ class DataTransferViewModel @Inject constructor(
         }
     }
 
+    /** Anki .apkg: the zip is read straight from the document picker stream. */
+    fun importAnki(uri: Uri) {
+        _state.value = _state.value.copy(
+            busy = true,
+            error = null,
+            message = null,
+            report = null,
+            ankiAdded = null,
+        )
+        viewModelScope.launch {
+            val result = runCatching {
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { stream ->
+                        dataTransfer.importAnki(stream)
+                    } ?: error("open_failed")
+                }
+            }.getOrNull()
+            _state.value = when (result) {
+                is AnkiImportResult.Imported -> {
+                    runCatching { widgetUpdater.refresh() }
+                    _state.value.copy(
+                        busy = false,
+                        report = result.report,
+                        ankiAdded = result.report.added,
+                        ankiDecks = result.decks,
+                    )
+                }
+                is AnkiImportResult.Unsupported -> _state.value.copy(busy = false, error = "anki_unsupported")
+                is AnkiImportResult.Corrupt, null -> _state.value.copy(busy = false, error = "anki_corrupt")
+            }
+        }
+    }
+
     fun previewBackup(uri: Uri) {
         _state.value = _state.value.copy(busy = true, error = null, message = null, previewText = null)
         viewModelScope.launch {
@@ -106,6 +150,41 @@ class DataTransferViewModel @Inject constructor(
         }
     }
 
+    /** Restores one of the backups the app wrote on its own. */
+    fun restoreAutoBackup(backup: AutoBackupFile) {
+        _state.value = _state.value.copy(busy = true, error = null, message = null)
+        viewModelScope.launch {
+            val result = autoBackupManager.restore(backup.file, merge = _state.value.restoreMode == RestoreMode.MERGE)
+            if (result is BackupResult.Success) runCatching { widgetUpdater.refresh() }
+            _state.value = when (result) {
+                is BackupResult.Success -> _state.value.copy(busy = false, message = "auto_restored")
+                is BackupResult.Corrupt -> _state.value.copy(busy = false, error = "corrupt")
+                is BackupResult.NewerVersion -> _state.value.copy(busy = false, error = "version")
+            }
+            refreshAutoBackups()
+        }
+    }
+
+    fun deleteAutoBackup(backup: AutoBackupFile) {
+        autoBackupManager.delete(backup.file)
+        refreshAutoBackups()
+    }
+
+    /** Writes a fresh automatic backup without waiting for the daily check. */
+    fun backupNow() {
+        _state.value = _state.value.copy(busy = true, error = null, message = null)
+        viewModelScope.launch {
+            runCatching { autoBackupManager.backupNow() }
+                .onSuccess { _state.value = _state.value.copy(busy = false, message = "auto_saved") }
+                .onFailure { _state.value = _state.value.copy(busy = false, error = it.message) }
+            refreshAutoBackups()
+        }
+    }
+
+    private fun refreshAutoBackups() {
+        _state.value = _state.value.copy(autoBackups = autoBackupManager.list())
+    }
+
     private fun write(uri: Uri, producer: suspend () -> String) {
         _state.value = _state.value.copy(busy = true, error = null, message = null)
         viewModelScope.launch {
@@ -121,6 +200,7 @@ class DataTransferViewModel @Inject constructor(
             }.onFailure {
                 _state.value = _state.value.copy(busy = false, error = it.message)
             }
+            refreshAutoBackups()
         }
     }
 

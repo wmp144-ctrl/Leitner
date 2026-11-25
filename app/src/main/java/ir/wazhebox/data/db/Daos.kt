@@ -36,6 +36,20 @@ interface DeckDao {
     @Query("UPDATE decks SET archived = 1, updated_at = :now WHERE id = :id")
     suspend fun archive(id: Long, now: Long)
 
+    @Query("UPDATE decks SET archived = 0, updated_at = :now WHERE id = :id")
+    suspend fun unarchive(id: Long, now: Long)
+
+    @Query(
+        """
+        UPDATE decks SET name = :name, description = :description, updated_at = :now
+        WHERE id = :id
+        """,
+    )
+    suspend fun rename(id: Long, name: String, description: String?, now: Long)
+
+    @Query("SELECT deck_id AS deck_id, COUNT(*) AS word_count FROM words GROUP BY deck_id")
+    fun observeWordCounts(): Flow<List<DeckWordCount>>
+
     @Query("DELETE FROM decks WHERE id = :id")
     suspend fun delete(id: Long)
 
@@ -69,6 +83,9 @@ interface WordDao {
 
     @Query("SELECT COUNT(*) FROM words")
     fun observeWordCount(): Flow<Int>
+
+    @Query("SELECT COUNT(*) FROM words WHERE deck_id = :deckId")
+    suspend fun countInDeck(deckId: Long): Int
 
     @Query("SELECT COUNT(*) FROM words")
     suspend fun count(): Int

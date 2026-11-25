@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -193,6 +194,62 @@ fun SettingsScreen(
                         )
                     }
                 }
+            }
+        }
+
+        SectionCard {
+            Text(
+                text = stringResource(R.string.settings_appearance),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = stringResource(R.string.settings_theme),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+            ) {
+                ir.wazhebox.data.settings.ThemeMode.entries.forEach { mode ->
+                    FilterChip(
+                        selected = settings.themeMode == mode,
+                        onClick = { viewModel.setThemeMode(mode) },
+                        label = {
+                            Text(
+                                text = stringResource(
+                                    when (mode) {
+                                        ir.wazhebox.data.settings.ThemeMode.SYSTEM ->
+                                            R.string.settings_theme_system
+                                        ir.wazhebox.data.settings.ThemeMode.LIGHT ->
+                                            R.string.settings_theme_light
+                                        ir.wazhebox.data.settings.ThemeMode.DARK ->
+                                            R.string.settings_theme_dark
+                                    },
+                                ),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                    )
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_amoled))
+                    Text(
+                        text = stringResource(R.string.settings_amoled_hint),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = settings.amoled,
+                    onCheckedChange = viewModel::setAmoled,
+                )
             }
         }
 

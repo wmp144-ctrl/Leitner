@@ -17,3 +17,6 @@ keystore.properties
 
 # Local installable APKs and test keystore
 /artifacts/
+
+# local build toolchain notes and logs
+/.tools/

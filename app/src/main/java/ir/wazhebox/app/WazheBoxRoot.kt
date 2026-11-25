@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SwapVert
@@ -41,6 +42,7 @@ import ir.wazhebox.R
 import ir.wazhebox.app.navigation.AboutRoute
 import ir.wazhebox.app.navigation.AddWordRoute
 import ir.wazhebox.app.navigation.DataTransferRoute
+import ir.wazhebox.app.navigation.DeckSettingsRoute
 import ir.wazhebox.app.navigation.HomeRoute
 import ir.wazhebox.app.navigation.LibraryRoute
 import ir.wazhebox.app.navigation.OnboardingRoute
@@ -53,6 +55,7 @@ import ir.wazhebox.core.ui.components.DrawerItem
 import ir.wazhebox.core.ui.components.LoadingBox
 import ir.wazhebox.core.ui.components.WazheBoxDrawer
 import ir.wazhebox.feature.add.AddWordScreen
+import ir.wazhebox.feature.decks.DeckListScreen
 import ir.wazhebox.feature.detail.WordDetailScreen
 import ir.wazhebox.feature.home.HomeScreen
 import ir.wazhebox.feature.library.LibraryScreen
@@ -129,6 +132,12 @@ fun WazheBoxRoot(
                         onClick = { selectTab(LibraryRoute) },
                     ),
                     DrawerItem(
+                        label = stringResource(R.string.nav_decks),
+                        icon = Icons.Filled.FolderOpen,
+                        selected = destination?.hasRoute<DeckSettingsRoute>() == true,
+                        onClick = { selectTab(DeckSettingsRoute) },
+                    ),
+                    DrawerItem(
                         label = stringResource(R.string.nav_stats),
                         icon = Icons.Filled.BarChart,
                         selected = destination?.hasRoute<StatsRoute>() == true,
@@ -198,6 +207,16 @@ fun WazheBoxRoot(
                             onStartReview = { navController.navigate(ReviewRoute()) },
                             onFreePractice = { navController.navigate(ReviewRoute(freePractice = true)) },
                             onOpenMenu = openMenu,
+                            onOpenData = { navController.navigate(DataTransferRoute) },
+                        )
+                    }
+
+                    composable<DeckSettingsRoute> {
+                        DeckListScreen(
+                            onBack = { navController.popBackStack() },
+                            onReviewDeck = { deckId ->
+                                navController.navigate(ReviewRoute(deckId = deckId))
+                            },
                         )
                     }
 

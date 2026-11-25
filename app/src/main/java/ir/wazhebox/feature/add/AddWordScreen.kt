@@ -48,6 +48,7 @@ fun AddWordScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     var posExpanded by remember { mutableStateOf(false) }
+    var deckExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.saved, state.deleted) {
         if (state.saved || state.deleted) onDone()
@@ -97,6 +98,37 @@ fun AddWordScreen(
             isError = state.error == InvalidReason.EMPTY_MEANING,
             minLines = 2,
         )
+
+        // Only worth showing once a second deck exists; with one deck the field
+        // would be a choice with a single option.
+        if (state.decks.size > 1) {
+            androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = { deckExpanded = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    val current = state.decks.firstOrNull { it.id == state.deckId }
+                    Text(
+                        text = stringResource(R.string.word_deck) + ": " +
+                            (current?.name ?: "—"),
+                    )
+                }
+                DropdownMenu(
+                    expanded = deckExpanded,
+                    onDismissRequest = { deckExpanded = false },
+                ) {
+                    state.decks.forEach { deck ->
+                        DropdownMenuItem(
+                            text = { Text(deck.name) },
+                            onClick = {
+                                viewModel.setDeck(deck.id)
+                                deckExpanded = false
+                            },
+                        )
+                    }
+                }
+            }
+        }
 
         androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth()) {
             OutlinedButton(

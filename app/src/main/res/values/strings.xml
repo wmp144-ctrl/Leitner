@@ -7,6 +7,7 @@
     <string name="nav_library">کتابخانه</string>
     <string name="nav_stats">آمار</string>
     <string name="nav_settings">تنظیمات</string>
+    <string name="nav_decks">دک‌ها</string>
     <string name="nav_menu">منو</string>
     <string name="drawer_tagline">یادگیری واژه‌های انگلیسی</string>
     <string name="drawer_offline">کاملاً آفلاین، بدون نیاز به اینترنت</string>
@@ -64,6 +65,11 @@
     <string name="review_direction_en_fa">انگلیسی ← فارسی</string>
     <string name="review_direction_fa_en">فارسی ← انگلیسی</string>
     <string name="review_direction_cloze">جای خالی در جمله</string>
+    <string name="review_direction_listen">شنیداری</string>
+    <string name="review_cloze_hint">واژهٔ جاافتاده را بنویس یا روی کارت ضربه بزن</string>
+    <string name="review_listen_hint">گوش کن و واژه را بگو، بعد کارت را برگردان</string>
+    <string name="review_listen_play">پخش دوبارهٔ صدا</string>
+    <string name="review_cloze_answer">جملهٔ کامل</string>
     <string name="review_show_answer">نمایش پاسخ</string>
     <string name="review_tap_answer">برای دیدن پاسخ روی کارت ضربه بزن</string>
     <string name="review_tap_word">برای دیدن واژه روی کارت ضربه بزن</string>
@@ -229,6 +235,68 @@
     <string name="settings_deck_management">دک‌ها</string>
     <string name="settings_wipe">پاک کردن همهٔ داده‌ها</string>
     <string name="settings_wipe_confirm">همهٔ لغات، کارت‌ها و تاریخچهٔ مرور پاک شود؟ این کار برگشت‌پذیر نیست.</string>
+
+    <!-- Appearance -->
+    <string name="settings_appearance">ظاهر برنامه</string>
+    <string name="settings_theme">تم</string>
+    <string name="settings_theme_system">هماهنگ با گوشی</string>
+    <string name="settings_theme_light">روشن</string>
+    <string name="settings_theme_dark">تیره</string>
+    <string name="settings_amoled">پس‌زمینهٔ کاملاً مشکی (AMOLED)</string>
+    <string name="settings_amoled_hint">در تم تیره پیکسل‌های خاموش باتری کمتری مصرف می‌کنند.</string>
+
+    <!-- Decks -->
+    <string name="deck_title">دک‌ها</string>
+    <string name="deck_subtitle">هر دک مجموعهٔ جداگانه‌ای از واژه‌هاست.</string>
+    <string name="deck_new">دک جدید</string>
+    <string name="deck_name">نام دک</string>
+    <string name="deck_description">توضیح (اختیاری)</string>
+    <string name="deck_create">ساختن دک</string>
+    <string name="deck_default_badge">دک اصلی</string>
+    <string name="deck_word_count">%1$s لغت</string>
+    <string name="deck_review">مرور این دک</string>
+    <string name="deck_rename">تغییر نام</string>
+    <string name="deck_archive">بایگانی</string>
+    <string name="deck_unarchive">بازگرداندن از بایگانی</string>
+    <string name="deck_archived_badge">بایگانی‌شده</string>
+    <string name="deck_delete">حذف دک</string>
+    <string name="deck_delete_confirm">دک «%1$s» با همهٔ لغت‌ها و تاریخچهٔ مرورش حذف شود؟ این کار برگشت‌پذیر نیست.</string>
+    <string name="deck_delete_default_blocked">دک اصلی را نمی‌توان حذف کرد.</string>
+    <string name="deck_empty">هنوز دک دیگری نساخته‌ای.</string>
+    <string name="deck_name_required">نام دک را وارد کن</string>
+    <string name="deck_duplicate_name">دکی با این نام هست.</string>
+    <string name="deck_saved">ذخیره شد</string>
+    <string name="deck_review_done">برای این دک امروز کاری نمانده.</string>
+    <string name="deck_all">همهٔ دک‌ها</string>
+
+    <!-- Card types -->
+    <string name="detail_new_card">ساخت کارت تازه</string>
+    <string name="detail_add_cloze">کارت جای خالی</string>
+    <string name="detail_add_listen">کارت شنیداری</string>
+    <string name="detail_card_created">کارت ساخته شد</string>
+    <string name="detail_card_exists">این کارت از قبل هست.</string>
+    <string name="detail_cloze_needs_example">برای کارت جای خالی اول یک جملهٔ مثال با همین واژه بنویس.</string>
+
+    <!-- Anki -->
+    <string name="io_import_anki">ورود از Anki (.apkg)</string>
+    <string name="io_import_anki_hint">فایل apkg آنکی را انتخاب کن؛ دک‌ها و واژه‌ها خوانده می‌شوند.</string>
+    <string name="io_anki_imported">%1$s لغت از Anki اضافه شد</string>
+    <string name="io_anki_unsupported">این فایل apkg با نسخهٔ جدید آنکی ساخته شده و خوانده نشد.</string>
+    <string name="io_anki_corrupt">فایل apkg خراب است یا مجموعهٔ آنکی داخلش نیست.</string>
+
+    <!-- Backup -->
+    <string name="backup_auto_title">پشتیبان‌گیری خودکار</string>
+    <string name="backup_auto_hint">هر روز که برنامه باز شود یک نسخهٔ پشتیبان در حافظهٔ خود برنامه ساخته می‌شود.</string>
+    <string name="backup_auto_none">هنوز پشتیبان خودکاری ساخته نشده.</string>
+    <string name="backup_auto_item">%1$s — %2$s</string>
+    <string name="backup_auto_restore">بازیابی</string>
+    <string name="backup_auto_delete">حذف پشتیبان</string>
+    <string name="backup_auto_restored">پشتیبان خودکار بازیابی شد.</string>
+    <string name="backup_banner_title">پشتیبان تازه‌ای نداری</string>
+    <string name="backup_banner_body">آخرین پشتیبان %1$s روز پیش بود. یک نسخه بگیر تا پیشرفتت امن بماند.</string>
+    <string name="backup_banner_never">هنوز هیچ پشتیبانی نگرفته‌ای.</string>
+    <string name="backup_banner_action">رفتن به پشتیبان‌گیری</string>
+    <string name="backup_banner_later">بعداً</string>
 
     <!-- Import / export -->
     <string name="io_import_title">ورود داده</string>
